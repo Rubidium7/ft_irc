@@ -1,28 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   irc.hpp                                            :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlonka <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/17 11:37:48 by nlonka            #+#    #+#             */
-/*   Updated: 2023/08/17 11:41:38 by nlonka           ###   ########.fr       */
+/*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
+/*   Updated: 2023/08/17 14:47:28 by nlonka           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef IRC_HPP
-# define IRC_HPP
+#include "Server.hpp"
+#include "irc.hpp"
 
-# include <iostream>
-# include <string>
-# include <sstream>
-# include "defines.hpp"
+Server::Server()
+{
 
-//errors.c
-int		print_error(t_error_code type);
 
-//setup.c
-bool	check_characters(std::string password);
-int		check_port(char	*av);
+}
 
-#endif
+Server::Server(int port, std::string password) : _password(password)
+{}
