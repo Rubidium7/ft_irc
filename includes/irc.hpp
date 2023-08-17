@@ -17,6 +17,7 @@
 # include <string>
 # include <sstream>
 # include "defines.hpp"
+# include "Server.hpp"
 
 //errors.c
 int		print_error(t_error_code type);

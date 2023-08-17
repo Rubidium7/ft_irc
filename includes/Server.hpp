@@ -14,19 +14,25 @@
 # define SERVER_HPP
 
 # include <string>
+# include <sys/socket.h>
+# include <netinet/in.h>
 
 class Server
 {
 	public:
-		Server();
 		Server(int port, std::string password);
-		Server(const Server &src);
 		~Server();
-
-		Server	&operator=(const Server &rhs);
+		t_error_code checkFailure();
 
 	private:
-		std::string	_password;
+		Server();
+		Server(const Server &src);
+		Server	&operator=(const Server &rhs);
+
+		std::string			_password;
+		t_error_code		_failure;
+		int					_serverSocket;
+		struct sockaddr_in	_serverSettings;
 
 };
 

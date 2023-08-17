@@ -12,6 +12,8 @@
 
 #include "irc.hpp"
 
+//fcntl(fd, F_SETFL, O_NONBLOCK); (!)
+
 int main(int ac, char **av)
 {
 	if (ac != 3)
@@ -26,5 +28,10 @@ int main(int ac, char **av)
 	if (port < 10)
 		return (port);
 
+	Server	server(port, password);
+
+	if (server.checkFailure())
+		return (print_error(server.checkFailure()));
+	
 	return (0);
 }
