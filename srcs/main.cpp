@@ -33,5 +33,28 @@ int main(int ac, char **av)
 	if (server.checkFailure())
 		return (print_error(server.checkFailure()));
 	
+	while (42)
+	{
+		server.setReadySockets();
+		server.monitorSockets();
+		if (server.checkFailure())
+			return (print_error(server.checkFailure()));
+		for (int id = 0; id <= server.getMaxSocket(); id++)
+		{
+			if (server.isInSet(id))
+			{
+				if (server.getServerSocket() == id)
+				{
+					server.newClient();
+					if (server.checkFailure())
+						return (print_error(server.checkFailure()));
+				}
+				else
+				{
+					server.receiveMessage(id);
+				}
+			}
+		}
+	}
 	return (0);
 }

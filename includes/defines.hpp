@@ -15,6 +15,13 @@
 
 # define MAX_AMOUNT_CLIENTS 1023
 
+typedef enum e_message
+{
+	CLIENT_ARRIVED = 1,
+	CLIENT_LEFT,
+	CLIENT_MESSAGE
+}	t_message;
+
 typedef enum e_error
 {
 	NO_ERROR,
@@ -23,9 +30,12 @@ typedef enum e_error
 	OUT_OF_RANGE_PORT,
 	PASSWD_TOO_LONG,
 	PASSWD_NON_CHAR,
+	TOO_MANY_CLIENTS,
 	SERV_SOCKET_FAILURE,
 	SERV_BIND_FAILURE,
-	SERV_LISTEN_FAILURE
+	SERV_LISTEN_FAILURE,
+	SERV_SELECT_FAILURE,
+	SERV_ACCEPT_FAILURE
 }	t_error_code;
 
 #endif

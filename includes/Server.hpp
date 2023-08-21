@@ -22,7 +22,16 @@ class Server
 	public:
 		Server(int port, std::string password);
 		~Server();
-		t_error_code checkFailure();
+		t_error_code	checkFailure();
+		void			setReadySockets();
+		void			monitorSockets();
+		int				getMaxSocket();
+		bool			isInSet(int index);
+		int				getServerSocket();
+		void			newClient();
+		void			sendToClients(int id, t_message type, std::string msg);
+		void			clientExit(int id);
+		void			receiveMessage(int id);
 
 	private:
 		Server();
@@ -33,7 +42,12 @@ class Server
 		t_error_code		_failure;
 		int					_serverSocket;
 		struct sockaddr_in	_serverSettings;
-
+		int					_clientSockets[MAX_AMOUNT_CLIENTS];
+		fd_set				_activeSockets;
+		fd_set				_readySockets;
+		int					_maxSocket;
+		int					_clientIndex;
+		char				_buffer[200000]; //temporary solution
 };
 
 #endif
