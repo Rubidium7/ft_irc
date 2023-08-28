@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   defines.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nlonka <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/08/17 14:46:52 by nlonka           ###   ########.fr       */
+/*   Updated: 2023/08/28 20:06:17 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef DEFINES_HPP
 # define DEFINES_HPP
 
-# define MAX_AMOUNT_CLIENTS 1023
+# define MAX_AMOUNT_CLIENTS  5 //1023
 
 typedef enum e_message
 {

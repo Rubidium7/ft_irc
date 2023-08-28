@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nlonka <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:46:52 by nlonka            #+#    #+#             */
-/*   Updated: 2023/08/17 14:46:55 by nlonka           ###   ########.fr       */
+/*   Updated: 2023/08/28 20:12:19 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ class Server
 		int				getServerSocket();
 		void			newClient();
 		void			sendToClients(int id, t_message type, std::string msg);
+		void			sendToOneClient(int id, t_message type, std::string msg);
 		void			clientExit(int id);
 		void			receiveMessage(int id);
 
@@ -37,6 +38,8 @@ class Server
 		Server();
 		Server(const Server &src);
 		Server	&operator=(const Server &rhs);
+
+		int				_findSmallestFreeClientIndex() const;
 
 		std::string			_password;
 		t_error_code		_failure;
@@ -46,7 +49,6 @@ class Server
 		fd_set				_activeSockets;
 		fd_set				_readySockets;
 		int					_maxSocket;
-		int					_clientIndex;
 		char				_buffer[20000]; //temporary solution
 };
 

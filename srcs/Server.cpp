@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nlonka <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/08/17 14:47:28 by nlonka           ###   ########.fr       */
+/*   Updated: 2023/08/28 20:18:52 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.hpp"
 
-Server::Server(int port, std::string password) : _password(password), _failure(NO_ERROR), _clientIndex(0)
+Server::Server(int port, std::string password) : _password(password), _failure(NO_ERROR)
 {
 	memset(_serverSettings.sin_zero, 0, sizeof(_serverSettings.sin_zero));
 	_serverSettings.sin_family = AF_INET;
@@ -73,7 +73,7 @@ int		Server::getServerSocket(void)
 void	Server::sendToClients(int id, t_message type, std::string msg)
 {
 	std::stringstream		message;
-	const char					*buffer;
+	const char				*buffer;
 	std::string::size_type	size;
 
 	if (type == CLIENT_ARRIVED)
@@ -84,32 +84,58 @@ void	Server::sendToClients(int id, t_message type, std::string msg)
 		message << "client " << id << ": " << msg << std::endl;
 	buffer = message.str().c_str();
 	size = message.str().size();
-	for (int i = 0; i < _clientIndex; i++)
-		send(_clientSockets[i], buffer, size, 0);
-		//empty stream & str
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; i++)
+	{
+		if (_clientSockets[i] != 0)
+		{
+			// for debug printing
+			std::cerr << "i = " << i << " client nro: " << _clientSockets[i] << std::endl;
+			send(_clientSockets[i], buffer, size, 0);
+		}
+	}
+}
+
+void	Server::sendToOneClient(int id, t_message type, std::string msg)
+{
+	std::stringstream		message;
+	const char				*buffer;
+	std::string::size_type	size;
+
+	if (type == CLIENT_ARRIVED)
+		message << "server: client " << id << " just arrived" << std::endl;
+	else if (type == CLIENT_LEFT)
+		message << "server: client " << id << " left the server" << std::endl;
+	else if (type == CLIENT_MESSAGE)
+		message << "client " << id << ": " << msg << std::endl;
+	buffer = message.str().c_str();
+	size = message.str().size();
+	send(id, buffer, size, 0);
 }
 
 void	Server::newClient(void)
 {
 	int	new_client;
+	int _clientIndex = _findSmallestFreeClientIndex();
 
-	if (_clientIndex == MAX_AMOUNT_CLIENTS)
-	{
-		print_error(TOO_MANY_CLIENTS);
-		return ;
-	}
 	new_client = accept(_serverSocket, NULL, NULL);
 	if (new_client < 0)
 	{
 		_failure = SERV_ACCEPT_FAILURE;
 		return ;
 	}
+	if (_clientIndex >= MAX_AMOUNT_CLIENTS)
+	{
+		print_error(TOO_MANY_CLIENTS);
+		sendToOneClient(new_client, CLIENT_MESSAGE, "Too many clients on a server");
+		close(new_client);
+		FD_CLR(new_client, &_activeSockets);
+		return ;
+	}
 	FD_SET(new_client, &_activeSockets);
 	if (new_client > _maxSocket)
 		_maxSocket = new_client;
 	_clientSockets[_clientIndex] = new_client;
-	sendToClients(_clientIndex, CLIENT_ARRIVED, "");
-	_clientIndex++;
+	sendToClients(new_client, CLIENT_ARRIVED, "");
 }
 
 void	Server::clientExit(int id)
@@ -117,6 +143,14 @@ void	Server::clientExit(int id)
 	sendToClients(id, CLIENT_LEFT, "");
 	close(id);
 	FD_CLR(id, &_activeSockets);
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
+	{
+		if (_clientSockets[i] == id)
+		{
+			_clientSockets[i] = 0;
+			break ;
+		}
+	}
 }
 
 void	Server::receiveMessage(int id)
@@ -131,4 +165,16 @@ void	Server::receiveMessage(int id)
 		_buffer[bytes_read] = '\0';
 		sendToClients(id, CLIENT_MESSAGE, _buffer);
 	}
+}
+
+int		Server::_findSmallestFreeClientIndex() const
+{
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
+	{
+		if (_clientSockets[i] == 0)
+		{
+			return (i);
+		}
+	}
+	return (MAX_AMOUNT_CLIENTS);
 }
