@@ -108,20 +108,20 @@ void	Server::newClient(void)
 	if (new_client > _maxSocket)
 		_maxSocket = new_client;
 	_clientSockets[_clientIndex] = new_client;
-	sendToClients(_clientIndex, CLIENT_ARRIVED, NULL);
+	sendToClients(_clientIndex, CLIENT_ARRIVED, "");
 	_clientIndex++;
 }
 
 void	Server::clientExit(int id)
 {
-	sendToClients(id, CLIENT_LEFT, NULL);
+	sendToClients(id, CLIENT_LEFT, "");
 	close(id);
 	FD_CLR(id, &_activeSockets);
 }
 
 void	Server::receiveMessage(int id)
 {
-	int	bytes_read = recv(id, _buffer, sizeof(_buffer) - 1, 0);
+	int	bytes_read = recv(id, _buffer, 20000 - 1, 0);
 	if (bytes_read <= 0)
 	{
 		clientExit(id);

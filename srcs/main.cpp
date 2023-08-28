@@ -50,9 +50,7 @@ int main(int ac, char **av)
 						return (print_error(server.checkFailure()));
 				}
 				else
-				{
 					server.receiveMessage(id);
-				}
 			}
 		}
 	}

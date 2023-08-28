@@ -47,7 +47,7 @@ class Server
 		fd_set				_readySockets;
 		int					_maxSocket;
 		int					_clientIndex;
-		char				_buffer[200000]; //temporary solution
+		char				_buffer[20000]; //temporary solution
 };
 
 #endif
