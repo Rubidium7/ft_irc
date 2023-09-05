@@ -84,13 +84,13 @@ void	Server::sendToClients(std::string msg)
 		if (_clients[i].getSocket() != 0)
 		{
 			// for debug printing
-			std::cerr << "i = " << i << " client nro: " << _clients[i].getSocket() << std::endl;
+			std::cerr << "i = " << i << " client nro: " << _clients[i].getId() << std::endl;
 			send(_clients[i].getSocket(), buffer, size, 0);
 		}
 	}
 }
 
-void	Server::sendToOneClient(int id, std::string msg)
+void	Server::sendToOneClient(int socket, std::string msg)
 {
 	std::stringstream		message;
 	const char				*buffer;
@@ -99,7 +99,7 @@ void	Server::sendToOneClient(int id, std::string msg)
 	message << msg;
 	buffer = message.str().c_str();
 	size = message.str().size();
-	send(id, buffer, size, 0);
+	send(socket, buffer, size, 0);
 }
 
 void	Server::newClient(void)
@@ -126,35 +126,31 @@ void	Server::newClient(void)
 		_maxSocket = new_client;
 	_clients[_clientIndex].setSocket(new_client);
 	_clients[_clientIndex].setId(_clientIndex);
-	_clients[_clientIndex].runHandShake();
-	sendToOneClient(new_client, "CAP * LS :");
 }
 
-void	Server::clientExit(int id)
+void	Server::clientExit(int socket)
 {
-	close(id);
-	FD_CLR(id, &_activeSockets);
-	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
-	{
-		if (_clients[i].getSocket() == id)
-		{
-			_clients[i].setSocket(0);
-			break ;
-		}
-	}
+	close(socket);
+	FD_CLR(socket, &_activeSockets);
+	_matchClient(socket).setSocket(0);
 }
 
-void	Server::receiveMessage(int id)
+void	Server::receiveMessage(int socket)
 {
-	int	bytes_read = recv(id, _buffer, MSG_SIZE, 0);
+	int	bytes_read = recv(socket, _buffer, MSG_SIZE, 0);
 	if (bytes_read <= 0)
 	{
-		clientExit(id);
+		clientExit(socket);
 	}
 	else
 	{
 		_buffer[bytes_read] = '\0';
-		sendToClients(_buffer);
+		_matchClient(socket).addToBuffer(_buffer);
+		Parser	parser(_matchClient(socket).getBuffer());
+		if (parser.isEndOfMessage())
+		{
+			parser.parse();
+		}
 	}
 }
 
@@ -168,4 +164,16 @@ int		Server::_findSmallestFreeClientIndex() const
 		}
 	}
 	return (MAX_AMOUNT_CLIENTS);
+}
+
+Client	&Server::_matchClient(int socket)
+{
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
+	{
+		if (_clients[i].getSocket() == socket)
+		{
+			return (_clients[i]);
+		}
+	}
+	return (_clients[0]);
 }

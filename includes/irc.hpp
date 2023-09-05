@@ -16,6 +16,8 @@
 # include <iostream>
 # include <string>
 # include <sstream>
+# include <vector>
+# include <iterator>
 # include <unistd.h>
 # include <sys/select.h>
 # include "defines.hpp"

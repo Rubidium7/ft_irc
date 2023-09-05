@@ -10,11 +10,12 @@ class Client
 		Client();
 		~Client();
 
-		int		getSocket() const;
-		void	setSocket(int socket);
-		void	setId(int id);
-		int		getId() const;
-		void	runHandShake();
+		int			getSocket() const;
+		void		setSocket(int socket);
+		void		setId(int id);
+		int			getId() const;
+		void		addToBuffer(std::string text);
+		std::string	getBuffer() const;
 
 	private:
 		Client(const Client &src);
@@ -23,7 +24,7 @@ class Client
 		int			_socket;
 		int			_id;
 		std::string	_nickName;
-		char		_buffer[MSG_SIZE];
+		std::string	_buffer;
 
 };
 

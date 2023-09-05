@@ -31,24 +31,28 @@ int	Client::getId() const
 	return (_id);
 }
 
-void	Client::runHandShake()
+void	Client::addToBuffer(std::string text)
 {
-	int	bytes_read = 1;
-	std::string		message;
-	std::ofstream	outfile("client_messages");
-
-	if (!outfile.is_open())
-	{
-		std::cerr << "client outfile didn't open" << std::endl;
-	}
-	// while (bytes_read)
-	// {
-		bytes_read = recv(_socket, _buffer, MSG_SIZE, 0);
-		_buffer[bytes_read] = '\0';
-		message = _buffer;
-		std::cout << message << std::endl;
-		outfile << message << std::endl;
-		//save to client buffer
-	//}
-
+	_buffer += text;
+	std::cout << _buffer;
 }
+
+std::string	Client::getBuffer() const
+{
+	return (_buffer);
+}
+
+// void	Client::runHandShake()
+// {
+// 	int	bytes_read;
+// 	std::ofstream	outfile("client_messages");
+
+// 	if (!outfile.is_open())
+// 	{
+// 		std::cerr << "client outfile didn't open" << std::endl;
+// 	}
+// 	bytes_read = recv(_id, _buffer, MSG_SIZE, 0);
+// 	_buffer[bytes_read] = '\0';
+// 	std::cout << _buffer << std::endl;
+// 	outfile << _buffer << std::endl;
+// }

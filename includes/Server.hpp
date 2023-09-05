@@ -14,6 +14,7 @@
 # define SERVER_HPP
 
 # include "Client.hpp"
+# include "Parser.hpp"
 # include <string>
 # include <fstream>
 # include <sys/socket.h>
@@ -42,6 +43,7 @@ class Server
 		Server	&operator=(const Server &rhs);
 
 		int				_findSmallestFreeClientIndex() const;
+		Client			&_matchClient(int socket);
 
 		std::string			_password;
 		t_error_code		_failure;
