@@ -15,6 +15,7 @@
 
 # include "Client.hpp"
 # include <string>
+# include <fstream>
 # include <sys/socket.h>
 # include <netinet/in.h>
 

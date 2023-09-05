@@ -125,6 +125,9 @@ void	Server::newClient(void)
 	if (new_client > _maxSocket)
 		_maxSocket = new_client;
 	_clients[_clientIndex].setSocket(new_client);
+	_clients[_clientIndex].setId(_clientIndex);
+	_clients[_clientIndex].runHandShake();
+	sendToOneClient(new_client, "CAP * LS :");
 }
 
 void	Server::clientExit(int id)
