@@ -18,7 +18,6 @@ int main(int ac, char **av)
 {
 	if (ac != 3)
 		return (print_error(WRONG_ARGS));
-	
 	std::string	password(av[2]);
 	if (password.size() > 100)
 		return (print_error(PASSWD_TOO_LONG));

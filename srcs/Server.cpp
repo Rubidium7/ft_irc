@@ -70,33 +70,31 @@ int		Server::getServerSocket(void)
 	return (_serverSocket);
 }
 
-void	Server::sendToClients(std::string msg)
+void	Server::sendToClients(int code, std::string msg)
 {
 	std::stringstream		message;
 	const char				*buffer;
 	std::string::size_type	size;
 
-	message << msg;
-	buffer = message.str().c_str();
-	size = message.str().size();
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; i++)
 	{
 		if (_clients[i].getSocket() != 0)
 		{
-			// for debug printing
-			std::cerr << "i = " << i << " client nro: " << _clients[i].getId() << std::endl;
+			message << ":localhost " << code << " " << _clients[i].getNick() << " :" << msg << "\r\n";
+			buffer = message.str().c_str();
+			size = message.str().size();
 			send(_clients[i].getSocket(), buffer, size, 0);
 		}
 	}
 }
 
-void	Server::sendToOneClient(int socket, std::string msg)
+void	Server::sendToOneClient(int socket, std::string nick, int code, std::string msg)
 {
 	std::stringstream		message;
 	const char				*buffer;
 	std::string::size_type	size;
 
-	message << msg;
+	message << ":localhost " << code << " " << nick << " " << msg << "\r\n";
 	buffer = message.str().c_str();
 	size = message.str().size();
 	send(socket, buffer, size, 0);
@@ -116,7 +114,7 @@ void	Server::newClient(void)
 	if (_clientIndex >= MAX_AMOUNT_CLIENTS)
 	{
 		print_error(TOO_MANY_CLIENTS);
-		sendToOneClient(new_client, "Too many clients on a server");
+		sendToOneClient(new_client, "*", 777, "Server is full");
 		close(new_client);
 		FD_CLR(new_client, &_activeSockets);
 		return ;
@@ -147,9 +145,57 @@ void	Server::receiveMessage(int socket)
 		_buffer[bytes_read] = '\0';
 		_matchClient(socket).addToBuffer(_buffer);
 		Parser	parser(_matchClient(socket).getBuffer());
-		if (parser.isEndOfMessage())
+		while (parser.isEndOfMessage())
 		{
-			parser.parse();
+			try
+			{
+				parser.parse();
+			}
+			catch (const IncorrectCommandException &e)
+			{
+			_matchClient(socket).emptyBuffer();
+				sendToOneClient(socket, _matchClient(socket).getNick(), 421, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			catch (const IncorrectArgumentAmountException &e)
+			{
+			_matchClient(socket).emptyBuffer();
+				sendToOneClient(socket, _matchClient(socket).getNick(), 461, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			catch (const IncorrectCapException &e)
+			{
+			_matchClient(socket).emptyBuffer();
+				sendToOneClient(socket, _matchClient(socket).getNick(), 410, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			catch (const IncorrectChannelException &e)
+			{
+			_matchClient(socket).emptyBuffer();
+				sendToOneClient(socket, _matchClient(socket).getNick(), 403, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			catch(const std::exception &e)
+			{
+			_matchClient(socket).emptyBuffer();
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			_matchClient(socket).emptyBuffer();
+			// try
+			// {
+			// 	server.runCommand(parser.getCommand(), parser.getArgs());
+			// }
+			// catch(const std::exception &e)
+			// {
+			// 	sendToOneClient(socket, e.what());
+			// 	std::cerr << e.what() << std::endl;
+			// }
+			
 		}
 	}
 }

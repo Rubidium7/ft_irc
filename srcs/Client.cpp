@@ -1,7 +1,7 @@
 
 #include "irc.hpp"
 
-Client::Client() : _socket(0), _id(-1), _nickName("")
+Client::Client() : _socket(0), _id(-1), _nickName("*")
 {
 
 }
@@ -31,6 +31,17 @@ int	Client::getId() const
 	return (_id);
 }
 
+void	Client::setNick(std::string nickName)
+{
+	_nickName = nickName;
+}
+
+
+std::string	Client::getNick() const
+{
+	return (_nickName);
+}
+
 void	Client::addToBuffer(std::string text)
 {
 	_buffer += text;
@@ -40,6 +51,11 @@ void	Client::addToBuffer(std::string text)
 std::string	Client::getBuffer() const
 {
 	return (_buffer);
+}
+
+void	Client::emptyBuffer()
+{
+	_buffer.clear();
 }
 
 // void	Client::runHandShake()

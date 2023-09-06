@@ -14,8 +14,11 @@ class Client
 		void		setSocket(int socket);
 		void		setId(int id);
 		int			getId() const;
+		void		setNick(std::string nickName);
+		std::string	getNick() const;
 		void		addToBuffer(std::string text);
 		std::string	getBuffer() const;
+		void		emptyBuffer();
 
 	private:
 		Client(const Client &src);

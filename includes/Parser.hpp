@@ -20,7 +20,13 @@ class Parser
 		Parser(const Parser &src);
 		Parser &operator=(const Parser &rhs);
 
+		void	_saveArguments();
+		void	_parseCap();
+		void	_parseJoin();
+
+		std::string					_commandOptions[10];
 		std::string					_input;
+		std::string					_wholeInput;
 		std::string					_command;
 		std::vector<std::string>	_args;
 

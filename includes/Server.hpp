@@ -32,8 +32,8 @@ class Server
 		bool			isInSet(int index);
 		int				getServerSocket();
 		void			newClient();
-		void			sendToClients(std::string msg);
-		void			sendToOneClient(int id, std::string msg);
+		void			sendToClients(int code, std::string msg);
+		void			sendToOneClient(int socket, std::string nick, int code, std::string msg);
 		void			clientExit(int id);
 		void			receiveMessage(int id);
 
