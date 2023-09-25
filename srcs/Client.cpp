@@ -45,7 +45,7 @@ std::string	Client::getNick() const
 void	Client::addToBuffer(std::string text)
 {
 	_buffer += text;
-	//std::cout << _buffer; //debug
+	std::cout << _buffer; //debug
 }
 
 std::string	Client::getBuffer() const

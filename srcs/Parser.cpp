@@ -31,7 +31,7 @@ bool	Parser::isEndOfMessage()
 {
 	size_t	found;
 
-	found = _wholeInput.find("\n"); //doesn't work with nc
+	found = _wholeInput.find("\r\n"); //doesn't work with nc
 	_input = _wholeInput.substr(0, found + 2);
 	_wholeInput.erase(0, found + 2);
 	if (found != std::string::npos)
