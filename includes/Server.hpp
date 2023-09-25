@@ -44,6 +44,7 @@ class Server
 
 		int				_findSmallestFreeClientIndex() const;
 		Client			&_matchClient(int socket);
+		void			_runCommand(std::string command, std::vector<std::string> args, int socket);
 
 		std::string			_password;
 		t_error_code		_failure;
@@ -54,6 +55,7 @@ class Server
 		fd_set				_readySockets;
 		int					_maxSocket;
 		char				_buffer[MSG_SIZE]; //temporary solution
+		std::string			_neededCmd;
 };
 
 #endif

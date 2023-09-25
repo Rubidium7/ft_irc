@@ -38,6 +38,10 @@ struct IncorrectCapException : public std::runtime_error{
 	IncorrectCapException(const std::string &msg) : runtime_error(msg){}
 };
 
+struct IncorrectCapVersionException : public std::runtime_error{
+	IncorrectCapVersionException(const std::string &msg) : runtime_error(msg){}
+};
+
 struct IncorrectChannelException : public std::runtime_error{
 	IncorrectChannelException(const std::string &msg) : runtime_error(msg){}
 };

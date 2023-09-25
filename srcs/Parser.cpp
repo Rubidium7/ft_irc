@@ -1,6 +1,6 @@
 #include "irc.hpp"
 
-Parser::Parser(std::string input) : _wholeInput(input), _command("no_command")
+Parser::Parser(std::string input) : _wholeInput(input), _command("empty")
 {
 	_commandOptions[0] = "CAP";
 	_commandOptions[1] = "KICK";
@@ -11,7 +11,7 @@ Parser::Parser(std::string input) : _wholeInput(input), _command("no_command")
 	_commandOptions[6] = "JOIN";
 	_commandOptions[7] = "PASS";
 	_commandOptions[8] = "PRIVMSG";
-	_commandOptions[9] = "no_command";
+	_commandOptions[9] = "empty";
 }
 
 Parser::~Parser()
@@ -20,6 +20,11 @@ Parser::~Parser()
 std::string	Parser::getCommand() const
 {
 	return (_command);
+}
+
+std::vector<std::string>	Parser::getArgs() const
+{
+	return (_args);
 }
 
 bool	Parser::isEndOfMessage()
@@ -35,14 +40,28 @@ bool	Parser::isEndOfMessage()
 		return (false);
 }
 
+void	Parser::_emptyCommand()
+{
+	_args.clear();
+	_command = "empty";
+}
+
 void	Parser::_parseCap()
 {
 	if (_args.size() < 2)
 		throw IncorrectArgumentAmountException(_command + " :Not enough parameters");
-	std::string sub_commmand = _args.at(1);
-	if (sub_commmand != "LS" && sub_commmand != "LIST"
-		&& sub_commmand != "REQ" && sub_commmand != "END")
-		throw IncorrectCapException(_command + " :Invalid CAP command");
+	std::string sub_command = _args.at(1);
+	if (sub_command != "LS" && sub_command != "LIST"
+		&& sub_command != "REQ" && sub_command != "END")
+		throw IncorrectCapException(_command + " :Invalid CAP subcommand");
+	if (sub_command != "LS")
+		return ;
+	if (_args.size() < 3)
+		throw IncorrectArgumentAmountException(_command + " :Not enough parameters");
+	std::string cap_version = _args.at(2);
+	if (cap_version != "302")
+		throw IncorrectCapVersionException(_command + " :Unsupported CAP version"); //not exactly correct
+
 }
 
 void	Parser::_parseJoin()
@@ -110,7 +129,8 @@ void	Parser::parse()
 		case 9:
 			break ;
 		default :
+			_emptyCommand();
 			throw IncorrectCommandException(_command + " :Unknown command");
 	}
-	std::cout << "command is: " << _command << std::endl;
+	std::cout << "command is: " << _command << std::endl; //debug
 }

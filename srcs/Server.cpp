@@ -12,7 +12,7 @@
 
 #include "irc.hpp"
 
-Server::Server(int port, std::string password) : _password(password), _failure(NO_ERROR)
+Server::Server(int port, std::string password) : _password(password), _failure(NO_ERROR), _neededCmd("empty")
 {
 	memset(_serverSettings.sin_zero, 0, sizeof(_serverSettings.sin_zero));
 	_serverSettings.sin_family = AF_INET;
@@ -70,6 +70,28 @@ int		Server::getServerSocket(void)
 	return (_serverSocket);
 }
 
+void	Server::_runCommand(std::string command, std::vector<std::string> args, int socket)
+{
+	if (command == "CAP")
+	{
+		_neededCmd = "JOIN";
+		return ;
+	}
+	if (command == "JOIN")
+	{
+		if (_neededCmd == "JOIN" && args.at(1).at(0) == ':')
+		{
+			sendToOneClient(socket, _matchClient(socket).getNick(), 20, ":Please wait while we process your connection.");
+			if (_matchClient(socket).getNick() == "*")
+			{
+				sendToOneClient(socket, _matchClient(socket).getNick(), 451, ":You have not registered");
+				_neededCmd = "NICK";
+			}
+		}
+	}
+	_neededCmd = "empty";
+}
+
 void	Server::sendToClients(int code, std::string msg)
 {
 	std::stringstream		message;
@@ -94,7 +116,12 @@ void	Server::sendToOneClient(int socket, std::string nick, int code, std::string
 	const char				*buffer;
 	std::string::size_type	size;
 
-	message << ":localhost " << code << " " << nick << " " << msg << "\r\n";
+	message << ":localhost ";
+	if (code < 100)
+		message << "0";
+	if (code < 10)
+		message << "0";
+	message << code << " " << nick << " " << msg << "\r\n";
 	buffer = message.str().c_str();
 	size = message.str().size();
 	send(socket, buffer, size, 0);
@@ -147,49 +174,50 @@ void	Server::receiveMessage(int socket)
 		Parser	parser(_matchClient(socket).getBuffer());
 		while (parser.isEndOfMessage())
 		{
+			_matchClient(socket).emptyBuffer();
 			try
 			{
 				parser.parse();
 			}
 			catch (const IncorrectCommandException &e)
 			{
-			_matchClient(socket).emptyBuffer();
 				sendToOneClient(socket, _matchClient(socket).getNick(), 421, e.what());
 				std::cerr << e.what() << std::endl;
 				return ;
 			}
 			catch (const IncorrectArgumentAmountException &e)
 			{
-			_matchClient(socket).emptyBuffer();
 				sendToOneClient(socket, _matchClient(socket).getNick(), 461, e.what());
 				std::cerr << e.what() << std::endl;
 				return ;
 			}
 			catch (const IncorrectCapException &e)
 			{
-			_matchClient(socket).emptyBuffer();
 				sendToOneClient(socket, _matchClient(socket).getNick(), 410, e.what());
 				std::cerr << e.what() << std::endl;
 				return ;
 			}
 			catch (const IncorrectChannelException &e)
 			{
-			_matchClient(socket).emptyBuffer();
 				sendToOneClient(socket, _matchClient(socket).getNick(), 403, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			catch (const IncorrectCapVersionException &e)
+			{
+				sendToOneClient(socket, _matchClient(socket).getNick(), 408, e.what());
 				std::cerr << e.what() << std::endl;
 				return ;
 			}
 			catch(const std::exception &e)
 			{
-			_matchClient(socket).emptyBuffer();
 				std::cerr << e.what() << std::endl;
 				return ;
 			}
-			_matchClient(socket).emptyBuffer();
-			// try
-			// {
-			// 	server.runCommand(parser.getCommand(), parser.getArgs());
-			// }
+			//try
+			//{
+				_runCommand(parser.getCommand(), parser.getArgs(), socket);
+			//}
 			// catch(const std::exception &e)
 			// {
 			// 	sendToOneClient(socket, e.what());

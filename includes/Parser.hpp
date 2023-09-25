@@ -14,6 +14,7 @@ class Parser
 		bool	isEndOfMessage();
 		void	parse();
 		std::string	getCommand() const;
+		std::vector<std::string>	getArgs() const;
 
 	private:
 		Parser();
@@ -23,6 +24,7 @@ class Parser
 		void	_saveArguments();
 		void	_parseCap();
 		void	_parseJoin();
+		void	_emptyCommand();
 
 		std::string					_commandOptions[10];
 		std::string					_input;
