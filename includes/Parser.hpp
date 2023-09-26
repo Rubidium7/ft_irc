@@ -23,10 +23,14 @@ class Parser
 
 		void	_saveArguments();
 		void	_parseCap();
+		void	_parseNick();
 		void	_parseJoin();
+		void	_parsePass();
+		void	_parseUser();
+		void	_parsePing();
 		void	_emptyCommand();
 
-		std::string					_commandOptions[10];
+		std::string					_commandOptions[12];
 		std::string					_input;
 		std::string					_wholeInput;
 		std::string					_command;

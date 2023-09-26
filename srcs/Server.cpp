@@ -12,7 +12,7 @@
 
 #include "irc.hpp"
 
-Server::Server(int port, std::string password) : _password(password), _failure(NO_ERROR), _neededCmd("empty")
+Server::Server(int port, std::string password) : _hostName("localhost"), _password(password), _failure(NO_ERROR), _neededCmd("empty")
 {
 	memset(_serverSettings.sin_zero, 0, sizeof(_serverSettings.sin_zero));
 	_serverSettings.sin_family = AF_INET;
@@ -55,7 +55,7 @@ void	Server::monitorSockets(void)
 		_failure = SERV_SELECT_FAILURE;
 }
 
-int		Server::getMaxSocket()
+int	Server::getMaxSocket()
 {
 	return (_maxSocket);
 }
@@ -65,17 +65,104 @@ bool	Server::isInSet(int id)
 	return (FD_ISSET(id, &_readySockets));
 }
 
-int		Server::getServerSocket(void)
+int	Server::getServerSocket(void)
 {
 	return (_serverSocket);
 }
 
+void	Server::_messageOfTheDay(int socket, std::string &nick)
+{
+	std::string	msg;
+
+	msg = ":- " + _hostName;
+	msg += " Message of the Day -";
+	sendToOneClient(socket, nick, 375, msg);
+	msg.clear();
+	msg = "Hello this is the server woo";
+	sendToOneClient(socket, nick, 372, msg);
+	msg.clear();
+	msg = "Ur welcome";
+	sendToOneClient(socket, nick, 372, msg);
+	msg.clear();
+	sendToOneClient(socket, nick, 376, ":End of MOTD command.");
+}
+
+void	Server::_newUserMessage(int socket)
+{
+	std::string	msg;
+	std::string	nick;
+
+	nick = _matchClient(socket).getNick();
+	msg = ":Welcome to the server :) ";
+	msg += nick + "!";
+	msg += _matchClient(socket).getUserName() + "@";
+	msg += _matchClient(socket).getHostName();
+	sendToOneClient(socket, nick, 1, msg);
+	msg.clear();
+	msg = ":Your host is " + _hostName;
+	msg += ", running version v0.1";
+	sendToOneClient(socket, nick, 2, msg);
+	msg.clear();
+	msg = ":This server was created 17/08/2023 13:53:54"; //just made it up :p
+	sendToOneClient(socket, nick, 3, msg);
+	msg.clear();
+	msg = _hostName + " v0.1 o iklot";
+	//<server_name> <version> <usermodes> <chanmodes>
+	sendToOneClient(socket, nick, 4, msg);
+	msg.clear();
+	//implement 005 message with extra info
+	//maybe LUSERS cmd here or not
+	_messageOfTheDay(socket, nick);
+}
+
+std::string	Server::_parseRealName(std::vector<std::string> args)
+{
+	std::string 	real_name;
+	unsigned int	args_size;
+
+	args_size = args.size();
+	real_name = args.at(4).erase(0, 1);
+	for (unsigned int i = 5; i < args_size; i++)
+	{
+		real_name += " ";
+		real_name += args.at(i);
+	}
+	return (real_name);
+}
+
+bool	Server::_nickInUse(std::string &nick) const
+{
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; i++)
+	{
+		if (_clients[i].getSocket() != 0)
+		{
+			if (_clients[i].getNick() == nick)
+				return (true);
+		}
+	}
+	return (false);
+}
+
 void	Server::_runCommand(std::string command, std::vector<std::string> args, int socket)
 {
+	if (_neededCmd != "empty" && _neededCmd != command)
+	{
+		throw WrongCommandException(_neededCmd + ": command required");
+	}
 	if (command == "CAP")
 	{
 		_neededCmd = "JOIN";
 		return ;
+	}
+	if (command == "PASS")
+	{
+		if (args.at(1) != _password)
+			throw IncorrectPasswordException(":Incorrect password");
+		if (_neededCmd == "PASS")
+		{
+			_neededCmd = "NICK";
+			return ;
+		}
 	}
 	if (command == "JOIN")
 	{
@@ -85,9 +172,33 @@ void	Server::_runCommand(std::string command, std::vector<std::string> args, int
 			if (_matchClient(socket).getNick() == "*")
 			{
 				sendToOneClient(socket, _matchClient(socket).getNick(), 451, ":You have not registered");
-				_neededCmd = "NICK";
+				_neededCmd = "PASS";
+				return ;
 			}
 		}
+		// else
+		//	joinChannel();
+	}
+	if (command == "NICK")
+	{
+		if (_matchClient(socket).getNick() != args.at(1) && _nickInUse(args.at(1)))
+			throw NickInUseException(args.at(1) + " :Nickname is already in use.");
+			//idk if it's an error to change to the nick you already have
+		_matchClient(socket).setNick(args.at(1));
+		if (_neededCmd == "NICK")
+		{
+			_neededCmd = "USER";
+			return ;
+		}
+	}
+	if (command == "USER")
+	{
+		if (_neededCmd != "USER")
+			throw AlreadyRegisteredException(":Already registered as " + _matchClient(socket).getUserName());
+		_matchClient(socket).setUserName(args.at(1));
+		_matchClient(socket).setHostName(args.at(3));
+		_matchClient(socket).setRealName(_parseRealName(args));
+		_newUserMessage(socket);
 	}
 	_neededCmd = "empty";
 }
@@ -102,7 +213,7 @@ void	Server::sendToClients(int code, std::string msg)
 	{
 		if (_clients[i].getSocket() != 0)
 		{
-			message << ":localhost " << code << " " << _clients[i].getNick() << " :" << msg << "\r\n";
+			message << ":" << _hostName << " " << code << " " << _clients[i].getNick() << " :" << msg << "\r\n";
 			buffer = message.str().c_str();
 			size = message.str().size();
 			send(_clients[i].getSocket(), buffer, size, 0);
@@ -116,7 +227,7 @@ void	Server::sendToOneClient(int socket, std::string nick, int code, std::string
 	const char				*buffer;
 	std::string::size_type	size;
 
-	message << ":localhost ";
+	message << ":" << _hostName << " ";
 	if (code < 100)
 		message << "0";
 	if (code < 10)
@@ -124,6 +235,7 @@ void	Server::sendToOneClient(int socket, std::string nick, int code, std::string
 	message << code << " " << nick << " " << msg << "\r\n";
 	buffer = message.str().c_str();
 	size = message.str().size();
+	std::cerr << buffer; //debug
 	send(socket, buffer, size, 0);
 }
 
@@ -141,7 +253,7 @@ void	Server::newClient(void)
 	if (_clientIndex >= MAX_AMOUNT_CLIENTS)
 	{
 		print_error(TOO_MANY_CLIENTS);
-		sendToOneClient(new_client, "*", 777, "Server is full");
+		sendToOneClient(new_client, "*", 5, ":Server is full");
 		close(new_client);
 		FD_CLR(new_client, &_activeSockets);
 		return ;
@@ -209,21 +321,50 @@ void	Server::receiveMessage(int socket)
 				std::cerr << e.what() << std::endl;
 				return ;
 			}
+			catch (const NickIncorrectFormatException &e)
+			{
+				sendToOneClient(socket, _matchClient(socket).getNick(), 432, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			catch (const NickInUseException &e)
+			{
+				sendToOneClient(socket, _matchClient(socket).getNick(), 433, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
 			catch(const std::exception &e)
 			{
 				std::cerr << e.what() << std::endl;
 				return ;
 			}
-			//try
-			//{
+			try
+			{
 				_runCommand(parser.getCommand(), parser.getArgs(), socket);
-			//}
-			// catch(const std::exception &e)
-			// {
-			// 	sendToOneClient(socket, e.what());
-			// 	std::cerr << e.what() << std::endl;
-			// }
-			
+			}
+			catch (const WrongCommandException &e)
+			{
+				sendToOneClient(socket, _matchClient(socket).getNick(), 400, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			catch (const AlreadyRegisteredException &e)
+			{
+				sendToOneClient(socket, _matchClient(socket).getNick(), 462, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			catch (const IncorrectPasswordException &e)
+			{
+				sendToOneClient(socket, _matchClient(socket).getNick(), 464, e.what());
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
+			catch(const std::exception &e)
+			{
+				std::cerr << e.what() << std::endl;
+				return ;
+			}
 		}
 	}
 }

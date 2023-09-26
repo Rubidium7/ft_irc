@@ -2,7 +2,7 @@
 
 Parser::Parser(std::string input) : _wholeInput(input), _command("empty")
 {
-	_commandOptions[0] = "CAP";
+	_commandOptions[0] = "empty";
 	_commandOptions[1] = "KICK";
 	_commandOptions[2] = "INVITE";
 	_commandOptions[3] = "TOPIC";
@@ -10,8 +10,10 @@ Parser::Parser(std::string input) : _wholeInput(input), _command("empty")
 	_commandOptions[5] = "NICK";
 	_commandOptions[6] = "JOIN";
 	_commandOptions[7] = "PASS";
-	_commandOptions[8] = "PRIVMSG";
-	_commandOptions[9] = "empty";
+	_commandOptions[8] = "USER";
+	_commandOptions[9] = "PRIVMSG";
+	_commandOptions[10] = "CAP";
+	_commandOptions[11] = "PING";
 }
 
 Parser::~Parser()
@@ -72,10 +74,43 @@ void	Parser::_parseJoin()
 		throw IncorrectChannelException(_args.at(1) + " :No such channel");
 }
 
+void	Parser::_parsePass()
+{
+	if (_args.size() < 2)
+		throw IncorrectArgumentAmountException(_command + " :Not enough parameters");
+}
+
+void	Parser::_parseUser()
+{
+	if (_args.size() < 5 || _args.at(4).back() == ':')
+		throw IncorrectArgumentAmountException(_command + " :Not enough parameters");
+	if (_args.at(4).front() != ':')
+		throw IncorrectArgumentAmountException(_command + " :Not enough parameters");
+}
+
+void	Parser::_parsePing()
+{
+	if (_args.size() < 2)
+		throw IncorrectArgumentAmountException(_command + " :Not enough parameters");
+}
+
+void	Parser::_parseNick()
+{
+	if (_args.size() < 2)
+		throw IncorrectArgumentAmountException(_command + " :Not enough parameters");
+	if (_args.at(1).size() > 9)
+		throw NickIncorrectFormatException(_args.at(1) + " :Nickname is too long");
+	if (_args.at(1).size() < 1)
+		throw NickIncorrectFormatException(_args.at(1) + " :No Nickname given");
+	if (!isalpha(_args.at(1).at(0)))
+		throw NickIncorrectFormatException(_args.at(1) + " :Incorrect Nickname characters");
+		//could check nick format more here
+}
+
 void	Parser::_saveArguments()
 {
 	std::stringstream	process(_input);
-	std::string			word;
+	std::string				word;
 
 	_args.clear();
 	process >> word;
@@ -100,7 +135,6 @@ void	Parser::parse()
 	switch (i)
 	{
 		case 0:
-			_parseCap();
 			break ;
 		case 1:
 
@@ -115,22 +149,30 @@ void	Parser::parse()
 
 			break ;
 		case 5:
-
+			_parseNick();
 			break ;
 		case 6:
 			_parseJoin();
 			break ;
 		case 7:
-
+			_parsePass();
 			break ;
 		case 8:
-
+			_parseUser();
 			break ;
 		case 9:
+
+			break ;
+		case 10:
+			_parseCap();
+			break ;
+		case 11:
+			_parsePing();
 			break ;
 		default :
+			word = _command;
 			_emptyCommand();
-			throw IncorrectCommandException(_command + " :Unknown command");
+			throw IncorrectCommandException(word + " :Unknown command");
 	}
 	std::cout << "command is: " << _command << std::endl; //debug
 }

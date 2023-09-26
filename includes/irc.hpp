@@ -42,8 +42,28 @@ struct IncorrectCapVersionException : public std::runtime_error{
 	IncorrectCapVersionException(const std::string &msg) : runtime_error(msg){}
 };
 
+struct IncorrectPasswordException : public std::runtime_error{
+	IncorrectPasswordException(const std::string &msg) : runtime_error(msg){}
+};
+
+struct NickIncorrectFormatException : public std::runtime_error{
+	NickIncorrectFormatException(const std::string &msg) : runtime_error(msg){}
+};
+
+struct NickInUseException : public std::runtime_error{
+	NickInUseException(const std::string &msg) : runtime_error(msg){}
+};
+
+struct AlreadyRegisteredException : public std::runtime_error{
+	AlreadyRegisteredException(const std::string &msg) : runtime_error(msg){}
+};
+
 struct IncorrectChannelException : public std::runtime_error{
 	IncorrectChannelException(const std::string &msg) : runtime_error(msg){}
+};
+
+struct WrongCommandException : public std::runtime_error{
+	WrongCommandException(const std::string &msg) : runtime_error(msg){}
 };
 
 //errors.c
