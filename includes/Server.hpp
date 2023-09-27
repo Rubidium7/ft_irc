@@ -46,6 +46,7 @@ class Server
 		std::string		_parseRealName(std::vector<std::string> args);
 		bool			_nickInUse(std::string &nick) const;
 		Client			&_matchClient(int socket);
+		void			_sendPong(int socket);
 		void			_newUserMessage(int socket);
 		void			_messageOfTheDay(int socket, std::string &nick);
 		void			_runCommand(std::string command, std::vector<std::string> args, int socket);

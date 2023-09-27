@@ -30,7 +30,7 @@ class Parser
 		void	_parsePing();
 		void	_emptyCommand();
 
-		std::string					_commandOptions[12];
+		std::string					_commandOptions[13];
 		std::string					_input;
 		std::string					_wholeInput;
 		std::string					_command;

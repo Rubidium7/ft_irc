@@ -14,6 +14,7 @@ Parser::Parser(std::string input) : _wholeInput(input), _command("empty")
 	_commandOptions[9] = "PRIVMSG";
 	_commandOptions[10] = "CAP";
 	_commandOptions[11] = "PING";
+	_commandOptions[12] = "QUIT";
 }
 
 Parser::~Parser()
@@ -129,7 +130,8 @@ void	Parser::parse()
 	int					i;
 
 	_saveArguments();
-	for (i = 0; i != 10; i++)
+	std::cerr << "command is " << _command << std::endl; //debug
+	for (i = 0; i != 12; i++)
 		if (_commandOptions[i] == _command)
 			break ;
 	switch (i)
@@ -169,10 +171,12 @@ void	Parser::parse()
 		case 11:
 			_parsePing();
 			break ;
+		case 12:
+
+			break ;
 		default :
 			word = _command;
 			_emptyCommand();
 			throw IncorrectCommandException(word + " :Unknown command");
 	}
-	std::cout << "command is: " << _command << std::endl; //debug
 }

@@ -87,6 +87,21 @@ void	Server::_messageOfTheDay(int socket, std::string &nick)
 	sendToOneClient(socket, nick, 376, ":End of MOTD command.");
 }
 
+void	Server::_sendPong(int socket)
+{
+	std::stringstream		message;
+	const char				*buffer;
+	std::string::size_type	size;
+
+	message << ":" << _hostName << " PONG ";
+	message << _hostName << " :" << _hostName << "\r\n";
+
+	buffer = message.str().c_str();
+	size = message.str().size();
+	std::cerr << buffer; //debug
+	send(socket, buffer, size, 0);
+}
+
 void	Server::_newUserMessage(int socket)
 {
 	std::string	msg;
@@ -199,6 +214,10 @@ void	Server::_runCommand(std::string command, std::vector<std::string> args, int
 		_matchClient(socket).setHostName(args.at(3));
 		_matchClient(socket).setRealName(_parseRealName(args));
 		_newUserMessage(socket);
+	}
+	if (command == "PING")
+	{
+		_sendPong(socket);
 	}
 	_neededCmd = "empty";
 }
