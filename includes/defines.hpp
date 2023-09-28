@@ -18,13 +18,7 @@
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
-
-typedef enum e_message
-{
-	CLIENT_ARRIVED = 1,
-	CLIENT_LEFT,
-	CLIENT_MESSAGE
-}	t_message;
+# define EOM "\r\n"
 
 typedef enum e_error
 {
@@ -42,12 +36,34 @@ typedef enum e_error
 	SERV_ACCEPT_FAILURE
 }	t_error_code;
 
+typedef enum e_code
+{
+	EMPTY,
+	RPL_WELCOME,
+	RPL_YOURHOST,
+	RPL_CREATED,
+	RPL_MYINFO,
+	RPL_BOUNCE,
+	RPL_HELLO = 20,
+	ERR_UNKNOWNERROR = 400,
+	ERR_NOSUCHCHANNEL = 403,
+	ERR_NOSUCHSERVICE = 408,
+	ERR_INVALIDCAPCMD = 410,
+	ERR_UNKNOWNCOMMAND = 421,
+	ERR_ERRONEUSNICKNAME = 432,
+	ERR_NICKNAMEINUSE = 433,
+	ERR_NOTREGISTERED = 451,
+	ERR_NEEDMOREPARAMS = 461,
+	ERR_ALREADYREGISTERED = 462,
+	ERR_PASSWDMISMATCH = 464
+}	t_code;
+
 typedef struct s_channel_mode
 {
 	int					invite_only;	// Invite only channel
 	int					topic; 			// Restrict topic to only ops
 	std::string			key; 			// channel key (password)
-	std::vector<int>	ops_list;		// Who has the ops 
+	std::vector<int>	ops_list;		// Who has the ops
 	int					limit_users;	// limit of users
 }	t_channel_mode;
 
@@ -73,5 +89,11 @@ typedef struct s_commands
 	std::string first_part;
 	t_command	command;
 }	t_commands;
+
+typedef struct s_message
+{
+	std::string	msg;
+	t_code		code;
+}	t_message;
 
 #endif

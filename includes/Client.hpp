@@ -13,13 +13,13 @@ class Client
 		int			getSocket() const;
 		void		setSocket(int socket);
 
-		std::string	getNickName() const;
-		void		setNickName(std::string &name);
+		std::string	getNick() const;
+		void		setNick(std::string nickName);
 
 	private:
 		Client(const Client &src);
 		Client	&operator=(const Client &rhs);
-		
+
 		int			_socket;
 		std::string	_nickName;
 

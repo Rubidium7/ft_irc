@@ -1,7 +1,7 @@
 
 #include "Client.hpp"
 
-Client::Client(): _socket(0), _nickName("")
+Client::Client(): _socket(0), _nickName("*")
 {
 
 }
@@ -19,4 +19,15 @@ int	Client::getSocket() const
 void	Client::setSocket(int socket)
 {
 	_socket = socket;
+}
+
+void	Client::setNick(std::string nickName)
+{
+	_nickName = nickName;
+}
+
+
+std::string	Client::getNick() const
+{
+	return (_nickName);
 }
