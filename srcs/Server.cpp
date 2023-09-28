@@ -6,11 +6,12 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/08/28 20:18:52 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/28 12:12:19 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.hpp"
+#include "../includes/defines.hpp"
 
 Server::Server(int port, std::string password) : _password(password), _failure(NO_ERROR)
 {
@@ -32,6 +33,9 @@ Server::Server(int port, std::string password) : _password(password), _failure(N
 	FD_ZERO(&_activeSockets);
 	FD_SET(_serverSocket, &_activeSockets);
 	_maxSocket = _serverSocket;
+	_clientBuffers.reserve(MAX_AMOUNT_CLIENTS + 4);
+	for(std::vector<std::string>::size_type i = 0; i < _clientBuffers.capacity(); ++i)
+		_clientBuffers.push_back("");
 }
 
 Server::~Server()
@@ -130,6 +134,7 @@ void	Server::newClient(void)
 void	Server::clientExit(int id)
 {
 	close(id);
+	_clientBuffers.at(id).clear();
 	FD_CLR(id, &_activeSockets);
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
@@ -151,11 +156,29 @@ void	Server::receiveMessage(int id)
 	else
 	{
 		_buffer[bytes_read] = '\0';
-		sendToClients(_buffer);
+		// Apparently command handling happens after this ???
+		
+		// Print what client sent
+		std::cout << "Client: " << id << " " << "Sent: #" << _buffer << "#" << std::endl;
+		
+		// Add buffer to clientbuffer
+		for(int i = 0; _buffer[i]; ++i)
+		{
+			_clientBuffers.at(id).push_back(_buffer[i]);
+		}
+	
+		while (_clientBuffers.at(id).find('\n') != std::string::npos)
+		{
+			std::cout << "client id: " << id << " buffer contents is:\n"
+			<< _clientBuffers.at(id) << std::endl;
+			_handleCommands(id);
+		}
+				
+		// sendToClients(_buffer); Needed ???
 	}
 }
 
-int		Server::_findSmallestFreeClientIndex() const
+int	Server::_findSmallestFreeClientIndex(void) const
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
@@ -165,4 +188,186 @@ int		Server::_findSmallestFreeClientIndex() const
 		}
 	}
 	return (MAX_AMOUNT_CLIENTS);
+}
+
+void	Server::_handleCommands(int id)
+{
+	t_command	command = _returnFirstPartOfCommand(_clientBuffers.at(id));
+
+	switch(command)
+	{
+		case CAP:
+			_handleCap(id);
+			break;
+		case JOIN:
+			_handleJoin(id);
+			break;
+		case MODE:
+			_handleMode(id);
+			break;
+		case WHO:
+			_handleWho(id);
+			break;
+		case WHOIS:
+			_handleWhois(id);
+			break;
+		case NICK:
+			_handleNick(id);
+			break;
+		case PART:
+			_handlePart(id);
+			break;
+		case PRIVMSG:
+			_handlePrivmsg(id);
+			break;
+		case PING:
+			_handlePing(id);
+			break;
+		case TOPIC:
+			_handleTopic(id);
+			break;
+		case KICK:
+			_handleKick(id);
+			break;
+		case QUIT:
+			_handleQuit(id);
+			break;
+		case NOT_COMMAND:
+			_handleNotCommand(id);
+			break;
+		default:
+			std::cout << "Not a valid command." << std::endl;
+	}
+}
+
+t_command		Server::_returnFirstPartOfCommand(std::string command) const
+{
+	t_commands commands[12] = {
+        {"CAP", CAP},
+        {"JOIN", JOIN},
+        {"MODE", MODE},
+        {"WHO", WHO},
+        {"WHOIS", WHOIS},
+		{"NICK", NICK},
+		{"PART", PART},
+		{"PRIVMSG", PRIVMSG},
+		{"PING", PING},
+		{"TOPIC", TOPIC},
+		{"KICK", KICK},
+		{"QUIT", QUIT}
+    };
+	std::stringstream ss(command);
+	std::string firstPart;
+
+	ss >> firstPart;
+	for (int i = 0; i < 12; ++i)
+	{
+		if (commands[i].first_part == firstPart)
+			return (commands[i].command);
+	}
+	return (NOT_COMMAND);
+}
+
+void	Server::_handleCap(int id)
+{
+	std::cout << "Cap" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handleJoin(int id)
+{
+	std::cout << "Join" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handleMode(int id)
+{
+	std::cout << "Mode" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handleWho(int id)
+{
+	std::cout << "Who" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handleWhois(int id)
+{
+	std::cout << "Whois" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handleNick(int id)
+{
+	std::cout << "Nick" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handlePart(int id)
+{
+	std::cout << "Part" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handlePrivmsg(int id)
+{
+	std::cout << "Privmsg" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handlePing(int id)
+{
+	std::cout << "Ping" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handleTopic(int id)
+{
+	std::cout << "Topic" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handleKick(int id)
+{
+	std::cout << "Kick" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handleQuit(int id)
+{
+	std::cout << "Quit" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
+}
+
+void	Server::_handleNotCommand(int id)
+{
+	std::cout << "Not_command" << std::endl;
+	int newLinePos = _clientBuffers.at(id).find('\n');
+    std::string full_command =  _clientBuffers.at(id).substr(0, newLinePos);
+	_clientBuffers.at(id) = _clientBuffers.at(id).substr(newLinePos + 1);
 }

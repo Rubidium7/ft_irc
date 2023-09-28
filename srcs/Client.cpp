@@ -1,7 +1,7 @@
 
 #include "Client.hpp"
 
-Client::Client() : _socket(0), _nickName("")
+Client::Client(): _socket(0), _nickName("")
 {
 
 }

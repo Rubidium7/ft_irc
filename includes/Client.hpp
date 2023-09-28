@@ -10,8 +10,11 @@ class Client
 		Client();
 		~Client();
 
-		int		getSocket() const;
-		void	setSocket(int socket);
+		int			getSocket() const;
+		void		setSocket(int socket);
+
+		std::string	getNickName() const;
+		void		setNickName(std::string &name);
 
 	private:
 		Client(const Client &src);
