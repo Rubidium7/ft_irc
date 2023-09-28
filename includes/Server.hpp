@@ -46,7 +46,7 @@ class Server
 		void			_handleCommands(int id);
 		t_command		_returnFirstPartOfCommand(std::string command) const;
 		void			_handleCap(int id);
-		void			_handleJoin(int id);
+		void			_handleJoin(int id, std::string channel);
 		void			_handleMode(int id);
 		void			_handleWho(int id);
 		void			_handleWhois(int id);
