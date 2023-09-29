@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/26 19:50:03 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 17:35:39 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define DEFINES_HPP
 
 # include <vector>
+//# include <set> 
 
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
@@ -60,15 +61,6 @@ typedef enum e_code
 	ERR_BADCHANNELKEY = 475
 }	t_code;
 
-typedef struct s_channel_mode
-{
-	int					invite_only;	// Invite only channel
-	int					topic; 			// Restrict topic to only ops
-	std::string			key; 			// channel key (password)
-	std::vector<int>	ops_list;		// Who has the ops
-	int					limit_users;	// limit of users
-}	t_channel_mode;
-
 typedef enum e_command
 {
 	NOT_COMMAND,
@@ -97,5 +89,16 @@ typedef struct s_message
 	std::string	msg;
 	t_code		code;
 }	t_message;
+
+typedef struct s_channel_mode
+{
+	std::string 		name_of_channel;	// Name of channel
+	std::vector<int>		channel_members;	// Who are on channel
+	int					invite_only;		// Invite only channel
+	int					topic;				// Restrict topic to only ops
+	std::string			key;				// channel key (password)
+	std::vector<int>		ops_list;			// Who has the ops 
+	int					limit_users;		// limit of users
+}	t_channel_mode;
 
 #endif
