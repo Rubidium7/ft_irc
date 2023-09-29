@@ -18,7 +18,7 @@
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
-# define EOM "\r\n"
+# define EOM "\n"
 
 typedef enum e_error
 {
@@ -47,6 +47,7 @@ typedef enum e_code
 	RPL_HELLO = 20,
 	ERR_UNKNOWNERROR = 400,
 	ERR_NOSUCHCHANNEL = 403,
+	ERR_TOOMANYTARGETS = 407,
 	ERR_NOSUCHSERVICE = 408,
 	ERR_INVALIDCAPCMD = 410,
 	ERR_UNKNOWNCOMMAND = 421,
@@ -55,7 +56,8 @@ typedef enum e_code
 	ERR_NOTREGISTERED = 451,
 	ERR_NEEDMOREPARAMS = 461,
 	ERR_ALREADYREGISTERED = 462,
-	ERR_PASSWDMISMATCH = 464
+	ERR_PASSWDMISMATCH = 464,
+	ERR_BADCHANNELKEY = 475
 }	t_code;
 
 typedef struct s_channel_mode

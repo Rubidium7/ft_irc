@@ -249,6 +249,7 @@ void	Server::_handleCommands(int socket)
 				_handleCap(socket, command, full_command);
 			break;
 		case JOIN:
+			parser.parseJoin();
 			break;
 		case MODE:
 			break;
