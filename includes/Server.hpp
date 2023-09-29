@@ -38,8 +38,6 @@ class Server
 		void			clientExit(int socket);
 		void			receiveMessage(int socket);
 
-		friend class	Parser;
-
 	private:
 		Server();
 		Server(const Server &src);
@@ -64,6 +62,7 @@ class Server
 		// void			_handleQuit(int id);
 		void			_handleNotCommand(int socket);
 		void			_sendAnswer(int socket, std::string nick, t_code code, std::string msg);
+		void			_assignServerMessage(t_code code, std::string msg);
 
 		std::string					_hostName;
 		std::string					_password;

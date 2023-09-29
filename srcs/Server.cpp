@@ -76,6 +76,12 @@ int		Server::getServerSocket(void)
 	return (_serverSocket);
 }
 
+void	Server::_assignServerMessage(t_code code, std::string msg)
+{
+	_message.msg = msg;
+	_message.code = code;
+}
+
 void	Server::_sendMessageFromStruct(int socket, t_message message)
 {
 	std::cerr << message.msg << std::endl; //debug
@@ -238,7 +244,7 @@ void	Server::_handleCommands(int socket)
 	switch(command)
 	{
 		case CAP:
-			parser._parseCap();
+			parser.parseCap();
 			if (!parser.getMessageCode())
 				_handleCap(socket, command, full_command);
 			break;
@@ -257,7 +263,7 @@ void	Server::_handleCommands(int socket)
 		case PRIVMSG:
 			break;
 		case PING:
-			//parser._parsePing();
+			//parser.parsePing();
 			if (!parser.getMessageCode())
 				_handlePing(socket, full_command);
 			break;
@@ -270,7 +276,7 @@ void	Server::_handleCommands(int socket)
 		case NOT_COMMAND:
 			break;
 		default:
-			parser._assignMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
+			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
 	}
 	if (parser.getMessageCode())
 		_sendMessageFromStruct(socket, parser.getMessage());
