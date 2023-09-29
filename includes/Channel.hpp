@@ -15,7 +15,18 @@
 # define CHANNEL_HPP
 
 # include <string>
-# include "defines.hpp"
+# include <vector>
+
+typedef struct s_channel_mode
+{
+	std::string			name_of_channel;	// Name of channel
+	std::vector<int>	channel_members;	// Who are on channel
+	int					invite_only;		// Invite only channel
+	int					topic;				// Restrict topic to only ops
+	std::string			key;				// channel key (password)
+	std::vector<int>	ops_list;			// Who has the ops 
+	int					limit_users;		// limit of users
+}	t_channel_mode;
 
 class Channel
 {
@@ -26,8 +37,8 @@ class Channel
 
 		std::string	getChannelName() const;
 		int			isInviteOnly() const;
-		int			isOnChannel(int id) const;
-		void		addToChannel(int id);
+		int			isOnChannel(int socket) const;
+		void		addToChannel(int socket);
 
 	private:
 
@@ -35,7 +46,7 @@ class Channel
 		Channel(const Channel &src);
 		Channel	&operator=(const Channel &rhs);
 
-		t_channel_mode				_settings;
+		t_channel_mode _channelSettings;
 };
 
 #endif

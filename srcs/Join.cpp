@@ -6,18 +6,19 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/09/29 17:15:27 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 20:07:31 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Join.hpp"
 #include "../includes/Channel.hpp"
+#include "../includes/Server.hpp"
 #include <string>
 #include <vector>
 #include <sstream>
 #include <iostream>
 
-void Join::joincmd(int id, std::string full_command, std::vector<Channel> &_channels)
+void Join::joincmd(int socket, std::string full_command, t_server_mode	&_serverSettings)
 {
 	std::vector<std::string> command_parts;
 	std::vector<std::string> temp_channels;
@@ -29,19 +30,25 @@ void Join::joincmd(int id, std::string full_command, std::vector<Channel> &_chan
 	switch(command_parts.size())
 	{
 		case 2:
+			if (command_parts.at(1) == ":")
+				return ;
 			_parse_into_parts(command_parts, 1, temp_channels);
 			for (std::vector<std::string>::size_type i = 0; i < temp_channels.size(); ++i)
 			{
-				for (std::vector<Channel>::size_type k = 0; k < _channels.size(); ++k)
+				for (std::vector<Channel>::size_type k = 0; k < _serverSettings.channels.size(); ++k)
 				{
-					if (temp_channels.at(i) == _channels.at(k).getChannelName())
+					if (temp_channels.at(i) == _serverSettings.channels.at(k).getChannelName())
 					{
-						if (_channels.at(k).isOnChannel(id))
+						if (_serverSettings.channels.at(k).isOnChannel(socket))
 						{
-							// Is already on channel what to return?
+							// Check with laptop what happens if already on channel?
+							//Server::sendAnswer(socket, _findNickName(socket, _serverSettings.clients), 666, "Already on channel")
 						}else
 						{
-							_channels.at(k).addToChannel(id);
+							_serverSettings.channels.at(k).addToChannel(socket);
+							// Remember to add channels joined in client
+							// change client vector 
+							//Server::sendAnswer(socket, _findNickName(socket, _serverSettings.clients), 666, "Joined Channel")
 						}
 					}
 				}	
@@ -80,4 +87,14 @@ void Join::_parse_into_parts(const std::vector<std::string> &command_parts, int 
 			temp_strings.at(i).erase(position, 1);
 		}
 	}
+}
+
+std::string	Join::_findNickName(const int socket, const std::vector<Client> clients)
+{
+	for (std::vector<Client>::size_type i = 0; i < clients.size(); ++i)
+	{
+		if (clients.at(i).getSocket() == socket)
+			return (clients.at(i).getNick());
+	}
+	return ("*");
 }

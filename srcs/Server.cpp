@@ -6,39 +6,42 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/29 17:12:50 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 20:18:43 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "irc.hpp"
 #include "../includes/defines.hpp"
+#include "irc.hpp"
 #include "../includes/Join.hpp"
 
-Server::Server(int port, std::string password) : _hostName("localhost"), _password(password), _failure(NO_ERROR)
+Server::Server(int port, std::string password)
 {
-	memset(_serverSettings.sin_zero, 0, sizeof(_serverSettings.sin_zero));
-	_serverSettings.sin_family = AF_INET;
-	_serverSettings.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	_serverSettings.sin_port = htons(port);
+	_serverSettings.hostName = "localhost";
+	_serverSettings.password = password;
+	_serverSettings.failure = NO_ERROR;
+	memset(_serverSettings.socketSettings.sin_zero, 0, sizeof(_serverSettings.socketSettings.sin_zero));
+	_serverSettings.socketSettings.sin_family = AF_INET;
+	_serverSettings.socketSettings.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	_serverSettings.socketSettings.sin_port = htons(port);
 
-	_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (_serverSocket < 0)
-		_failure = SERV_SOCKET_FAILURE;
+	_serverSettings.serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (_serverSettings.serverSocket < 0)
+		_serverSettings.failure = SERV_SOCKET_FAILURE;
 
-	if (!_failure && bind(_serverSocket, (struct sockaddr *)&_serverSettings, sizeof(_serverSettings)) < 0)
-		_failure = SERV_BIND_FAILURE;
+	if (!_serverSettings.failure && bind(_serverSettings.serverSocket, (struct sockaddr *)&_serverSettings.socketSettings, sizeof(_serverSettings.socketSettings)) < 0)
+		_serverSettings.failure = SERV_BIND_FAILURE;
 
-	if (!_failure && listen(_serverSocket, MAX_AMOUNT_CLIENTS) < 0)
-		_failure = SERV_LISTEN_FAILURE;
+	if (!_serverSettings.failure && listen(_serverSettings.serverSocket, MAX_AMOUNT_CLIENTS) < 0)
+		_serverSettings.failure = SERV_LISTEN_FAILURE;
 
-	FD_ZERO(&_activeSockets);
-	FD_SET(_serverSocket, &_activeSockets);
-	_maxSocket = _serverSocket;
-	_clientBuffers.reserve(MAX_AMOUNT_CLIENTS + 4);
-	for(std::vector<std::string>::size_type i = 0; i < _clientBuffers.capacity(); ++i)
-		_clientBuffers.push_back("");
-	_message.msg = "";
-	_message.code = EMPTY;
+	FD_ZERO(&_serverSettings.activeSockets);
+	FD_SET(_serverSettings.serverSocket, &_serverSettings.activeSockets);
+	_serverSettings.maxSocket = _serverSettings.serverSocket;
+	_serverSettings.clientBuffers.reserve(MAX_AMOUNT_CLIENTS + 4);
+	for(std::vector<std::string>::size_type i = 0; i < _serverSettings.clientBuffers.capacity(); ++i)
+		_serverSettings.clientBuffers.push_back("");
+	_serverSettings.message.msg = "";
+	_serverSettings.message.code = EMPTY;
 }
 
 Server::~Server()
@@ -48,57 +51,57 @@ Server::~Server()
 
 t_error_code	Server::checkFailure(void)
 {
-	return (_failure);
+	return (_serverSettings.failure);
 }
 
 void	Server::setReadySockets(void)
 {
-	_readySockets = _activeSockets;
+	_serverSettings.readySockets = _serverSettings.activeSockets;
 }
 
 void	Server::monitorSockets(void)
 {
-	if (select(_maxSocket + 1, &_readySockets, NULL, NULL, NULL) < 0)
-		_failure = SERV_SELECT_FAILURE;
+	if (select(_serverSettings.maxSocket + 1, &_serverSettings.readySockets, NULL, NULL, NULL) < 0)
+		_serverSettings.failure = SERV_SELECT_FAILURE;
 }
 
 int		Server::getMaxSocket()
 {
-	return (_maxSocket);
+	return (_serverSettings.maxSocket);
 }
 
 bool	Server::isInSet(int socket)
 {
-	return (FD_ISSET(socket, &_readySockets));
+	return (FD_ISSET(socket, &_serverSettings.readySockets));
 }
 
 int		Server::getServerSocket(void)
 {
-	return (_serverSocket);
+	return (_serverSettings.serverSocket);
 }
 
 void	Server::_assignServerMessage(t_code code, std::string msg)
 {
-	_message.msg = msg;
-	_message.code = code;
+	_serverSettings.message.msg = msg;
+	_serverSettings.message.code = code;
 }
 
 void	Server::_sendMessageFromStruct(int socket, t_message message)
 {
 	std::cerr << message.msg << std::endl; //debug
-	_sendAnswer(socket, _matchClient(socket).getNick(), message.code, message.msg);
+	sendAnswer(socket, _matchClient(socket).getNick(), message.code, message.msg);
 }
 
 Client	&Server::_matchClient(int socket)
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
-		if (_clients[i].getSocket() == socket)
+		if (_serverSettings.clients[i].getSocket() == socket)
 		{
-			return (_clients[i]);
+			return (_serverSettings.clients[i]);
 		}
 	}
-	return (_clients[0]);
+	return (_serverSettings.clients[0]);
 }
 
 void	Server::sendToClients(std::string msg)
@@ -112,22 +115,22 @@ void	Server::sendToClients(std::string msg)
 	size = message.str().size();
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; i++)
 	{
-		if (_clients[i].getSocket() != 0)
+		if (_serverSettings.clients[i].getSocket() != 0)
 		{
 			// for debug printing
-			std::cerr << "i = " << i << " client nro: " << _clients[i].getSocket() << std::endl;
-			send(_clients[i].getSocket(), buffer, size, 0);
+			std::cerr << "i = " << i << " client nro: " << _serverSettings.clients[i].getSocket() << std::endl;
+			send(_serverSettings.clients[i].getSocket(), buffer, size, 0);
 		}
 	}
 }
 
-void	Server::_sendAnswer(int socket, std::string nick, t_code code, std::string msg)
+void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string msg)
 {
 	std::stringstream		message;
 	const char				*buffer;
 	std::string::size_type	size;
 
-	message << ":" << _hostName << " ";
+	message << ":" << _serverSettings.hostName << " ";
 	if (code < 100)
 		message << "0";
 	if (code < 10)
@@ -156,56 +159,56 @@ void	Server::newClient(void)
 	int	new_client;
 	int _clientIndex = _findSmallestFreeClientIndex();
 
-	new_client = accept(_serverSocket, NULL, NULL);
+	new_client = accept(_serverSettings.serverSocket, NULL, NULL);
 	if (new_client < 0)
 	{
-		_failure = SERV_ACCEPT_FAILURE;
+		_serverSettings.failure = SERV_ACCEPT_FAILURE;
 		return ;
 	}
 	if (_clientIndex >= MAX_AMOUNT_CLIENTS)
 	{
 		print_error(TOO_MANY_CLIENTS);
-		_sendAnswer(new_client, "*", RPL_BOUNCE, ":Server is full");
+		sendAnswer(new_client, "*", RPL_BOUNCE, ":Server is full");
 		close(new_client);
-		FD_CLR(new_client, &_activeSockets);
+		FD_CLR(new_client, &_serverSettings.activeSockets);
 		return ;
 	}
-	FD_SET(new_client, &_activeSockets);
-	if (new_client > _maxSocket)
-		_maxSocket = new_client;
-	_clients[_clientIndex].setSocket(new_client);
+	FD_SET(new_client, &_serverSettings.activeSockets);
+	if (new_client > _serverSettings.maxSocket)
+		_serverSettings.maxSocket = new_client;
+	_serverSettings.clients[_clientIndex].setSocket(new_client);
 }
 
 void	Server::clientExit(int socket)
 {
 	close(socket);
-	_clientBuffers.at(socket).clear();
-	FD_CLR(socket, &_activeSockets);
+	_serverSettings.clientBuffers.at(socket).clear();
+	FD_CLR(socket, &_serverSettings.activeSockets);
 	_matchClient(socket).setSocket(0);
 }
 
 void	Server::receiveMessage(int socket)
 {
-	int	bytes_read = recv(socket, _buffer, MSG_SIZE, 0);
+	int	bytes_read = recv(socket, _serverSettings.buffer, MSG_SIZE, 0);
 	if (bytes_read <= 0)
 	{
 		clientExit(socket);
 	}
 	else
 	{
-		_buffer[bytes_read] = '\0';
+		_serverSettings.buffer[bytes_read] = '\0';
 		// Apparently command handling happens after this ???
 
 		// Print what client sent
-		std::cout << "Client: " << socket << " " << "Sent: #" << _buffer << "#" << std::endl;
+		std::cout << "Client: " << socket << " " << "Sent: #" << _serverSettings.buffer << "#" << std::endl;
 
 		// Add buffer to clientbuffer
-		for(int i = 0; _buffer[i]; ++i)
+		for(int i = 0; _serverSettings.buffer[i]; ++i)
 		{
-			_clientBuffers.at(socket).push_back(_buffer[i]);
+			_serverSettings.clientBuffers.at(socket).push_back(_serverSettings.buffer[i]);
 		}
 
-		while (_clientBuffers.at(socket).find(EOM) != std::string::npos)
+		while (_serverSettings.clientBuffers.at(socket).find(EOM) != std::string::npos)
 		{
 		//	std::cout << "client id: " << socket << " buffer contents is:" << std::endl
 		//	<< _clientBuffers.at(socket) << std::endl;
@@ -220,7 +223,7 @@ int	Server::_findSmallestFreeClientIndex(void) const
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
-		if (_clients[i].getSocket() == 0)
+		if (_serverSettings.clients[i].getSocket() == 0)
 		{
 			return (i);
 		}
@@ -230,14 +233,14 @@ int	Server::_findSmallestFreeClientIndex(void) const
 
 void	Server::_handleCommands(int socket)
 {
-	t_command	command = _returnFirstPartOfCommand(_clientBuffers.at(socket));
+	t_command	command = _returnFirstPartOfCommand(_serverSettings.clientBuffers.at(socket));
 
-	int newline_pos = _clientBuffers.at(socket).find(EOM);
-    std::string full_command =  _clientBuffers.at(socket).substr(0, newline_pos);
+	int newline_pos = _serverSettings.clientBuffers.at(socket).find(EOM);
+    std::string full_command =  _serverSettings.clientBuffers.at(socket).substr(0, newline_pos);
 	if (EOM == "\n")
-		_clientBuffers.at(socket) = _clientBuffers.at(socket).substr(newline_pos + 1);
+		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 1);
 	else
-		_clientBuffers.at(socket) = _clientBuffers.at(socket).substr(newline_pos + 2);
+		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 2);
 	std::cerr << full_command << std::endl;
 
 	Parser	parser(full_command);
@@ -250,7 +253,7 @@ void	Server::_handleCommands(int socket)
 				_handleCap(socket, command, full_command);
 			break;
 		case JOIN:
-			Join::joincmd(socket, full_command, _channels);
+			Join::joincmd(socket, full_command, _serverSettings);
 			break;
 		case MODE:
 			break;
@@ -282,8 +285,8 @@ void	Server::_handleCommands(int socket)
 	}
 	if (parser.getMessageCode())
 		_sendMessageFromStruct(socket, parser.getMessage());
-	if (_message.code)
-		_sendMessageFromStruct(socket, _message);
+	if (_serverSettings.message.code)
+		_sendMessageFromStruct(socket, _serverSettings.message);
 }
 
 t_command		Server::_returnFirstPartOfCommand(std::string command) const
@@ -324,5 +327,5 @@ void	Server::_handleCap(int socket, t_command command, std::string full_command)
 void	Server::_handlePing(int socket, std::string full_command)
 {
 	(void)full_command;
-	sendToOneClient(socket, ":" + _hostName + " PONG " + _hostName + " :" + _hostName + "\r\n");
+	sendToOneClient(socket, ":" + _serverSettings.hostName + " PONG " + _serverSettings.hostName + " :" + _serverSettings.hostName + "\r\n");
 }

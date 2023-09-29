@@ -1,14 +1,14 @@
-// ************************************************************************** //
-//                                                                            //
-//                                                        :::      ::::::::   //
-//   Client.hpp                                         :+:      :+:    :+:   //
-//                                                    +:+ +:+         +:+     //
-//   By: tpoho <marvin@42.fr>                       +#+  +:+       +#+        //
-//                                                +#+#+#+#+#+   +#+           //
-//   Created: 2023/09/29 17:37:31 by tpoho             #+#    #+#             //
-//   Updated: 2023/09/29 17:37:32 by tpoho            ###   ########.fr       //
-//                                                                            //
-// ************************************************************************** //
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/29 17:37:31 by tpoho             #+#    #+#             */
+/*   Updated: 2023/09/29 19:55:53 by tpoho            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 
 
@@ -29,6 +29,10 @@ class Client
 		std::string	getNick() const;
 		void		setNick(std::string nickName);
 
+		int			howManyChannelsJoined() const;
+		void		increaseChannelsJoined();
+		void		decreaseChannelsJoined(); 
+
 	private:
 		Client(const Client &src);
 		Client	&operator=(const Client &rhs);
@@ -36,6 +40,7 @@ class Client
 		int			_socket;
 		std::string	_nickName;
 		int			_registration;
+		int			_howManyChannelsJoined;
 
 };
 

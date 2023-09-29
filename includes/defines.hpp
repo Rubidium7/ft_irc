@@ -6,15 +6,20 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/29 17:35:39 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 19:30:05 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef DEFINES_HPP
 # define DEFINES_HPP
 
+# include <sys/socket.h>
+# include <netinet/in.h>
 # include <vector>
+# include <string>
 //# include <set> 
+# include "Client.hpp" 
+# include "Channel.hpp"
 
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
@@ -87,16 +92,5 @@ typedef struct s_message
 	std::string	msg;
 	t_code		code;
 }	t_message;
-
-typedef struct s_channel_mode
-{
-	std::string 		name_of_channel;	// Name of channel
-	std::vector<int>		channel_members;	// Who are on channel
-	int					invite_only;		// Invite only channel
-	int					topic;				// Restrict topic to only ops
-	std::string			key;				// channel key (password)
-	std::vector<int>		ops_list;			// Who has the ops 
-	int					limit_users;		// limit of users
-}	t_channel_mode;
 
 #endif

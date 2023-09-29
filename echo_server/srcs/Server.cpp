@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/08/28 20:18:52 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 20:19:15 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,18 +20,18 @@ Server::Server(int port, std::string password) : _password(password), _failure(N
 	_serverSettings.sin_port = htons(port);
 
 	_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (_serverSocket < 0)
-		_failure = SERV_SOCKET_FAILURE;
+	if (_serverSettings.serverSocket < 0)
+		_serverSettings.failure = SERV_SOCKET_FAILURE;
 
-	if (!_failure && bind(_serverSocket, (struct sockaddr *)&_serverSettings, sizeof(_serverSettings)) < 0)
-		_failure = SERV_BIND_FAILURE;
+	if (!_serverSettings.failure && bind(_serverSocket, (struct sockaddr *)&_serverSettings, sizeof(_serverSettings)) < 0)
+		_serverSettings.failure = SERV_BIND_FAILURE;
 
-	if (!_failure && listen(_serverSocket, MAX_AMOUNT_CLIENTS) < 0)
-		_failure = SERV_LISTEN_FAILURE;
+	if (!_serverSettings.failure && listen(_serverSocket, MAX_AMOUNT_CLIENTS) < 0)
+		_serverSettings.failure = SERV_LISTEN_FAILURE;
 
-	FD_ZERO(&_activeSockets);
-	FD_SET(_serverSocket, &_activeSockets);
-	_maxSocket = _serverSocket;
+	FD_ZERO(&_serverSettings.activeSockets);
+	FD_SET(_serverSettings.serverSocket, &_serverSettings.activeSockets);
+	_serverSettings.maxSocket = _serverSettings.serverSocket;
 }
 
 Server::~Server()
