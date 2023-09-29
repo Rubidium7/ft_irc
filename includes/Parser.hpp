@@ -18,6 +18,7 @@ class Parser
 		std::string					getCommand() const;
 		void						parseCap();
 		void						parseJoin();
+		void						parsePing(std::string serverName);
 
 	private:
 		Parser();
@@ -25,6 +26,8 @@ class Parser
 		Parser &operator=(const Parser &rhs);
 
 		void	_assignParserMessage(t_code code, std::string msg);
+		bool	_isChannelKeyFormatCorrect(size_t amountOfChannels);
+		bool	_isChannelFormatCorrect(size_t *amountOfChannels);
 		void	_saveArguments(std::string input);
 
 		std::vector<std::string>	_args;

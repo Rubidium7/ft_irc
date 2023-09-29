@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/29 19:30:05 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 20:23:05 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,21 @@
 # include <vector>
 # include <string>
 //# include <set> 
-# include "Client.hpp" 
-# include "Channel.hpp"
+//# include "Client.hpp" 
+//# include "Channel.hpp"
 
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
 # define EOM "\n"
+
+typedef enum e_registration
+{
+	REGISTERED,
+	NO_PASS,
+	NO_USER,
+	NO_NICK
+}	t_registration;
 
 typedef enum e_error
 {
@@ -45,15 +53,19 @@ typedef enum e_error
 typedef enum e_code
 {
 	EMPTY,
-	RPL_WELCOME,
-	RPL_YOURHOST,
-	RPL_CREATED,
-	RPL_MYINFO,
-	RPL_BOUNCE,
+	RPL_WELCOME = 1,
+	RPL_YOURHOST = 2,
+	RPL_CREATED = 3,
+	RPL_MYINFO = 4,
+	RPL_BOUNCE = 5,
 	RPL_HELLO = 20,
 	ERR_UNKNOWNERROR = 400,
+	ERR_NOSUCHNICK = 401,
+	ERR_NOSUCHSERVER = 402,
 	ERR_NOSUCHCHANNEL = 403,
+	ERR_TOOMANYTARGETS = 407,
 	ERR_NOSUCHSERVICE = 408,
+	ERR_NOORIGIN = 409,
 	ERR_INVALIDCAPCMD = 410,
 	ERR_UNKNOWNCOMMAND = 421,
 	ERR_ERRONEUSNICKNAME = 432,
@@ -61,7 +73,8 @@ typedef enum e_code
 	ERR_NOTREGISTERED = 451,
 	ERR_NEEDMOREPARAMS = 461,
 	ERR_ALREADYREGISTERED = 462,
-	ERR_PASSWDMISMATCH = 464
+	ERR_PASSWDMISMATCH = 464,
+	ERR_BADCHANNELKEY = 475
 }	t_code;
 
 typedef enum e_command
@@ -73,6 +86,8 @@ typedef enum e_command
 	WHO,
 	WHOIS,
 	NICK,
+	USER,
+	PASS,
 	PART,
 	PRIVMSG,
 	PING,

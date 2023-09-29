@@ -74,7 +74,7 @@ class Server
 		// void			_handleNick(int id);
 		// void			_handlePart(int id);
 		// void			_handlePrivmsg(int id);
-		void			_handlePing(int socket, std::string full_command);
+		void			_handlePing(int socket);
 		// void			_handleTopic(int id);
 		// void			_handleKick(int id);
 		// void			_handleQuit(int id);

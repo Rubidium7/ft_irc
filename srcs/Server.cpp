@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/29 20:18:43 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 20:25:32 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,7 +253,9 @@ void	Server::_handleCommands(int socket)
 				_handleCap(socket, command, full_command);
 			break;
 		case JOIN:
-			Join::joincmd(socket, full_command, _serverSettings);
+			parser.parseJoin();
+			if (!parser.getMessageCode())
+				Join::joincmd(socket, full_command, _serverSettings);
 			break;
 		case MODE:
 			break;
@@ -263,14 +265,18 @@ void	Server::_handleCommands(int socket)
 			break;
 		case NICK:
 			break;
+		case USER:
+			break;
+		case PASS:
+			break;
 		case PART:
 			break;
 		case PRIVMSG:
 			break;
 		case PING:
-			//parser.parsePing();
+			parser.parsePing(_serverSettings.hostName);
 			if (!parser.getMessageCode())
-				_handlePing(socket, full_command);
+				_handlePing(socket);
 			break;
 		case TOPIC:
 			break;
@@ -291,13 +297,15 @@ void	Server::_handleCommands(int socket)
 
 t_command		Server::_returnFirstPartOfCommand(std::string command) const
 {
-	t_commands commands[12] = {
+	t_commands commands[14] = {
         {"CAP", CAP},
         {"JOIN", JOIN},
         {"MODE", MODE},
         {"WHO", WHO},
         {"WHOIS", WHOIS},
 		{"NICK", NICK},
+		{"USER", USER},
+		{"PASS", PASS},
 		{"PART", PART},
 		{"PRIVMSG", PRIVMSG},
 		{"PING", PING},
@@ -324,8 +332,8 @@ void	Server::_handleCap(int socket, t_command command, std::string full_command)
 	(void)full_command;
 }
 
-void	Server::_handlePing(int socket, std::string full_command)
+void	Server::_handlePing(int socket)
 {
-	(void)full_command;
+	//(void) full_command;
 	sendToOneClient(socket, ":" + _serverSettings.hostName + " PONG " + _serverSettings.hostName + " :" + _serverSettings.hostName + "\r\n");
 }
