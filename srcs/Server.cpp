@@ -6,12 +6,13 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/28 12:12:19 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 17:12:50 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.hpp"
 #include "../includes/defines.hpp"
+#include "../includes/Join.hpp"
 
 Server::Server(int port, std::string password) : _hostName("localhost"), _password(password), _failure(NO_ERROR)
 {
@@ -196,7 +197,7 @@ void	Server::receiveMessage(int socket)
 		// Apparently command handling happens after this ???
 
 		// Print what client sent
-		//std::cout << "Client: " << socket << " " << "Sent: #" << _buffer << "#" << std::endl;
+		std::cout << "Client: " << socket << " " << "Sent: #" << _buffer << "#" << std::endl;
 
 		// Add buffer to clientbuffer
 		for(int i = 0; _buffer[i]; ++i)
@@ -249,6 +250,7 @@ void	Server::_handleCommands(int socket)
 				_handleCap(socket, command, full_command);
 			break;
 		case JOIN:
+			Join::joincmd(socket, full_command, _channels);
 			break;
 		case MODE:
 			break;

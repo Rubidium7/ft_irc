@@ -1,3 +1,4 @@
+
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -6,7 +7,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:16:14 by tpoho             #+#    #+#             */
-/*   Updated: 2023/09/26 20:53:25 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 16:40:41 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +26,8 @@ class Channel
 
 		std::string	getChannelName() const;
 		int			isInviteOnly() const;
+		int			isOnChannel(int id) const;
+		void		addToChannel(int id);
 
 	private:
 
@@ -32,10 +35,7 @@ class Channel
 		Channel(const Channel &src);
 		Channel	&operator=(const Channel &rhs);
 
-		std::string					_nameOfChannel;
-		std::vector<int>			_channelMembers;
-		t_channel_mode				_channelMode;
-
+		t_channel_mode				_settings;
 };
 
 #endif

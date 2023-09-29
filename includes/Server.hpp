@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:46:52 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/26 20:51:07 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/09/29 17:20:27 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ class Server
 		void			_handleCommands(int socket);
 		t_command		_returnFirstPartOfCommand(std::string command) const;
 		void			_handleCap(int socket, t_command command, std::string full_command);
-		// void			_handleJoin(int id, std::string channel);
 		// void			_handleMode(int id);
 		// void			_handleWho(int id);
 		// void			_handleWhois(int id);
