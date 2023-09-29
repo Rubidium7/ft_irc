@@ -18,6 +18,7 @@ class Parser
 		std::string					getCommand() const;
 		void						parseCap();
 		void						parseJoin();
+		void						parsePing(std::string serverName);
 
 	private:
 		Parser();

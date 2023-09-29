@@ -142,8 +142,24 @@ void	Parser::parseJoin()
 	}
 	if (!_isChannelFormatCorrect(&amountOfChannels))
 		return ;
-	if (!_isChannelKeyFormatCorrect(amountOfChannels))
+	if (_args.size() > 2)
+		_isChannelKeyFormatCorrect(amountOfChannels);
+}
+
+void	Parser::parsePing(std::string serverName)
+{
+	if (_args.size() < 2)
+	{
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
 		return ;
+	}
+	if (_args.size() > 2)
+	{
+		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(2) + " :Too many targets");
+		return ;
+	}
+	if (_args.at(1) != serverName)
+		_assignParserMessage(ERR_NOSUCHSERVER, _args.at(1) + " :Server out of our scope");
 }
 
 void	Parser::_saveArguments(std::string input)

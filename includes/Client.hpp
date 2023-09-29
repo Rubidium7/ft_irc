@@ -16,6 +16,7 @@
 # define CLIENT_HPP
 
 # include <iostream>
+# include "defines.hpp"
 
 class Client
 {
@@ -28,13 +29,22 @@ class Client
 
 		std::string	getNick() const;
 		void		setNick(std::string nickName);
+		std::string	getUserName() const;
+		void		setUserName(std::string userName);
+		std::string	getRealName() const;
+		void		setRealName(std::string realName);
+		std::string	getHostName() const;
+		void		setHostName(std::string hostName);
 
 	private:
 		Client(const Client &src);
 		Client	&operator=(const Client &rhs);
-		
+
 		int			_socket;
 		std::string	_nickName;
+		std::string	_userName;
+		std::string	_realName;
+		std::string	_hostName;
 		int			_registration;
 
 };

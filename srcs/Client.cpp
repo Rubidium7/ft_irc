@@ -12,7 +12,7 @@
 
 #include "Client.hpp"
 
-Client::Client(): _socket(0), _nickName("*")
+Client::Client(): _socket(0), _nickName("*"), _userName("*"), _realName("*"), _hostName("*"), _registration(NO_NICK)
 {
 
 }
@@ -40,4 +40,34 @@ void	Client::setNick(std::string nickName)
 std::string	Client::getNick() const
 {
 	return (_nickName);
+}
+
+std::string	Client::getUserName() const
+{
+	return (_userName);
+}
+
+void	Client::setUserName(std::string userName)
+{
+	_userName = userName;
+}
+
+std::string	Client::getRealName() const
+{
+	return (_realName);
+}
+
+void	Client::setRealName(std::string realName)
+{
+	_realName = realName;
+}
+
+std::string	Client::getHostName() const
+{
+	return (_hostName);
+}
+
+void	Client::setHostName(std::string hostName)
+{
+	_hostName = hostName;
 }

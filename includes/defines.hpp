@@ -14,12 +14,20 @@
 # define DEFINES_HPP
 
 # include <vector>
-//# include <set> 
+//# include <set>
 
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
 # define EOM "\n"
+
+typedef enum e_registration
+{
+	REGISTERED,
+	NO_PASS,
+	NO_USER,
+	NO_NICK
+}	t_registration;
 
 typedef enum e_error
 {
@@ -40,16 +48,19 @@ typedef enum e_error
 typedef enum e_code
 {
 	EMPTY,
-	RPL_WELCOME,
-	RPL_YOURHOST,
-	RPL_CREATED,
-	RPL_MYINFO,
-	RPL_BOUNCE,
+	RPL_WELCOME = 1,
+	RPL_YOURHOST = 2,
+	RPL_CREATED = 3,
+	RPL_MYINFO = 4,
+	RPL_BOUNCE = 5,
 	RPL_HELLO = 20,
 	ERR_UNKNOWNERROR = 400,
+	ERR_NOSUCHNICK = 401,
+	ERR_NOSUCHSERVER = 402,
 	ERR_NOSUCHCHANNEL = 403,
 	ERR_TOOMANYTARGETS = 407,
 	ERR_NOSUCHSERVICE = 408,
+	ERR_NOORIGIN = 409,
 	ERR_INVALIDCAPCMD = 410,
 	ERR_UNKNOWNCOMMAND = 421,
 	ERR_ERRONEUSNICKNAME = 432,
@@ -70,6 +81,8 @@ typedef enum e_command
 	WHO,
 	WHOIS,
 	NICK,
+	USER,
+	PASS,
 	PART,
 	PRIVMSG,
 	PING,
@@ -97,7 +110,7 @@ typedef struct s_channel_mode
 	int					invite_only;		// Invite only channel
 	int					topic;				// Restrict topic to only ops
 	std::string			key;				// channel key (password)
-	std::vector<int>		ops_list;			// Who has the ops 
+	std::vector<int>		ops_list;			// Who has the ops
 	int					limit_users;		// limit of users
 }	t_channel_mode;
 

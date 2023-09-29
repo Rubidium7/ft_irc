@@ -262,14 +262,18 @@ void	Server::_handleCommands(int socket)
 			break;
 		case NICK:
 			break;
+		case USER:
+			break;
+		case PASS:
+			break;
 		case PART:
 			break;
 		case PRIVMSG:
 			break;
 		case PING:
-			//parser.parsePing();
+			parser.parsePing(_hostName);
 			if (!parser.getMessageCode())
-				_handlePing(socket, full_command);
+				_handlePing(socket);
 			break;
 		case TOPIC:
 			break;
@@ -290,13 +294,15 @@ void	Server::_handleCommands(int socket)
 
 t_command		Server::_returnFirstPartOfCommand(std::string command) const
 {
-	t_commands commands[12] = {
+	t_commands commands[14] = {
         {"CAP", CAP},
         {"JOIN", JOIN},
         {"MODE", MODE},
         {"WHO", WHO},
         {"WHOIS", WHOIS},
 		{"NICK", NICK},
+		{"USER", USER},
+		{"PASS", PASS},
 		{"PART", PART},
 		{"PRIVMSG", PRIVMSG},
 		{"PING", PING},
@@ -323,8 +329,7 @@ void	Server::_handleCap(int socket, t_command command, std::string full_command)
 	(void)full_command;
 }
 
-void	Server::_handlePing(int socket, std::string full_command)
+void	Server::_handlePing(int socket)
 {
-	(void)full_command;
 	sendToOneClient(socket, ":" + _hostName + " PONG " + _hostName + " :" + _hostName + "\r\n");
 }
