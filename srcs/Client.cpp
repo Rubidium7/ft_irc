@@ -71,3 +71,13 @@ void	Client::setHostName(std::string hostName)
 {
 	_hostName = hostName;
 }
+
+int	getRegistrationStatus() const
+{
+	return (_registration);
+}
+
+void	setRegistrationStatus(int status)
+{
+	_registration = status;
+}

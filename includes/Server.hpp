@@ -48,7 +48,7 @@ class Server
 		int				_findSmallestFreeClientIndex() const;
 		void			_handleCommands(int socket);
 		t_command		_returnFirstPartOfCommand(std::string command) const;
-		void			_handleCap(int socket, t_command command, std::string full_command);
+		void			_handleNewRegistration(int socket);
 		// void			_handleMode(int id);
 		// void			_handleWho(int id);
 		// void			_handleWhois(int id);

@@ -23,10 +23,10 @@
 
 typedef enum e_registration
 {
-	REGISTERED,
-	NO_PASS,
+	NO_NICK,
 	NO_USER,
-	NO_NICK
+	NO_PASS,
+	REGISTERED
 }	t_registration;
 
 typedef enum e_error

@@ -35,6 +35,8 @@ class Client
 		void		setRealName(std::string realName);
 		std::string	getHostName() const;
 		void		setHostName(std::string hostName);
+		int			getRegistrationStatus() const;
+		void		setRegistrationStatus(int status);
 
 	private:
 		Client(const Client &src);
