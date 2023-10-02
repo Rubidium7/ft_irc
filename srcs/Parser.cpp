@@ -179,6 +179,20 @@ void	Parser::parseNick()
 	}
 }
 
+void	Parser::parseUser()
+{
+	if (_args.size() < 5 || _args.at(4).back() == ':')
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+	else if (_args.at(4).front() != ':')
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+}
+
+void	Parser::parsePass()
+{
+	if (_args.size() < 2)
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+}
+
 void	Parser::parsePing(std::string serverName)
 {
 	if (_args.size() < 2)

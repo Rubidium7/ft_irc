@@ -19,6 +19,8 @@ class Parser
 		void						parseCap();
 		void						parseJoin();
 		void						parseNick();
+		void						parseUser();
+		void						parsePass();
 		void						parsePing(std::string serverName);
 
 	private:

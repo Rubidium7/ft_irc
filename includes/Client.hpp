@@ -35,12 +35,12 @@ class Client
 		void		setRealName(std::string realName);
 		std::string	getHostName() const;
 		void		setHostName(std::string hostName);
-		int			getRegistrationStatus() const;
-		void		setRegistrationStatus(int status);
+		int			registrationStatus() const;
+		void		setGivenPass(bool truth);
 
 		int			howManyChannelsJoined() const;
 		void		increaseChannelsJoined();
-		void		decreaseChannelsJoined(); 
+		void		decreaseChannelsJoined();
 
 	private:
 		Client(const Client &src);
@@ -51,7 +51,7 @@ class Client
 		std::string	_userName;
 		std::string	_realName;
 		std::string	_hostName;
-		int			_registration;
+		bool		_givenPass;
 		int			_howManyChannelsJoined;
 
 };

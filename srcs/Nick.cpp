@@ -25,7 +25,4 @@ void	Nick::nickCommand(int socket, Client &client, std::string nick, t_server_mo
 		return ;
 	}
 	client.setNick(nick);
-	if (client.getRegistrationStatus() == NO_NICK)
-		client.setRegistrationStatus(NO_USER);
-	std::cerr << client.getNick() << std::endl;
 }

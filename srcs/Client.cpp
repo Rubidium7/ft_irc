@@ -12,7 +12,9 @@
 
 #include "Client.hpp"
 
-Client::Client(): _socket(0), _nickName("*"), _userName("*"), _realName("*"), _hostName("*"), _registration(NO_NICK), _howManyChannelsJoined(0)
+Client::Client():
+	_socket(0), _nickName("*"), _userName(""),
+	_realName(""), _hostName(""), _givenPass(false), _howManyChannelsJoined(0)
 {
 
 }
@@ -86,12 +88,18 @@ void	Client::setHostName(std::string hostName)
 	_hostName = hostName;
 }
 
-int		Client::getRegistrationStatus() const
+void	Client::setGivenPass(bool truth)
 {
-	return (_registration);
+	_givenPass = truth;
 }
 
-void	Client::setRegistrationStatus(int status)
+int		Client::registrationStatus() const
 {
-	_registration = status;
+	if (_nickName == "*")
+		return (NO_NICK);
+	if (_userName.empty() || _realName.empty() || _hostName.empty())
+		return (NO_USER);
+	if (!_givenPass)
+		return (NO_PASS);
+	return (REGISTERED);
 }

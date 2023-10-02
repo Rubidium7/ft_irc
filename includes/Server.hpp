@@ -70,10 +70,11 @@ class Server
 		void			_handleCommands(int socket);
 		t_command		_returnFirstPartOfCommand(std::string command) const;
 		void			_handleNewRegistration(int socket);
+		void			_messageOfTheDay(int socket, std::string &nick);
+		void			_newUserMessage(int socket, Client &client);
 		// void			_handleMode(int id);
 		// void			_handleWho(int id);
 		// void			_handleWhois(int id);
-		// void			_handleNick(int id);
 		// void			_handlePart(int id);
 		// void			_handlePrivmsg(int id);
 		void			_handlePing(int socket);

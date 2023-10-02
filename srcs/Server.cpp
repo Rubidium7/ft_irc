@@ -14,6 +14,8 @@
 #include "irc.hpp"
 #include "Join.hpp"
 #include "Nick.hpp"
+#include "User.hpp"
+#include "Pass.hpp"
 
 Server::Server(int port, std::string password)
 {
@@ -158,6 +160,7 @@ void	Server::sendToOneClient(int socket, std::string msg)
 	message << msg;
 	buffer = message.str().c_str();
 	size = message.str().size();
+	std::cerr << buffer; //debug
 	send(socket, buffer, size, 0);
 }
 
@@ -238,6 +241,51 @@ int	Server::_findSmallestFreeClientIndex(void) const
 	return (MAX_AMOUNT_CLIENTS);
 }
 
+void	Server::_messageOfTheDay(int socket, std::string &nick)
+{
+	std::string	msg;
+
+	msg = ":- " + _serverSettings.hostName;
+	msg += " Message of the Day -";
+	sendAnswer(socket, nick, RPL_MOTDSTART, msg);
+	msg.clear();
+	msg = "Hello this is the server woo";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = "Ur welcome";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	sendAnswer(socket, nick, RPL_ENDOFMOTD, ":End of MOTD command.");
+}
+
+void	Server::_newUserMessage(int socket, Client &client)
+{
+	std::string	msg;
+	std::string	nick;
+
+	nick = client.getNick();
+	msg = ":Welcome to the server :) ";
+	msg += nick + "!";
+	msg += client.getUserName() + "@";
+	msg += client.getHostName();
+	sendAnswer(socket, nick, RPL_WELCOME, msg);
+	msg.clear();
+	msg = ":Your host is " + _serverSettings.hostName;
+	msg += ", running version v0.1";
+	sendAnswer(socket, nick, RPL_YOURHOST, msg);
+	msg.clear();
+	msg = ":This server was created 17/08/2023 13:53:54"; //just made it up :p
+	sendAnswer(socket, nick, RPL_CREATED, msg);
+	msg.clear();
+	msg = _serverSettings.hostName + " v0.1 o iklot";
+	//<server_name> <version> <usermodes> <chanmodes>
+	sendAnswer(socket, nick, RPL_MYINFO, msg);
+	msg.clear();
+	//implement 005 message with extra info
+	//maybe LUSERS cmd here or not
+	_messageOfTheDay(socket, nick);
+}
+
 void	Server::_handleCommands(int socket)
 {
 	t_command	command = _returnFirstPartOfCommand(_serverSettings.clientBuffers.at(socket));
@@ -253,14 +301,13 @@ void	Server::_handleCommands(int socket)
 	_clearMessage();
 
 	Parser	parser(full_command);
-	// if (_matchClient(socket).getRegistrationStatus() != REGISTERED
-	// 	&& (command != NICK && command != USER &&
-	// 		command != PASS && command != CAP && command != JOIN))
-	// {
-	// 	sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
-	// 	return ;
-	// }
-	_matchClient(socket).setRegistrationStatus(REGISTERED);
+	if (_matchClient(socket).registrationStatus() != REGISTERED
+		&& (command != NICK && command != USER && command != QUIT &&
+			command != PASS && command != CAP && command != JOIN))
+	{
+		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
+		return ;
+	}
 	switch(command)
 	{
 		case CAP:
@@ -272,7 +319,7 @@ void	Server::_handleCommands(int socket)
 				break ;
 			if (parser.getArgs().at(1) == ":")
 				_handleJoinColon(socket);
-			else if (_matchClient(socket).getRegistrationStatus() == REGISTERED)
+			else if (_matchClient(socket).registrationStatus() == REGISTERED)
 				Join::joincmd(socket, full_command, _serverSettings);
 			else
 				_assignServerMessage(ERR_NOTREGISTERED, ":You have not registered");
@@ -289,11 +336,17 @@ void	Server::_handleCommands(int socket)
 				Nick::nickCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
 			break;
 		case USER:
-		//	parser.parseUser();
-		//	if (!parser.getMessageCode())
-		//		Nick::nickCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
+			parser.parseUser();
+			if (!parser.getMessageCode())
+			{
+				if (User::userCommand(socket, _matchClient(socket), parser.getArgs()))
+					_newUserMessage(socket, _matchClient(socket));
+			}
 			break;
-		case PASS://check if user
+		case PASS:
+			parser.parsePass();
+			if (!parser.getMessageCode())
+				Pass::passCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
 			break;
 		case PART:
 			break;
@@ -309,6 +362,7 @@ void	Server::_handleCommands(int socket)
 		case KICK:
 			break;
 		case QUIT:
+			clientExit(socket); //tmp
 			break;
 		default:
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
@@ -341,7 +395,7 @@ t_command		Server::_returnFirstPartOfCommand(std::string command) const
 	std::string first_part;
 
 	ss >> first_part;
-	for (int i = 0; i < 12; i++)
+	for (int i = 0; i < 14; i++)
 	{
 		if (commands[i].first_part == first_part)
 			return (commands[i].command);
@@ -352,12 +406,11 @@ t_command		Server::_returnFirstPartOfCommand(std::string command) const
 void	Server::_handleJoinColon(int socket)
 {
 	sendAnswer(socket, _matchClient(socket).getNick(), RPL_HELLO, ":Please wait while we process your connection.");
-	if (_matchClient(socket).getRegistrationStatus() != REGISTERED)
+	if (_matchClient(socket).registrationStatus() != REGISTERED)
 		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
 }
 
 void	Server::_handlePing(int socket)
 {
-	//(void) full_command;
 	sendToOneClient(socket, ":" + _serverSettings.hostName + " PONG " + _serverSettings.hostName + " :" + _serverSettings.hostName + "\r\n");
 }
