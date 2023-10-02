@@ -55,23 +55,26 @@ class Server
 		void			sendToOneClient(int socket, std::string msg);
 		void			clientExit(int socket);
 		void			receiveMessage(int socket);
-		void			sendAnswer(int socket, std::string nick, t_code code, std::string msg);
+		static void		sendAnswer(int socket, std::string nick, t_code code, std::string msg);
 
 	private:
 		Server();
 		Server(const Server &src);
 		Server	&operator=(const Server &rhs);
 
+		void			_clearMessage();
+		void			_assignServerMessage(t_code code, std::string msg);
 		void			_sendMessageFromStruct(int socket, t_message message);
 		Client			&_matchClient(int socket);
 		int				_findSmallestFreeClientIndex() const;
 		void			_handleCommands(int socket);
 		t_command		_returnFirstPartOfCommand(std::string command) const;
 		void			_handleNewRegistration(int socket);
+		void			_messageOfTheDay(int socket, std::string &nick);
+		void			_newUserMessage(int socket, Client &client);
 		// void			_handleMode(int id);
 		// void			_handleWho(int id);
 		// void			_handleWhois(int id);
-		// void			_handleNick(int id);
 		// void			_handlePart(int id);
 		// void			_handlePrivmsg(int id);
 		void			_handlePing(int socket);
@@ -81,7 +84,6 @@ class Server
 		void			_handleJoinColon(int socket);
 		void			_handleNotCommand(int socket);
 
-		void			_assignServerMessage(t_code code, std::string msg);
 
 		t_server_mode	_serverSettings;
 };

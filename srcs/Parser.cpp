@@ -166,6 +166,31 @@ void	Parser::parseNick()
 	}
 	if (_args.size() > 2)
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(2) + " :Too many targets");
+
+	if (_args.at(1).size() > 12)
+		_args.at(1).erase(12, std::string::npos);
+
+	std::string	nick = _args.at(1);
+
+	for (size_t i = 0; i < nick.size(); i++)
+	{
+		if (!isalnum(nick.at(i)) && nick.at(i) != '-' && nick.at(i) != '_')
+			_assignParserMessage(ERR_ERRONEUSNICKNAME, _args.at(1) + " :Nick includes weird characters");
+	}
+}
+
+void	Parser::parseUser()
+{
+	if (_args.size() < 5 || _args.at(4).back() == ':')
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+	else if (_args.at(4).front() != ':')
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+}
+
+void	Parser::parsePass()
+{
+	if (_args.size() < 2)
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
 }
 
 void	Parser::parsePing(std::string serverName)

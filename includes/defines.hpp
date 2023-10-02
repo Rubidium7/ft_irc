@@ -24,7 +24,7 @@
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
-# define EOM "\n"
+# define EOM "\r\n"
 
 typedef enum e_registration
 {
@@ -59,6 +59,9 @@ typedef enum e_code
 	RPL_MYINFO = 4,
 	RPL_BOUNCE = 5,
 	RPL_HELLO = 20,
+	RPL_MOTD = 372,
+	RPL_MOTDSTART = 375,
+	RPL_ENDOFMOTD = 376,
 	ERR_UNKNOWNERROR = 400,
 	ERR_NOSUCHNICK = 401,
 	ERR_NOSUCHSERVER = 402,

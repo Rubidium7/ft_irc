@@ -17,6 +17,7 @@
 # include <string>
 # include <sstream>
 # include <unistd.h>
+# include <cctype>
 # include <sys/select.h>
 # include "defines.hpp"
 # include "Server.hpp"
