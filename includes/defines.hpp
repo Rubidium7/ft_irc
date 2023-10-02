@@ -17,8 +17,8 @@
 # include <netinet/in.h>
 # include <vector>
 # include <string>
-//# include <set> 
-//# include "Client.hpp" 
+//# include <set>
+//# include "Client.hpp"
 //# include "Channel.hpp"
 
 # define MAX_AMOUNT_CLIENTS  5 //1023
@@ -28,10 +28,10 @@
 
 typedef enum e_registration
 {
-	REGISTERED,
-	NO_PASS,
+	NO_NICK,
 	NO_USER,
-	NO_NICK
+	NO_PASS,
+	REGISTERED
 }	t_registration;
 
 typedef enum e_error
@@ -68,6 +68,7 @@ typedef enum e_code
 	ERR_NOORIGIN = 409,
 	ERR_INVALIDCAPCMD = 410,
 	ERR_UNKNOWNCOMMAND = 421,
+	ERR_NONICKNAMEGIVEN = 431,
 	ERR_ERRONEUSNICKNAME = 432,
 	ERR_NICKNAMEINUSE = 433,
 	ERR_NOTREGISTERED = 451,

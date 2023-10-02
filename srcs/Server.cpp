@@ -244,18 +244,29 @@ void	Server::_handleCommands(int socket)
 	std::cerr << full_command << std::endl;
 
 	Parser	parser(full_command);
-
+	// if (_matchClient(socket).getRegistrationStatus() != REGISTERED
+	// 	&& (command != NICK && command != USER &&
+	// 		command != PASS && command != CAP && command != JOIN))
+	// {
+	// 	sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
+	// 	return ;
+	// }
+	_matchClient(socket).setRegistrationStatus(REGISTERED);
 	switch(command)
 	{
 		case CAP:
 			parser.parseCap();
-			if (!parser.getMessageCode())
-				_handleCap(socket, command, full_command);
-			break;
+			break ;
 		case JOIN:
 			parser.parseJoin();
-			if (!parser.getMessageCode())
+			if (parser.getMessageCode())
+				break ;
+			if (parser.getArgs().at(1) == ":")
+				_handleJoinColon(socket);
+			else if (_matchClient(socket).getRegistrationStatus() == REGISTERED)
 				Join::joincmd(socket, full_command, _serverSettings);
+			else
+				_assignServerMessage(ERR_NOTREGISTERED, ":You have not registered");
 			break;
 		case MODE:
 			break;
@@ -264,6 +275,9 @@ void	Server::_handleCommands(int socket)
 		case WHOIS:
 			break;
 		case NICK:
+			parser.parseNick();
+			//if (!parser.getMessageCode())
+			//	Nick::nickCommand(socket);
 			break;
 		case USER:
 			break;
@@ -325,11 +339,11 @@ t_command		Server::_returnFirstPartOfCommand(std::string command) const
 	return (NOT_COMMAND);
 }
 
-void	Server::_handleCap(int socket, t_command command, std::string full_command)
+void	Server::_handleJoinColon(int socket)
 {
-	(void)socket;
-	(void)command;
-	(void)full_command;
+	sendAnswer(socket, _matchClient(socket).getNick(), RPL_HELLO, ":Please wait while we process your connection.");
+	if (_matchClient(socket).getRegistrationStatus() != REGISTERED)
+		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
 }
 
 void	Server::_handlePing(int socket)

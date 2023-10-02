@@ -56,7 +56,7 @@ class Server
 		void			clientExit(int socket);
 		void			receiveMessage(int socket);
 		void			sendAnswer(int socket, std::string nick, t_code code, std::string msg);
-	
+
 	private:
 		Server();
 		Server(const Server &src);
@@ -67,7 +67,7 @@ class Server
 		int				_findSmallestFreeClientIndex() const;
 		void			_handleCommands(int socket);
 		t_command		_returnFirstPartOfCommand(std::string command) const;
-		void			_handleCap(int socket, t_command command, std::string full_command);
+		void			_handleNewRegistration(int socket);
 		// void			_handleMode(int id);
 		// void			_handleWho(int id);
 		// void			_handleWhois(int id);
@@ -78,8 +78,9 @@ class Server
 		// void			_handleTopic(int id);
 		// void			_handleKick(int id);
 		// void			_handleQuit(int id);
+		void			_handleJoinColon(int socket);
 		void			_handleNotCommand(int socket);
-		
+
 		void			_assignServerMessage(t_code code, std::string msg);
 
 		t_server_mode	_serverSettings;
