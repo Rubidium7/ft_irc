@@ -55,13 +55,15 @@ class Server
 		void			sendToOneClient(int socket, std::string msg);
 		void			clientExit(int socket);
 		void			receiveMessage(int socket);
-		void			sendAnswer(int socket, std::string nick, t_code code, std::string msg);
+		static void		sendAnswer(int socket, std::string nick, t_code code, std::string msg);
 
 	private:
 		Server();
 		Server(const Server &src);
 		Server	&operator=(const Server &rhs);
 
+		void			_clearMessage();
+		void			_assignServerMessage(t_code code, std::string msg);
 		void			_sendMessageFromStruct(int socket, t_message message);
 		Client			&_matchClient(int socket);
 		int				_findSmallestFreeClientIndex() const;
@@ -81,7 +83,6 @@ class Server
 		void			_handleJoinColon(int socket);
 		void			_handleNotCommand(int socket);
 
-		void			_assignServerMessage(t_code code, std::string msg);
 
 		t_server_mode	_serverSettings;
 };

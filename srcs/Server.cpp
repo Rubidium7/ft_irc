@@ -10,9 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/defines.hpp"
+#include "defines.hpp"
 #include "irc.hpp"
-#include "../includes/Join.hpp"
+#include "Join.hpp"
+#include "Nick.hpp"
 
 Server::Server(int port, std::string password)
 {
@@ -80,6 +81,12 @@ int		Server::getServerSocket(void)
 	return (_serverSettings.serverSocket);
 }
 
+void	Server::_clearMessage()
+{
+	_serverSettings.message.msg = "";
+	_serverSettings.message.code = EMPTY;
+}
+
 void	Server::_assignServerMessage(t_code code, std::string msg)
 {
 	_serverSettings.message.msg = msg;
@@ -130,7 +137,7 @@ void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string m
 	const char				*buffer;
 	std::string::size_type	size;
 
-	message << ":" << _serverSettings.hostName << " ";
+	message << ":" << "localhost" << " ";
 	if (code < 100)
 		message << "0";
 	if (code < 10)
@@ -200,7 +207,7 @@ void	Server::receiveMessage(int socket)
 		// Apparently command handling happens after this ???
 
 		// Print what client sent
-		std::cout << "Client: " << socket << " " << "Sent: #" << _serverSettings.buffer << "#" << std::endl;
+		//std::cout << "Client: " << socket << " " << "Sent: #" << _serverSettings.buffer << "#" << std::endl;
 
 		// Add buffer to clientbuffer
 		for(int i = 0; _serverSettings.buffer[i]; ++i)
@@ -243,6 +250,8 @@ void	Server::_handleCommands(int socket)
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 2);
 	std::cerr << full_command << std::endl;
 
+	_clearMessage();
+
 	Parser	parser(full_command);
 	// if (_matchClient(socket).getRegistrationStatus() != REGISTERED
 	// 	&& (command != NICK && command != USER &&
@@ -276,12 +285,15 @@ void	Server::_handleCommands(int socket)
 			break;
 		case NICK:
 			parser.parseNick();
-			//if (!parser.getMessageCode())
-			//	Nick::nickCommand(socket);
+			if (!parser.getMessageCode())
+				Nick::nickCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
 			break;
 		case USER:
+		//	parser.parseUser();
+		//	if (!parser.getMessageCode())
+		//		Nick::nickCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
 			break;
-		case PASS:
+		case PASS://check if user
 			break;
 		case PART:
 			break;
@@ -298,15 +310,13 @@ void	Server::_handleCommands(int socket)
 			break;
 		case QUIT:
 			break;
-		case NOT_COMMAND:
-			break;
 		default:
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
 	}
-	if (parser.getMessageCode())
-		_sendMessageFromStruct(socket, parser.getMessage());
 	if (_serverSettings.message.code)
 		_sendMessageFromStruct(socket, _serverSettings.message);
+	if (parser.getMessageCode())
+		_sendMessageFromStruct(socket, parser.getMessage());
 }
 
 t_command		Server::_returnFirstPartOfCommand(std::string command) const
