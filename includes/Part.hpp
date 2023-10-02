@@ -1,35 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Join.hpp                                           :+:      :+:    :+:   */
+/*   Part.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/09/28 16:17:30 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/02 17:57:43 by tpoho            ###   ########.fr       */
+/*   Created: 2023/10/02 17:09:07 by tpoho             #+#    #+#             */
+/*   Updated: 2023/10/02 19:12:06 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef JOIN_HPP
-# define JOIN_HPP
+#ifndef PART_HPP
+# define PART_HPP
 
-# include "defines.hpp"
+//# include "defines.hpp"
 //# include "Channel.hpp"
 # include "Server.hpp"
 # include <string>
 
-class Join
+class Part
 {
 	public:
 
-		static void joincmd(int socket, std::string full_command, t_server_mode	&_serverSettings);
+		static void partcmd(int socket, std::string full_command, t_server_mode	&_serverSettings);
 
 	private:
 
-		Join();
-		~Join();
-		Join(Join &copy_constructor);
-		Join &operator=(Join &copy_assignment);
+		Part();
+		~Part();
+		Part(Part &copy_constructor);
+		Part &operator=(Part &copy_assignment);
+
+		static std::string _return_last_part_of_string(int begin, std::string full_command);
 };
 
 #endif

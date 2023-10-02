@@ -34,17 +34,22 @@ class Channel
 
 		Channel(const std::string nameOfChannel, int socketDescriptor);
 		~Channel();
+		Channel(const Channel &copy_constructor);
+		Channel	&operator=(const Channel &copy_assignment);
 
 		std::string	getChannelName() const;
 		int			isInviteOnly() const;
 		int			isOnChannel(int socket) const;
 		void		addToChannel(int socket);
+		void		partFromChannel(int socket);
+		int			howManyMembersOnChannel() const;
+		int			isThereKey() const;
+		void		setKey(std::string new_key);
 
 	private:
 
 		Channel();
-		Channel(const Channel &src);
-		Channel	&operator=(const Channel &rhs);
+		
 
 		t_channel_mode _channelSettings;
 };

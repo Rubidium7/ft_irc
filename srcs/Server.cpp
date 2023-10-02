@@ -6,13 +6,14 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/29 20:25:32 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/02 19:52:25 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/defines.hpp"
 #include "irc.hpp"
 #include "../includes/Join.hpp"
+#include "../includes/Part.hpp"
 
 Server::Server(int port, std::string password)
 {
@@ -284,6 +285,7 @@ void	Server::_handleCommands(int socket)
 		case PASS:
 			break;
 		case PART:
+			Part::partcmd(socket, full_command, _serverSettings);
 			break;
 		case PRIVMSG:
 			break;
