@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/03 21:02:10 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/03 21:11:36 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -371,6 +371,7 @@ void	Server::_handleCommands(int socket)
 			break;
 		case DEBUG:
 			Debug::debugcmd(socket, full_command, _serverSettings);
+			break;
 		default:
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
 	}
