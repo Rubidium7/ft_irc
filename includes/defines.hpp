@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/29 20:23:05 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/03 21:02:52 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
-# define EOM "\r\n"
+# define EOM "\n"
 
 typedef enum e_registration
 {
@@ -97,7 +97,8 @@ typedef enum e_command
 	PING,
 	TOPIC,
 	KICK,
-	QUIT
+	QUIT,
+	DEBUG
 }	t_command;
 
 typedef struct s_commands

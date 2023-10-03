@@ -6,17 +6,20 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/02 20:10:10 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/03 21:02:10 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "defines.hpp"
+#include "Server.hpp"
 #include "irc.hpp"
-#include "../includes/Join.hpp"
-#include "../includes/Part.hpp"
+#include "Join.hpp"
+#include "Part.hpp"
 #include "Nick.hpp"
 #include "User.hpp"
 #include "Pass.hpp"
+#include "Debug.hpp"
+#include "Server.hpp"
 
 Server::Server(int port, std::string password)
 {
@@ -366,6 +369,8 @@ void	Server::_handleCommands(int socket)
 		case QUIT:
 			clientExit(socket); //tmp
 			break;
+		case DEBUG:
+			Debug::debugcmd(socket, full_command, _serverSettings);
 		default:
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
 	}
@@ -377,7 +382,7 @@ void	Server::_handleCommands(int socket)
 
 t_command		Server::_returnFirstPartOfCommand(std::string command) const
 {
-	t_commands commands[14] = {
+	t_commands commands[15] = {
         {"CAP", CAP},
         {"JOIN", JOIN},
         {"MODE", MODE},
@@ -391,13 +396,14 @@ t_command		Server::_returnFirstPartOfCommand(std::string command) const
 		{"PING", PING},
 		{"TOPIC", TOPIC},
 		{"KICK", KICK},
-		{"QUIT", QUIT}
+		{"QUIT", QUIT},
+		{"DEBUG", DEBUG}
     };
 	std::stringstream ss(command);
 	std::string first_part;
 
 	ss >> first_part;
-	for (int i = 0; i < 14; i++)
+	for (int i = 0; i < 15; i++)
 	{
 		if (commands[i].first_part == first_part)
 			return (commands[i].command);

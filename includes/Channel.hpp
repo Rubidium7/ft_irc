@@ -24,7 +24,7 @@ typedef struct s_channel_mode
 	int					invite_only;		// Invite only channel
 	int					topic;				// Restrict topic to only ops
 	std::string			key;				// channel key (password)
-	std::vector<int>	ops_list;			// Who has the ops 
+	std::vector<int>	ops;			// Who has the ops 
 	int					limit_users;		// limit of users
 }	t_channel_mode;
 
@@ -45,6 +45,7 @@ class Channel
 		int			howManyMembersOnChannel() const;
 		int			isThereKey() const;
 		void		setKey(std::string new_key);
+		void		printDebug() const;
 
 	private:
 
