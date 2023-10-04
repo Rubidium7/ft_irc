@@ -58,7 +58,6 @@ typedef enum e_code
 	RPL_CREATED = 3,
 	RPL_MYINFO = 4,
 	RPL_BOUNCE = 5,
-	RPL_ISUPPORT = 5,
 	RPL_HELLO = 20,
 	RPL_MOTD = 372,
 	RPL_MOTDSTART = 375,
@@ -71,6 +70,8 @@ typedef enum e_code
 	ERR_NOSUCHSERVICE = 408,
 	ERR_NOORIGIN = 409,
 	ERR_INVALIDCAPCMD = 410,
+	ERR_NORECIPIENT = 411,
+	ERR_NOTEXTTOSEND = 412,
 	ERR_UNKNOWNCOMMAND = 421,
 	ERR_NONICKNAMEGIVEN = 431,
 	ERR_ERRONEUSNICKNAME = 432,
@@ -79,6 +80,7 @@ typedef enum e_code
 	ERR_NEEDMOREPARAMS = 461,
 	ERR_ALREADYREGISTERED = 462,
 	ERR_PASSWDMISMATCH = 464,
+	ERR_UNKNOWNMODE = 472,
 	ERR_BADCHANNELKEY = 475
 }	t_code;
 
@@ -102,11 +104,32 @@ typedef enum e_command
 	DEBUG
 }	t_command;
 
+typedef enum e_mode
+{
+	UNKNOWN_MODE,
+	I,
+	I_OFF,
+	T,
+	T_OFF,
+	K,
+	K_OFF,
+	O,
+	O_OFF,
+	L,
+	L_OFF
+}	t_mode;
+
 typedef struct s_commands
 {
 	std::string first_part;
 	t_command	command;
 }	t_commands;
+
+typedef struct s_modes
+{
+	std::string string;
+	t_mode		mode;
+}	t_modes;
 
 typedef struct s_message
 {

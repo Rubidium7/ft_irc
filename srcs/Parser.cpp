@@ -36,24 +36,30 @@ void	Parser::_assignParserMessage(t_code code, std::string msg)
 	_message.code = code;
 }
 
-bool	Parser::_isChannelKeyFormatCorrect(size_t amountOfChannels)
+std::vector<std::string>	Parser::_createVector(std::string string, char separator)
 {
-	std::string					key_str;
-	std::vector<std::string>	keys;
-	size_t						comma;
+	std::vector<std::string>	ans;
+	size_t						found;
 
-	key_str = _args.at(2);
 	while (1)
 	{
-		comma = key_str.find(',');
-		if (comma == std::string::npos)
+		found = string.find(separator);
+		if (found == std::string::npos)
 		{
-			keys.push_back(key_str);
+			ans.push_back(string);
 			break ;
 		}
-		keys.push_back(key_str.substr(0, comma));
-		key_str.erase(0, comma + 1);
+		ans.push_back(string.substr(0, found));
+		string.erase(0, found + 1);
 	}
+	return (ans);
+}
+
+bool	Parser::_isChannelKeyFormatCorrect(size_t amountOfChannels)
+{
+	std::vector<std::string>	keys;
+
+	keys = _createVector(_args.at(2), ',');
 	for (size_t i = 0; i != keys.size(); i++)
 	{
 		if (keys.at(i).empty())
@@ -72,36 +78,56 @@ bool	Parser::_isChannelKeyFormatCorrect(size_t amountOfChannels)
 
 bool	Parser::_isChannelFormatCorrect(size_t *amountOfChannels)
 {
-	std::string					channel_str;
 	std::vector<std::string>	channels;
-	size_t						comma;
 
-	channel_str = _args.at(1);
-	while (1)
-	{
-		comma = channel_str.find(',');
-		if (comma == std::string::npos)
-		{
-			channels.push_back(channel_str);
-			break ;
-		}
-		channels.push_back(channel_str.substr(0, comma));
-		channel_str.erase(0, comma + 1);
-	}
+	channels = _createVector(_args.at(1), ',');
 	for (size_t i = 0; i != channels.size(); i++)
 	{
-		if (channels.at(i).empty() || channels.at(i).at(0) != '#')
+		if (channels.at(i).empty() || (channels.at(i).at(0) != '#' && amountOfChannels))
 		{
 			_assignParserMessage(ERR_NOSUCHCHANNEL, channels.at(i) + " :Improper channel format");
 			return (false);
 		}
-		if (channels.at(i).size() < 2)
+		if (channels.at(i).size() < 2 && amountOfChannels)
 		{
 			_assignParserMessage(ERR_NOSUCHCHANNEL, channels.at(i) + " :Improper channel format");
 			return (false);
 		}
 	}
-	*amountOfChannels = channels.size();
+	if (amountOfChannels)
+		*amountOfChannels = channels.size();
+	return (true);
+}
+
+t_mode	Parser::_identifyMode(std::string input)
+{
+	t_modes modes[10] = {
+		{"+i", I},
+		{"-i", I_OFF},
+		{"+t", T},
+		{"-t", T_OFF},
+		{"+k", K},
+		{"-k", K_OFF},
+		{"+o", O},
+		{"-o", O_OFF},
+		{"+l", L},
+		{"-l", L_OFF}
+	};
+	for (int i = 0; i != 10; i++)
+	{
+		if (input == modes[i].string)
+			return (modes[i].mode);
+	}
+	return (UNKNOWN_MODE);
+}
+
+bool	Parser::_onlyNumeric(std::string input)
+{
+	for (size_t i = 0; i != input.size(); i++)
+	{
+		if (!isdigit(input[i]))
+			return (false);
+	}
 	return (true);
 }
 
@@ -115,13 +141,13 @@ void	Parser::parseCap()
 	std::string sub_command = _args.at(1);
 	if (sub_command != "LS" && sub_command != "END")
 		_assignParserMessage(ERR_INVALIDCAPCMD, _args.at(1) + " :Invalid CAP subcommand");
-	if (sub_command == "END")
+	else if (sub_command == "END")
 	{
 		if (_args.size() != 2)
 			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(2) + " :Too many targets");
 		return ;
 	}
-	if (_args.size() < 3)
+	else if (_args.size() < 3)
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
 	else if (_args.size() > 3)
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(3) + " :Too many targets");
@@ -165,8 +191,10 @@ void	Parser::parseNick()
 		return ;
 	}
 	if (_args.size() > 2)
+	{
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(2) + " :Too many targets");
-
+		return ;
+	}
 	if (_args.at(1).size() > 12)
 		_args.at(1).erase(12, std::string::npos);
 
@@ -175,22 +203,146 @@ void	Parser::parseNick()
 	for (size_t i = 0; i < nick.size(); i++)
 	{
 		if (!isalnum(nick.at(i)) && nick.at(i) != '-' && nick.at(i) != '_')
-			_assignParserMessage(ERR_ERRONEUSNICKNAME, _args.at(1) + " :Nick includes weird characters");
+			_assignParserMessage(ERR_ERRONEUSNICKNAME, _args.at(i) + " :Nick includes weird characters");
 	}
 }
 
 void	Parser::parseUser()
 {
-	if (_args.size() < 5 || _args.at(4).back() == ':')
+	if (_args.size() < 5 || _args.at(4).size() < 2)
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
 	else if (_args.at(4).front() != ':')
-		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Incorrect format");
 }
 
 void	Parser::parsePass()
 {
 	if (_args.size() < 2)
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+}
+
+void	Parser::parsePart()
+{
+	if (_args.size() < 2)
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+	else if (!_isChannelFormatCorrect(NULL))
+		return ;
+	if (_args.size() != 2 && _args.at(2).front() != ':')
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(1) + " :Improper comment format");
+}
+
+void	Parser::parseQuit()
+{
+	if (_args.size() > 1 && _args.at(1).front() != ':')
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Improper leave message format");
+}
+
+void	Parser::parseKick()
+{
+	if (_args.size() < 3)
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+	else if (_args.size() > 3 && _args.at(2).front() != ':')
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Improper kick message format");
+	else if (_args.at(1).front() != '#' || _args.at(1).size() < 2)
+		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
+}
+
+void	Parser::parseTopic()
+{
+	if (_args.size() < 2)
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+	else if (_args.at(1).front() != '#' || _args.at(1).size() < 2)
+		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
+	else if (_args.size() > 2 && _args.at(2).front() != ':')
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Improper topic set format");
+}
+
+void	Parser::parseMode(std::string nick)
+{
+	if (_args.size() < 2)
+	{
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+		return ;
+	}
+	if (_args.at(1) == nick)
+		return ;
+	if (_args.at(1).front() != '#' || _args.at(1).size() < 2)
+	{
+		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
+		return ;
+	}
+	if (_args.size() == 2)
+		return ;
+	t_mode	mode = _identifyMode(_args.at(2));
+	switch (mode)
+	{
+		case I:
+		if (_args.size() > 3)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :No parameters for " + _args.at(2));
+			return ;
+		case I_OFF:
+		if (_args.size() > 3)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :No parameters for " + _args.at(2));
+			return ;
+		case T:
+		if (_args.size() > 3)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :No parameters for " + _args.at(2));
+			return ;
+		case T_OFF:
+		if (_args.size() > 3)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :No parameters for " + _args.at(2));
+			return ;
+		case K:
+		if (_args.size() > 4)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :only one parameter for " + _args.at(2));
+		else if (_args.size() != 4)
+			_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(2) + " :Not enough parameters");
+			return ;
+		case K_OFF:
+		if (_args.size() > 4)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :only one parameter for " + _args.at(2));
+		else if (_args.size() != 4)
+			_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(2) + " :Not enough parameters");
+			return ;
+		case O:
+		if (_args.size() > 4)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :only one parameter for " + _args.at(2));
+		else if (_args.size() != 4)
+			_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(2) + " :Not enough parameters");
+			return ;
+		case O_OFF:
+		if (_args.size() > 4)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :only one parameter for " + _args.at(2));
+		else if (_args.size() != 4)
+			_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(2) + " :Not enough parameters");
+			return ;
+		case L:
+		if (_args.size() > 4)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :only one parameter for " + _args.at(2));
+		else if (_args.size() != 4)
+			_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(2) + " :Not enough parameters");
+		else if (!_onlyNumeric(_args.at(3)))
+			_assignParserMessage(ERR_UNKNOWNMODE, _args.at(3) + " :should only include numbers for mode +l");
+			return ;
+		case L_OFF:
+		if (_args.size() > 3)
+			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :No parameters for " + _args.at(2));
+			return ;
+		default:
+			_assignParserMessage(ERR_UNKNOWNMODE, _args.at(2) + " :is unknown mode char to me for " + _args.at(1));
+	}
+}
+
+void	Parser::parsePrivmsg()
+{
+	if (_args.size() < 2 || _args.at(1).front() == ':')
+		_assignParserMessage(ERR_NORECIPIENT, _args.at(0) + " :No recipient");
+	else if (_args.size() < 3)
+		_assignParserMessage(ERR_NOTEXTTOSEND, _args.at(0) + " :Not given text to send");
+	else if (_args.at(2).front() != ':')
+		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(1) + " :Too many targets");
+	else if (_args.at(2).size() < 2)
+		_assignParserMessage(ERR_NOTEXTTOSEND, _args.at(0) + " :Not given text to send");
 }
 
 void	Parser::parsePing(std::string serverName)

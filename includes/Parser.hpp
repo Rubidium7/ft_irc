@@ -21,6 +21,12 @@ class Parser
 		void						parseNick();
 		void						parseUser();
 		void						parsePass();
+		void						parsePart();
+		void						parseQuit();
+		void						parseKick();
+		void						parseTopic();
+		void						parsePrivmsg();
+		void						parseMode(std::string nick);
 		void						parsePing(std::string serverName);
 
 	private:
@@ -32,6 +38,9 @@ class Parser
 		bool	_isChannelKeyFormatCorrect(size_t amountOfChannels);
 		bool	_isChannelFormatCorrect(size_t *amountOfChannels);
 		void	_saveArguments(std::string input);
+		std::vector<std::string>	_createVector(std::string string, char separator);
+		t_mode	_identifyMode(std::string input);
+		bool	_onlyNumeric(std::string input);
 
 		std::vector<std::string>	_args;
 		t_message					_message;

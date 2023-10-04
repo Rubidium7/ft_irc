@@ -287,7 +287,7 @@ void	Server::_newUserMessage(int socket, Client &client)
 	msg.clear();
 	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=# CHANLIMIT=#:42 NICKLEN=12";
 	msg += " :are supported by this server";
-	sendAnswer(socket, nick, RPL_ISUPPORT, msg);
+	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
 	//much more info can be added to 005 msg ^^^
 	//maybe LUSERS cmd here or not
@@ -297,6 +297,7 @@ void	Server::_newUserMessage(int socket, Client &client)
 void	Server::_handleCommands(int socket)
 {
 	t_command	command = _returnFirstPartOfCommand(_serverSettings.clientBuffers.at(socket));
+	bool		new_user = false;
 
 	int newline_pos = _serverSettings.clientBuffers.at(socket).find(EOM);
     std::string full_command =  _serverSettings.clientBuffers.at(socket).substr(0, newline_pos);
@@ -308,9 +309,10 @@ void	Server::_handleCommands(int socket)
 
 	_clearMessage();
 
+	if (_matchClient(socket).registrationStatus() != REGISTERED)
+		new_user = true;
 	Parser	parser(full_command);
-	if (_matchClient(socket).registrationStatus() != REGISTERED
-		&& (command != NICK && command != USER && command != QUIT &&
+	if (new_user && (command != NICK && command != USER && command != QUIT &&
 			command != PASS && command != CAP && command != JOIN))
 	{
 		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
@@ -331,51 +333,64 @@ void	Server::_handleCommands(int socket)
 				Join::joincmd(socket, full_command, _serverSettings);
 			else
 				_assignServerMessage(ERR_NOTREGISTERED, ":You have not registered");
-			break;
+			break ;
 		case MODE:
-			break;
-		case WHO:
-			break;
-		case WHOIS:
-			break;
+			parser.parseMode(_matchClient(socket).getNick());
+			//if (!parser.getMessageCode())
+				//
+			break ;
+		case WHO://might not need
+			break ;
+		case WHOIS://might not need
+			break ;
 		case NICK:
 			parser.parseNick();
 			if (!parser.getMessageCode())
 				Nick::nickCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
-			break;
+			break ;
 		case USER:
 			parser.parseUser();
 			if (!parser.getMessageCode())
-			{
-				if (User::userCommand(socket, _matchClient(socket), parser.getArgs()))
-					_newUserMessage(socket, _matchClient(socket));
-			}
-			break;
+				User::userCommand(socket, _matchClient(socket), parser.getArgs());
+			break ;
 		case PASS:
 			parser.parsePass();
 			if (!parser.getMessageCode())
 				Pass::passCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
-			break;
+			break ;
 		case PART:
-			Part::partcmd(socket, full_command, _serverSettings);
-			break;
+			parser.parsePart();
+			if (!parser.getMessageCode())
+				Part::partcmd(socket, full_command, _serverSettings);
+			break ;
 		case PRIVMSG:
+			parser.parsePrivmsg();
+			//if (!parser.getMessageCode())
+				//
 			break;
 		case PING:
 			parser.parsePing(_serverSettings.hostName);
 			if (!parser.getMessageCode())
 				_handlePing(socket);
-			break;
+			break ;
 		case TOPIC:
-			break;
+			parser.parseTopic();
+			//if (!parser.getMessageCode())
+				//
+			break ;
 		case KICK:
-			break;
+			parser.parseKick();
+			//if (!parser.getMessageCode())
+				//
+			break ;
 		case QUIT:
-			clientExit(socket); //tmp
-			break;
+			parser.parseQuit();
+			if (!parser.getMessageCode())
+				clientExit(socket); //tmp
+			break ;
 		case DEBUG:
 			Debug::debugcmd(socket, full_command, _serverSettings);
-			break;
+			break ;
 		default:
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
 	}
@@ -383,16 +398,18 @@ void	Server::_handleCommands(int socket)
 		_sendMessageFromStruct(socket, _serverSettings.message);
 	if (parser.getMessageCode())
 		_sendMessageFromStruct(socket, parser.getMessage());
+	if (_matchClient(socket).registrationStatus() == REGISTERED && new_user)
+		_newUserMessage(socket, _matchClient(socket));
 }
 
 t_command		Server::_returnFirstPartOfCommand(std::string command) const
 {
 	t_commands commands[15] = {
-        {"CAP", CAP},
-        {"JOIN", JOIN},
-        {"MODE", MODE},
-        {"WHO", WHO},
-        {"WHOIS", WHOIS},
+		{"CAP", CAP},
+		{"JOIN", JOIN},
+		{"MODE", MODE},
+		{"WHO", WHO},
+		{"WHOIS", WHOIS},
 		{"NICK", NICK},
 		{"USER", USER},
 		{"PASS", PASS},
@@ -403,7 +420,7 @@ t_command		Server::_returnFirstPartOfCommand(std::string command) const
 		{"KICK", KICK},
 		{"QUIT", QUIT},
 		{"DEBUG", DEBUG}
-    };
+	};
 	std::stringstream ss(command);
 	std::string first_part;
 
