@@ -285,8 +285,8 @@ void	Server::_newUserMessage(int socket, Client &client)
 	//<server_name> <version> <usermodes> <chanmodes>
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
-	msg << "RFC2812 PREFIX=(o)@ CHANTYPES=# CHANLIMIT=#:42 NICKLEN=12";
-	msg << " :are supported by this server";
+	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=# CHANLIMIT=#:42 NICKLEN=12";
+	msg += " :are supported by this server";
 	sendAnswer(socket, nick, RPL_ISUPPORT, msg);
 	msg.clear();
 	//much more info can be added to 005 msg ^^^
