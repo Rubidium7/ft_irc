@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:38:35 by tpoho             #+#    #+#             */
-/*   Updated: 2023/09/29 20:23:08 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/03 21:00:30 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Client::Client():
 	_socket(0), _nickName("*"), _userName(""),
-	_realName(""), _hostName(""), _givenPass(false), _howManyChannelsJoined(0)
+	_realName(""), _hostName(""), _givenPass(false)
 {
 
 }
@@ -44,20 +44,6 @@ std::string	Client::getNick() const
 	return (_nickName);
 }
 
-int		Client::howManyChannelsJoined() const
-{
-	return (_howManyChannelsJoined);
-}
-
-void		Client::increaseChannelsJoined()
-{
-	++_howManyChannelsJoined;
-}
-
-void	Client::decreaseChannelsJoined()
-{
-	--_howManyChannelsJoined;
-}
 std::string	Client::getUserName() const
 {
 	return (_userName);
@@ -93,7 +79,7 @@ void	Client::setGivenPass(bool truth)
 	_givenPass = truth;
 }
 
-int		Client::registrationStatus() const
+int	Client::registrationStatus() const
 {
 	if (_nickName == "*")
 		return (NO_NICK);
@@ -102,4 +88,15 @@ int		Client::registrationStatus() const
 	if (!_givenPass)
 		return (NO_PASS);
 	return (REGISTERED);
+}
+
+void	Client::printDebug() const
+{
+	std::cout << "Client information:" << std::endl;
+	std::cout << "Socket: " << _socket << std::endl;
+	std::cout << "Nick: " << _nickName << std::endl;
+	std::cout << "Username: " << _userName << std::endl;
+	std::cout << "Realname: " << _realName << std::endl;
+	std::cout << "Hostname: " << _hostName << std::endl;
+	std::cout << "Pass given: " << _givenPass << std::endl;
 }

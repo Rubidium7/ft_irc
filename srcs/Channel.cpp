@@ -6,10 +6,11 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/02 20:05:00 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/03 20:50:14 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <iostream>
 #include "../includes/defines.hpp"
 #include "../includes/Channel.hpp"
 
@@ -34,7 +35,7 @@ Channel::Channel(const Channel &copy_constructor)
 	_channelSettings.invite_only = copy_constructor._channelSettings.invite_only;
 	_channelSettings.topic = copy_constructor._channelSettings.topic;
 	_channelSettings.key = copy_constructor._channelSettings.key;
-	_channelSettings.ops_list = copy_constructor._channelSettings.ops_list;
+	_channelSettings.ops = copy_constructor._channelSettings.ops;
 	_channelSettings.limit_users = copy_constructor._channelSettings.limit_users;
 }
 
@@ -48,7 +49,7 @@ Channel &Channel::operator=(const Channel &copy_assignment)
 	_channelSettings.invite_only = copy_assignment._channelSettings.invite_only;
 	_channelSettings.topic = copy_assignment._channelSettings.topic;
 	_channelSettings.key = copy_assignment._channelSettings.key;
-	_channelSettings.ops_list = copy_assignment._channelSettings.ops_list;
+	_channelSettings.ops = copy_assignment._channelSettings.ops;
 	_channelSettings.limit_users = copy_assignment._channelSettings.limit_users;
 	return (*this);
 }
@@ -68,12 +69,12 @@ int	Channel::isOnChannel(int id) const
 	return (0);
 }
 
-void	Channel::addToChannel(int id)
+void Channel::addToChannel(int id)
 {
 	_channelSettings.channel_members.push_back(id);
 }
 
-void	Channel::partFromChannel(int socket)
+void Channel::partFromChannel(int socket)
 {
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channel_members.size(); ++i)
 	{
@@ -98,7 +99,22 @@ int	Channel::isThereKey() const
 	return (_channelSettings.key.size());		
 }
 
-void	Channel::setKey(std::string new_key)
+void Channel::setKey(std::string new_key)
 {
 	_channelSettings.key = new_key;
+}
+
+void Channel::printDebug() const
+{
+	std::cout << "Channelname: " << _channelSettings.name_of_channel << std::endl;
+	std::cout << "Channel members: " << std::endl;
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.channel_members.size(); ++i)
+		std::cout << _channelSettings.channel_members.at(i) << std::endl;
+		std::cout << "Invite only: " << _channelSettings.invite_only << std::endl;
+	std::cout << "Topic: " << _channelSettings.topic << std::endl;
+	std::cout << "Key: " << _channelSettings.key << std::endl;
+	std::cout << "Channel Ops: " << std::endl;
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.ops.size(); ++i)
+		std::cout << _channelSettings.ops.at(i) << std::endl;
+	std::cout << "Limit how many users: " << _channelSettings.limit_users << std::endl;
 }

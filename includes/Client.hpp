@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:37:31 by tpoho             #+#    #+#             */
-/*   Updated: 2023/09/29 19:55:53 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/03 20:59:05 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class Client
 		int			howManyChannelsJoined() const;
 		void		increaseChannelsJoined();
 		void		decreaseChannelsJoined();
+		void		printDebug() const;
 
 	private:
 		Client(const Client &src);
@@ -52,8 +53,6 @@ class Client
 		std::string	_realName;
 		std::string	_hostName;
 		bool		_givenPass;
-		int			_howManyChannelsJoined;
-
 };
 
 #endif
