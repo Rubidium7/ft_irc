@@ -21,6 +21,8 @@
 # include <vector>
 # include <sys/socket.h>
 # include <netinet/in.h>
+# include <arpa/inet.h> //only for printhost -> might not need
+# include <netdb.h> //only for printhost -> might not need
 
 typedef struct s_server_mode
 {

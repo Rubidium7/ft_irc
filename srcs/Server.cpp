@@ -295,8 +295,6 @@ void	Server::_newUserMessage(int socket, Client &client)
 	//maybe LUSERS cmd here or not
 	_messageOfTheDay(socket, nick);
 }
-#include <arpa/inet.h>
-#include <netdb.h>
 
 void	Server::_printHost(int socket)
 {
