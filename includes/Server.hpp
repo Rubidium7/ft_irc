@@ -24,7 +24,6 @@
 
 typedef struct s_server_mode
 {
-	std::string					hostName;
 	std::string					password;
 	t_error_code				failure;
 	t_message					message;
@@ -80,12 +79,14 @@ class Server
 		void			_handlePing(int socket);
 		// void			_handleTopic(int id);
 		// void			_handleKick(int id);
-		// void			_handleQuit(int id);
+		void			_handleQuit(int socket, Client &client, std::vector<std::string> args);
 		void			_handleJoinColon(int socket);
 		void			_handleNotCommand(int socket);
+		void			_printHost(int socket);
 
 
-		t_server_mode	_serverSettings;
+		t_server_mode		_serverSettings;
+		static std::string	_hostName;
 };
 
 #endif

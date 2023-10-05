@@ -140,7 +140,7 @@ void	Parser::parseCap()
 	}
 	std::string sub_command = _args.at(1);
 	if (sub_command != "LS" && sub_command != "END")
-		_assignParserMessage(ERR_INVALIDCAPCMD, _args.at(1) + " :Invalid CAP subcommand");
+		_assignParserMessage(ERR_INVALIDCAPCMD, sub_command + " :Invalid CAP subcommand");
 	else if (sub_command == "END")
 	{
 		if (_args.size() != 2)
@@ -169,7 +169,7 @@ void	Parser::parseJoin()
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(3) + " :Too many targets");
 		return ;
 	}
-	if (_args.at(1).at(0) == ':') //should we handle 0?
+	if (_args.at(1).at(0) == ':' || _args.at(1).at(0) == '0') //should we handle 0?
 	{
 		if (_args.size() != 2)
 			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(2) + " :Too many targets");
@@ -187,7 +187,7 @@ void	Parser::parseNick()
 {
 	if (_args.size() < 2)
 	{
-		_assignParserMessage(ERR_NONICKNAMEGIVEN, _args.at(0) + " :No nickname given");
+		_assignParserMessage(ERR_NONICKNAMEGIVEN, ":No nickname given");
 		return ;
 	}
 	if (_args.size() > 2)
@@ -203,7 +203,7 @@ void	Parser::parseNick()
 	for (size_t i = 0; i < nick.size(); i++)
 	{
 		if (!isalnum(nick.at(i)) && nick.at(i) != '-' && nick.at(i) != '_')
-			_assignParserMessage(ERR_ERRONEUSNICKNAME, _args.at(i) + " :Nick includes weird characters");
+			_assignParserMessage(ERR_ERRONEUSNICKNAME, _args.at(i) + " :Erroneous nickname");
 	}
 }
 
@@ -336,13 +336,13 @@ void	Parser::parseMode(std::string nick)
 void	Parser::parsePrivmsg()
 {
 	if (_args.size() < 2 || _args.at(1).front() == ':')
-		_assignParserMessage(ERR_NORECIPIENT, _args.at(0) + " :No recipient");
+		_assignParserMessage(ERR_NORECIPIENT, ":No recipient given " + _args.at(0));
 	else if (_args.size() < 3)
-		_assignParserMessage(ERR_NOTEXTTOSEND, _args.at(0) + " :Not given text to send");
+		_assignParserMessage(ERR_NOTEXTTOSEND, ":No text to send");
 	else if (_args.at(2).front() != ':')
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(1) + " :Too many targets");
 	else if (_args.at(2).size() < 2)
-		_assignParserMessage(ERR_NOTEXTTOSEND, _args.at(0) + " :Not given text to send");
+		_assignParserMessage(ERR_NOTEXTTOSEND, ":No text to send");
 }
 
 void	Parser::parsePing(std::string serverName)
