@@ -19,13 +19,16 @@
 
 typedef struct s_channel_mode
 {
-	std::string			name_of_channel;	// Name of channel
-	std::vector<int>	channel_members;	// Who are on channel
-	int					invite_only;		// Invite only channel
-	int					topic;				// Restrict topic to only ops
-	std::string			key;				// channel key (password)
-	std::vector<int>	ops;			// Who has the ops 
-	int					limit_users;		// limit of users
+	std::string					nameOfChannel;	// Name of channel
+	std::vector<int>			channelMembers;	// Who are on channel
+	int							i;				// Is invite only channel
+	std::vector<int>			invitedClients;	// List of invitations, one time only remember to delete once used
+	int							t;				// Restrict topic to only ops
+	std::string					topic;			// Topic that is printed when you join channel
+	std::string					k;				// channel key (password)
+	std::vector<int>			o;				// Who has the ops
+	int							l;				// Limit of how many users can join into a channel
+	std::vector<std::string>	b;				// List of banned sockets
 }	t_channel_mode;
 
 class Channel
@@ -39,13 +42,20 @@ class Channel
 
 		std::string	getChannelName() const;
 		int			isInviteOnly() const;
+		int			isClientInvited(int socket) const;
+		void		addInvitation(int socket);
+		void		removeInvitation(int socket);
 		int			isOnChannel(int socket) const;
 		void		addToChannel(int socket);
 		void		partFromChannel(int socket);
 		int			howManyMembersOnChannel() const;
 		int			isThereKey() const;
 		void		setKey(std::string new_key);
+		int			doesKeyMatch(const std::string &key) const;
 		void		printDebug() const;
+		void		sendToAllChannelMembers(const std::string message);
+		const std::vector<int>& returnChannelMembers() const;
+		int 		hasOps(int socket) const;
 
 	private:
 

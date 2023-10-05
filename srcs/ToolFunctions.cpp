@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:52:44 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/02 18:03:04 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/05 16:22:12 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,12 @@ void ToolFunctions::_parse_into_parts(const std::vector<std::string> &command_pa
 	}
 }
 
-std::string	ToolFunctions::_findNickName(const int socket, const std::vector<Client> clients)
+std::string	ToolFunctions::_findNickName(const int socket, const Client clients[])
 {
-	for (std::vector<Client>::size_type i = 0; i < clients.size(); ++i)
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
-		if (clients.at(i).getSocket() == socket)
-			return (clients.at(i).getNick());
+		if (clients[i].getSocket() == socket)
+			return (clients[i].getNick());
 	}
 	return ("*");
 }

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/03 17:19:01 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/03 20:50:51 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/05 16:18:19 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ void Debug::debugcmd(int socket, std::string full_command, t_server_mode &_serve
 		case 3:
 			if (command_parts.at(1) == "CHANNELS")
 			{
-				std::cout << "Channel " << command_parts.at(2) << " all data:" << std::endl;
 				for (std::vector<Channel>::size_type i = 0; i < _serverSettings.channels.size(); ++i)
 				{
 					if (_serverSettings.channels.at(i).getChannelName() == command_parts.at(2))
@@ -64,7 +63,6 @@ void Debug::debugcmd(int socket, std::string full_command, t_server_mode &_serve
 				}
 			}else if (command_parts.at(1) == "CLIENTS")
 			{
-				std::cout << "Client:" << std::endl;
 				for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 				{
 					if (_serverSettings.clients[i].getNick() == command_parts.at(2))

@@ -6,21 +6,22 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/03 20:50:14 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/05 18:55:48 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
+#include <sstream>
 #include "../includes/defines.hpp"
 #include "../includes/Channel.hpp"
 
 Channel::Channel(const std::string name, int socketDescriptor)
 {
-	_channelSettings.channel_members.push_back(socketDescriptor);
-	_channelSettings.name_of_channel = name;
-	_channelSettings.invite_only = 0;
-	_channelSettings.topic = 0;
-	_channelSettings.limit_users = MAX_AMOUNT_CLIENTS;
+	_channelSettings.nameOfChannel = name;
+	_channelSettings.channelMembers.push_back(socketDescriptor);
+	_channelSettings.i = 0;
+	_channelSettings.t = 0;
+	_channelSettings.l = MAX_AMOUNT_CLIENTS;
 }
 
 Channel::~Channel(void)
@@ -30,59 +31,96 @@ Channel::~Channel(void)
 
 Channel::Channel(const Channel &copy_constructor)
 {
-	_channelSettings.name_of_channel = copy_constructor._channelSettings.name_of_channel;
-	_channelSettings.channel_members = copy_constructor._channelSettings.channel_members;
-	_channelSettings.invite_only = copy_constructor._channelSettings.invite_only;
-	_channelSettings.topic = copy_constructor._channelSettings.topic;
-	_channelSettings.key = copy_constructor._channelSettings.key;
-	_channelSettings.ops = copy_constructor._channelSettings.ops;
-	_channelSettings.limit_users = copy_constructor._channelSettings.limit_users;
+	*this = copy_constructor;
 }
 
-Channel &Channel::operator=(const Channel &copy_assignment)
+Channel	&Channel::operator=(const Channel &copy_assignment)
 {
 	if (this == &copy_assignment)
 		return (*this);
 
-	_channelSettings.name_of_channel = copy_assignment._channelSettings.name_of_channel;
-	_channelSettings.channel_members = copy_assignment._channelSettings.channel_members;
-	_channelSettings.invite_only = copy_assignment._channelSettings.invite_only;
-	_channelSettings.topic = copy_assignment._channelSettings.topic;
-	_channelSettings.key = copy_assignment._channelSettings.key;
-	_channelSettings.ops = copy_assignment._channelSettings.ops;
-	_channelSettings.limit_users = copy_assignment._channelSettings.limit_users;
+	_channelSettings.nameOfChannel	=  copy_assignment._channelSettings.nameOfChannel;
+	_channelSettings.channelMembers = copy_assignment._channelSettings.channelMembers;
+	_channelSettings.i				= copy_assignment._channelSettings.i;
+	_channelSettings.invitedClients	= copy_assignment._channelSettings.invitedClients;
+	_channelSettings.t				= copy_assignment._channelSettings.t;
+	_channelSettings.topic			= copy_assignment._channelSettings.topic;
+	_channelSettings.k				= copy_assignment._channelSettings.k;
+	_channelSettings.o				= copy_assignment._channelSettings.o;
+	_channelSettings.l				= copy_assignment._channelSettings.l;
+
 	return (*this);
 }
 
 std::string	Channel::getChannelName(void) const
 {
-	return (_channelSettings.name_of_channel);
+	return (_channelSettings.nameOfChannel);
 }
 
-int	Channel::isOnChannel(int id) const
+int	Channel::isInviteOnly() const
 {
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.channel_members.size(); ++i)
+	return (_channelSettings.i);
+}
+
+int	Channel::isClientInvited(int socket) const
+{
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
 	{
-		if (_channelSettings.channel_members.at(i) == id)
+		if (_channelSettings.invitedClients.at(i) == socket)
 			return (1);
 	}
 	return (0);
 }
 
-void Channel::addToChannel(int id)
+void	Channel::addInvitation(int socket)
 {
-	_channelSettings.channel_members.push_back(id);
+	if (isClientInvited(socket))
+		return ;
+	_channelSettings.invitedClients.push_back(socket);
 }
 
-void Channel::partFromChannel(int socket)
+void	Channel::removeInvitation(int socket)
 {
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.channel_members.size(); ++i)
+	if (!isClientInvited(socket))
+		return ;
+	
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
 	{
-		if (_channelSettings.channel_members.at(i) == socket)
+		if (_channelSettings.invitedClients.at(i) == socket)
 		{
-			std::swap(_channelSettings.channel_members.at(i),
-				_channelSettings.channel_members.at(_channelSettings.channel_members.size() -1));
-				_channelSettings.channel_members.pop_back();
+			int temp = _channelSettings.invitedClients.at(i);
+			_channelSettings.invitedClients.at(i) = _channelSettings.invitedClients.at(_channelSettings.invitedClients.size() - 1);
+			_channelSettings.invitedClients.at(_channelSettings.invitedClients.size() - 1) = temp;
+			_channelSettings.invitedClients.pop_back();
+		}		
+	}
+
+}
+
+int	Channel::isOnChannel(int id) const
+{
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
+	{
+		if (_channelSettings.channelMembers.at(i) == id)
+			return (1);
+	}
+	return (0);
+}
+
+void	Channel::addToChannel(int id)
+{
+	_channelSettings.channelMembers.push_back(id);
+}
+
+void	Channel::partFromChannel(int socket)
+{
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
+	{
+		if (_channelSettings.channelMembers.at(i) == socket)
+		{
+			std::swap(_channelSettings.channelMembers.at(i),
+				_channelSettings.channelMembers.at(_channelSettings.channelMembers.size() -1));
+				_channelSettings.channelMembers.pop_back();
 			return ;
 		}
 	}
@@ -91,30 +129,74 @@ void Channel::partFromChannel(int socket)
 
 int	Channel::howManyMembersOnChannel() const
 {
-	return (_channelSettings.channel_members.size());
+	return (_channelSettings.channelMembers.size());
 }
 
 int	Channel::isThereKey() const
 {
-	return (_channelSettings.key.size());		
+	return (_channelSettings.k.size());		
 }
 
-void Channel::setKey(std::string new_key)
+void	Channel::setKey(std::string new_key)
 {
-	_channelSettings.key = new_key;
+	_channelSettings.k = new_key;
 }
 
-void Channel::printDebug() const
+int	Channel::doesKeyMatch(const std::string &key) const
 {
-	std::cout << "Channelname: " << _channelSettings.name_of_channel << std::endl;
+	if (_channelSettings.k == key)
+		return (1);
+	return (0);
+}
+
+void	Channel::printDebug() const
+{
+	std::cout << "Channel name: " << _channelSettings.nameOfChannel << std::endl;
 	std::cout << "Channel members: " << std::endl;
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.channel_members.size(); ++i)
-		std::cout << _channelSettings.channel_members.at(i) << std::endl;
-		std::cout << "Invite only: " << _channelSettings.invite_only << std::endl;
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
+		std::cout << _channelSettings.channelMembers.at(i) << std::endl;
+	std::cout << "Invite only: " << _channelSettings.i << std::endl;
+	std::cout << "Invited Clients: " << std::endl;
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
+		std::cout << _channelSettings.invitedClients.at(i) << std::endl;
+	std::cout << "t: " << _channelSettings.t << std::endl;
 	std::cout << "Topic: " << _channelSettings.topic << std::endl;
-	std::cout << "Key: " << _channelSettings.key << std::endl;
+	std::cout << "Key: " << _channelSettings.k << std::endl;
 	std::cout << "Channel Ops: " << std::endl;
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.ops.size(); ++i)
-		std::cout << _channelSettings.ops.at(i) << std::endl;
-	std::cout << "Limit how many users: " << _channelSettings.limit_users << std::endl;
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); ++i)
+		std::cout << _channelSettings.o.at(i) << std::endl;
+	std::cout << "Limit how many users: " << _channelSettings.l << std::endl;
+}
+
+void	Channel::sendToAllChannelMembers(const std::string msg)
+{
+	std::stringstream		message;
+	const char				*buffer;
+	std::string::size_type	size;
+
+	message << msg;
+	buffer = message.str().c_str();
+	size = message.str().size();
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
+	{
+		if (_channelSettings.channelMembers.at(i) != 0)
+		{
+			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
+		}
+	}
+}
+
+const std::vector<int>& Channel::returnChannelMembers() const
+{
+	return (_channelSettings.channelMembers);
+}
+
+int	Channel::hasOps(int socket) const
+{
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); ++i)
+	{
+		if (_channelSettings.o.at(i) == socket)
+			return (1);	
+	}
+	return (0);
 }

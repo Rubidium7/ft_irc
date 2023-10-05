@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:37:31 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/03 20:59:05 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/05 14:54:32 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,6 @@ class Client
 		void		setHostName(std::string hostName);
 		int			registrationStatus() const;
 		void		setGivenPass(bool truth);
-
-		int			howManyChannelsJoined() const;
-		void		increaseChannelsJoined();
-		void		decreaseChannelsJoined();
 		void		printDebug() const;
 
 	private:

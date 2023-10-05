@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/29 20:23:05 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/05 19:09:15 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
-# define EOM "\r\n"
+# define EOM "\n"
 
 typedef enum e_registration
 {
@@ -59,6 +59,8 @@ typedef enum e_code
 	RPL_MYINFO = 4,
 	RPL_BOUNCE = 5,
 	RPL_HELLO = 20,
+	RPL_NAMREPLY = 353,
+	RPL_ENDOFNAMES = 366,
 	RPL_MOTD = 372,
 	RPL_MOTDSTART = 375,
 	RPL_ENDOFMOTD = 376,
@@ -76,11 +78,13 @@ typedef enum e_code
 	ERR_NONICKNAMEGIVEN = 431,
 	ERR_ERRONEUSNICKNAME = 432,
 	ERR_NICKNAMEINUSE = 433,
+	ERR_USERONCHANNEL = 443, // Kaytan kun user on jo valmiiksi kanavalla oikeasti pitaisi kayttaa vain kun invite, kaytan myos kun JOIN ja on jo kanavalla, mietitaan tata myohemmin
 	ERR_NOTREGISTERED = 451,
 	ERR_NEEDMOREPARAMS = 461,
 	ERR_ALREADYREGISTERED = 462,
 	ERR_PASSWDMISMATCH = 464,
 	ERR_UNKNOWNMODE = 472,
+	ERR_INVITEONLYCHAN = 473,
 	ERR_BADCHANNELKEY = 475
 }	t_code;
 

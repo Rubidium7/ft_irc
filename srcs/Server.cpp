@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/03 21:11:36 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/05 20:02:57 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,18 @@ void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string m
 	size = message.str().size();
 	std::cerr << buffer; //debug
 	send(socket, buffer, size, 0);
+}
+
+int	Server::doesChannelExist(std::string nameChannel, std::vector<Channel> &channels)
+{
+	for (std::vector<Channel>::size_type i = 0; i < channels.size(); ++i)
+	{
+		if (channels.at(i).getChannelName() == nameChannel)
+		{
+			return (1);
+		}
+	}
+	return (0);
 }
 
 void	Server::sendToOneClient(int socket, std::string msg)
@@ -444,3 +456,5 @@ void	Server::_handlePing(int socket)
 {
 	sendToOneClient(socket, ":" + _serverSettings.hostName + " PONG " + _serverSettings.hostName + " :" + _serverSettings.hostName + "\r\n");
 }
+
+

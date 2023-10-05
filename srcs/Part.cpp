@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:09:32 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/02 19:14:02 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/05 20:29:52 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,43 +41,28 @@ void Part::partcmd(int socket, std::string full_command, t_server_mode	&_serverS
 					{
 						if (_serverSettings.channels.at(k).isOnChannel(socket))
 						{
+							std::stringstream ss;
+							ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients) << "!" << "localhost";
+							ss << " PART" << " " << _serverSettings.channels.at(k).getChannelName();
+							ss << " :" << std::endl;
+							_serverSettings.channels.at(k).sendToAllChannelMembers(ss.str());
 							_serverSettings.channels.at(k).partFromChannel(socket);
-							//Server::sendAnswer(socket, _findNickName(socket, _serverSettings.clients), 666, "Already on channel")
+							
+							//Server::sendAnswer(socket, ToolFunctions::(socket, _serverSettings.clients), 666, "Already on channel")
 							break ;
 						}else
 						{
 							// What to send if not in channel?
-							//Server::sendAnswer(socket, _findNickName(socket, _serverSettings.clients), 666, "Parted channel")
+							Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, "No such channel exist");
 							break;
 						}
 					}
-				}	
+				}
 			}
 			break;
 
 		default:
-			ToolFunctions::_parse_into_parts(command_parts, 1, temp_channels);
-			std::string rest_of_string = _return_last_part_of_string(2, full_command);
-			for (std::vector<std::string>::size_type i = 0; i < temp_channels.size(); ++i)
-			{
-				for (std::vector<Channel>::size_type k = 0; k < _serverSettings.channels.size(); ++k)
-				{
-					if (temp_channels.at(i) == _serverSettings.channels.at(k).getChannelName())
-					{
-						if (_serverSettings.channels.at(k).isOnChannel(socket))
-						{
-							_serverSettings.channels.at(k).partFromChannel(socket);
-							//Server::sendAnswer(socket, _findNickName(socket, _serverSettings.clients), 666, "rest_of_string")
-							break ;
-						}else
-						{
-							// What to send if not in channel?
-							//Server::sendAnswer(socket, _findNickName(socket, _serverSettings.clients), 666, "rest_of_string")
-							break;
-						}
-					}
-				}	
-			}
+			std::cout << "Part should not come in here." << std::endl;
 			break;
 	}
 }
