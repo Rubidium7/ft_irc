@@ -203,7 +203,10 @@ void	Parser::parseNick()
 	for (size_t i = 0; i < nick.size(); i++)
 	{
 		if (!isalnum(nick.at(i)) && nick.at(i) != '-' && nick.at(i) != '_')
+		{
 			_assignParserMessage(ERR_ERRONEUSNICKNAME, _args.at(i) + " :Erroneous nickname");
+			return ;
+		}
 	}
 }
 
@@ -227,7 +230,7 @@ void	Parser::parsePart()
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
 	else if (!_isChannelFormatCorrect(NULL))
 		return ;
-	if (_args.size() != 2 && _args.at(2).front() != ':')
+	else if (_args.size() != 2 && _args.at(2).front() != ':')
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(1) + " :Improper comment format");
 }
 

@@ -257,9 +257,45 @@ void	Server::_messageOfTheDay(int socket, std::string &nick)
 	msg = "Hello this is the server woo";
 	sendAnswer(socket, nick, RPL_MOTD, msg);
 	msg.clear();
-	msg = "Ur welcome";
+	msg = ": █     █░▓█████  ██▓     ▄████▄   ▒█████   ███▄ ▄███▓▓█████    ";
 	sendAnswer(socket, nick, RPL_MOTD, msg);
 	msg.clear();
+	msg = ":▓█░ █ ░█░▓█   ▀ ▓██▒    ▒██▀ ▀█  ▒██▒  ██▒▓██▒▀█▀ ██▒▓█   ▀    ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":▒█░ █ ░█ ▒███   ▒██░    ▒▓█    ▄ ▒██░  ██▒▓██    ▓██░▒███      ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":░█░ █ ░█ ▒▓█  ▄ ▒██░    ▒▓▓▄ ▄██▒▒██   ██░▒██    ▒██ ▒▓█  ▄    ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":░░██▒██▓ ░▒████▒░██████▒▒ ▓███▀ ░░ ████▓▒░▒██▒   ░██▒░▒████▒   ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":░ ▓░▒ ▒  ░░ ▒░ ░░ ▒░▓  ░░ ░▒ ▒  ░░ ▒░▒░▒░ ░ ▒░   ░  ░░░ ▒░ ░   ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":  ▒ ░ ░   ░ ░  ░░ ░ ▒  ░  ░  ▒     ░ ▒ ▒░ ░  ░      ░ ░ ░  ░   ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":  ░   ░     ░     ░ ░   ░        ░ ░ ░ ▒  ░      ░      ░      ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":    ░       ░  ░    ░  ░░ ░          ░ ░         ░      ░  ░";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":                        ░                                      ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	// msg = ":╦ ╦┌─┐┬  ┌─┐┌─┐┌┬┐┌─┐  ";
+	// sendAnswer(socket, nick, RPL_MOTD, msg);
+	// msg.clear();
+	// msg = ":║║║├┤ │  │  │ ││││├┤   ";
+	// sendAnswer(socket, nick, RPL_MOTD, msg);
+	// msg.clear();
+	// msg = ":╚╩╝└─┘┴─┘└─┘└─┘┴ ┴└─┘  ";
+	// sendAnswer(socket, nick, RPL_MOTD, msg);
+	// msg.clear();
 	sendAnswer(socket, nick, RPL_ENDOFMOTD, ":End of MOTD command.");
 }
 
@@ -269,7 +305,7 @@ void	Server::_newUserMessage(int socket, Client &client)
 	std::string	nick;
 
 	nick = client.getNick();
-	msg = ":Welcome to the server :) ";
+	msg  = ":Welcome to the server ";
 	msg += USER_ID(nick, client.getUserName(), client.getHostName());
 	// msg += nick + "!";
 	// msg += client.getUserName() + "@";
@@ -287,7 +323,8 @@ void	Server::_newUserMessage(int socket, Client &client)
 	//<server_name> <version> <usermodes> <chanmodes>
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
-	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=# CHANLIMIT=#:42 NICKLEN=12";
+	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=12";
+	msg += "TOPICLEN=255 KICKLEN=255 CHANNELLEN=50 CHANMODES=k,l,i,t";
 	msg += " :are supported by this server";
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
