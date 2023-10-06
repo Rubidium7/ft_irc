@@ -6,14 +6,15 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/06 19:11:07 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/06 20:41:54 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/Join.hpp"
-#include "../includes/Channel.hpp"
-#include "../includes/Server.hpp"
-#include "../includes/ToolFunctions.hpp"
+#include "Join.hpp"
+#include "Part.hpp"
+#include "Channel.hpp"
+#include "Server.hpp"
+#include "ToolFunctions.hpp"
 #include <string>
 #include <vector>
 #include <sstream>
@@ -43,18 +44,7 @@ void Join::joincmd(int socket, std::string full_command, t_server_mode	&_serverS
 				return ;
 			if (commandParts.at(1) == "0") // Part from all channels
 			{
-				for (std::vector<std::string>::size_type i = 0; i < _serverSettings.channels.size(); ++i)
-				{
-					if (_serverSettings.channels.at(i).isOnChannel(socket))
-					{
-						std::stringstream ss;
-						ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients);
-						ss << "!" << "localhost" << " PART " << _serverSettings.channels.at(i).getChannelName() << " :0" << std::endl;
-						Server::sendToOneClient(socket, ss.str());
-						ss.clear();
-						_serverSettings.channels.at(i).partFromChannel(socket);
-					}
-				}
+				Part::partFromAllChannels(socket, _serverSettings);
 				return ;
 			}
 

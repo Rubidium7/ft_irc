@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:09:07 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/02 19:12:06 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/06 20:24:09 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ class Part
 	public:
 
 		static void partcmd(int socket, std::string full_command, t_server_mode	&_serverSettings);
+		static void partFromAllChannels(int socket, t_server_mode &_serverSettings);
 
 	private:
 
