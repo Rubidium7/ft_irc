@@ -21,9 +21,10 @@
 #include "Debug.hpp"
 #include "Server.hpp"
 
+std::string	Server::_hostName = "localhost";
+
 Server::Server(int port, std::string password)
 {
-	_serverSettings.hostName = "localhost";
 	_serverSettings.password = password;
 	_serverSettings.failure = NO_ERROR;
 	memset(_serverSettings.socketSettings.sin_zero, 0, sizeof(_serverSettings.socketSettings.sin_zero));
@@ -45,7 +46,7 @@ Server::Server(int port, std::string password)
 	FD_SET(_serverSettings.serverSocket, &_serverSettings.activeSockets);
 	_serverSettings.maxSocket = _serverSettings.serverSocket;
 	_serverSettings.clientBuffers.reserve(MAX_AMOUNT_CLIENTS + 4);
-	for(std::vector<std::string>::size_type i = 0; i < _serverSettings.clientBuffers.capacity(); ++i)
+	for (std::vector<std::string>::size_type i = 0; i < _serverSettings.clientBuffers.capacity(); i++)
 		_serverSettings.clientBuffers.push_back("");
 	_serverSettings.message.msg = "";
 	_serverSettings.message.code = EMPTY;
@@ -143,7 +144,7 @@ void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string m
 	const char				*buffer;
 	std::string::size_type	size;
 
-	message << ":" << "localhost" << " ";
+	message << ":" << _hostName << " ";
 	if (code < 100)
 		message << "0";
 	if (code < 10)
@@ -229,7 +230,7 @@ void	Server::receiveMessage(int socket)
 		//std::cout << "Client: " << socket << " " << "Sent: #" << _serverSettings.buffer << "#" << std::endl;
 
 		// Add buffer to clientbuffer
-		for(int i = 0; _serverSettings.buffer[i]; ++i)
+		for (int i = 0; _serverSettings.buffer[i]; i++)
 		{
 			_serverSettings.clientBuffers.at(socket).push_back(_serverSettings.buffer[i]);
 		}
@@ -261,14 +262,41 @@ void	Server::_messageOfTheDay(int socket, std::string &nick)
 {
 	std::string	msg;
 
-	msg = ":- " + _serverSettings.hostName;
+	msg = ":- " + _hostName;
 	msg += " Message of the Day -";
 	sendAnswer(socket, nick, RPL_MOTDSTART, msg);
 	msg.clear();
 	msg = "Hello this is the server woo";
 	sendAnswer(socket, nick, RPL_MOTD, msg);
 	msg.clear();
-	msg = "Ur welcome";
+	msg = ": █     █░▓█████  ██▓     ▄████▄   ▒█████   ███▄ ▄███▓▓█████    ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":▓█░ █ ░█░▓█   ▀ ▓██▒    ▒██▀ ▀█  ▒██▒  ██▒▓██▒▀█▀ ██▒▓█   ▀    ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":▒█░ █ ░█ ▒███   ▒██░    ▒▓█    ▄ ▒██░  ██▒▓██    ▓██░▒███      ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":░█░ █ ░█ ▒▓█  ▄ ▒██░    ▒▓▓▄ ▄██▒▒██   ██░▒██    ▒██ ▒▓█  ▄    ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":░░██▒██▓ ░▒████▒░██████▒▒ ▓███▀ ░░ ████▓▒░▒██▒   ░██▒░▒████▒   ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":░ ▓░▒ ▒  ░░ ▒░ ░░ ▒░▓  ░░ ░▒ ▒  ░░ ▒░▒░▒░ ░ ▒░   ░  ░░░ ▒░ ░   ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":  ▒ ░ ░   ░ ░  ░░ ░ ▒  ░  ░  ▒     ░ ▒ ▒░ ░  ░      ░ ░ ░  ░   ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":  ░   ░     ░     ░ ░   ░        ░ ░ ░ ▒  ░      ░      ░      ";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":    ░       ░  ░    ░  ░░ ░          ░ ░         ░      ░  ░";
+	sendAnswer(socket, nick, RPL_MOTD, msg);
+	msg.clear();
+	msg = ":                        ░                                      ";
 	sendAnswer(socket, nick, RPL_MOTD, msg);
 	msg.clear();
 	sendAnswer(socket, nick, RPL_ENDOFMOTD, ":End of MOTD command.");
@@ -280,24 +308,23 @@ void	Server::_newUserMessage(int socket, Client &client)
 	std::string	nick;
 
 	nick = client.getNick();
-	msg = ":Welcome to the server :) ";
-	msg += nick + "!";
-	msg += client.getUserName() + "@";
-	msg += client.getHostName();
+	msg  = ":Welcome to the server ";
+	msg += USER_ID(nick, client.getUserName(), client.getHostName());
 	sendAnswer(socket, nick, RPL_WELCOME, msg);
 	msg.clear();
-	msg = ":Your host is " + _serverSettings.hostName;
+	msg = ":Your host is " + _hostName;
 	msg += ", running version v0.1";
 	sendAnswer(socket, nick, RPL_YOURHOST, msg);
 	msg.clear();
 	msg = ":This server was created 17/08/2023 13:53:54"; //just made it up :p
 	sendAnswer(socket, nick, RPL_CREATED, msg);
 	msg.clear();
-	msg = _serverSettings.hostName + " v0.1 o iklot";
+	msg = _hostName + " v0.1 o iklot";
 	//<server_name> <version> <usermodes> <chanmodes>
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
-	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=# CHANLIMIT=#:42 NICKLEN=12";
+	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=12";
+	msg += "TOPICLEN=255 KICKLEN=255 CHANNELLEN=50 CHANMODES=k,l,i,t";
 	msg += " :are supported by this server";
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
@@ -306,13 +333,38 @@ void	Server::_newUserMessage(int socket, Client &client)
 	_messageOfTheDay(socket, nick);
 }
 
+void	Server::_printHost(int socket)
+{
+	struct sockaddr_in	my_addr;
+
+	bzero(&my_addr, sizeof(my_addr));
+    socklen_t len = sizeof(my_addr);
+    getsockname(socket, (struct sockaddr *) &my_addr, &len);
+	std::cout << "ip: " << inet_ntoa(my_addr.sin_addr) << std::endl;
+
+	struct addrinfo *result;
+	struct addrinfo hints;
+
+	memset(&hints, 0, sizeof(hints));
+
+	hints.ai_flags = AI_CANONNAME;
+	hints.ai_family = AF_UNSPEC;
+
+	getaddrinfo(inet_ntoa(my_addr.sin_addr), NULL, &hints, &result);
+
+	if (result->ai_canonname)
+		std::cout << "name: " << result->ai_canonname << std::endl;
+	freeaddrinfo(result);
+
+} //might use later
+
 void	Server::_handleCommands(int socket)
 {
 	t_command	command = _returnFirstPartOfCommand(_serverSettings.clientBuffers.at(socket));
 	bool		new_user = false;
 
 	int newline_pos = _serverSettings.clientBuffers.at(socket).find(EOM);
-    std::string full_command =  _serverSettings.clientBuffers.at(socket).substr(0, newline_pos);
+    std::string full_command = _serverSettings.clientBuffers.at(socket).substr(0, newline_pos);
 	if (EOM == "\n")
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 1);
 	else
@@ -381,7 +433,7 @@ void	Server::_handleCommands(int socket)
 				//
 			break;
 		case PING:
-			parser.parsePing(_serverSettings.hostName);
+			parser.parsePing(_hostName);
 			if (!parser.getMessageCode())
 				_handlePing(socket);
 			break ;
@@ -398,7 +450,7 @@ void	Server::_handleCommands(int socket)
 		case QUIT:
 			parser.parseQuit();
 			if (!parser.getMessageCode())
-				clientExit(socket); //tmp
+				_handleQuit(socket, _matchClient(socket), parser.getArgs());
 			break ;
 		case DEBUG:
 			Debug::debugcmd(socket, full_command, _serverSettings);
@@ -452,9 +504,21 @@ void	Server::_handleJoinColon(int socket)
 		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
 }
 
-void	Server::_handlePing(int socket)
+void	Server::_handleQuit(int socket, Client &client, std::vector<std::string> args)
 {
-	sendToOneClient(socket, ":" + _serverSettings.hostName + " PONG " + _serverSettings.hostName + " :" + _serverSettings.hostName + "\r\n");
+	std::string	msg;
+
+	for (size_t i = 1; i != args.size(); i++)
+	{
+		msg += " ";
+		msg += args.at(i);
+	}
+	(void)client;
+	//sendToChannel(channel(s?), USER_ID(client.getNick(), client.getUserName(), client.getHostName()) + " QUIT" + msg);
+	clientExit(socket);
 }
 
-
+void	Server::_handlePing(int socket)
+{
+	sendToOneClient(socket, ":" + _hostName + " PONG " + _hostName + " :" + _hostName + "\r\n");
+}

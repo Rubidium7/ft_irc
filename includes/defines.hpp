@@ -24,7 +24,8 @@
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
-# define EOM "\n"
+# define EOM "\r\n"
+# define USER_ID(nick, user, host) (nick + "!" + user + "@" + host)
 
 typedef enum e_registration
 {
@@ -78,6 +79,7 @@ typedef enum e_code
 	ERR_NONICKNAMEGIVEN = 431,
 	ERR_ERRONEUSNICKNAME = 432,
 	ERR_NICKNAMEINUSE = 433,
+	ERR_NOTONCHANNEL = 442,
 	ERR_USERONCHANNEL = 443, // Kaytan kun user on jo valmiiksi kanavalla oikeasti pitaisi kayttaa vain kun invite, kaytan myos kun JOIN ja on jo kanavalla, mietitaan tata myohemmin
 	ERR_NOTREGISTERED = 451,
 	ERR_NEEDMOREPARAMS = 461,
