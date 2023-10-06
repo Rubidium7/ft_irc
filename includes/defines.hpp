@@ -24,7 +24,8 @@
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
-# define EOM "\n"
+# define EOM "\r\n"
+# define USER_ID(nick, user, host) (nick + "!" + user + "@" + host)
 
 typedef enum e_registration
 {

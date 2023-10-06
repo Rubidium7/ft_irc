@@ -13,8 +13,7 @@
 #include "Client.hpp"
 
 Client::Client():
-	_socket(0), _nickName("*"), _userName(""),
-	_realName(""), _hostName(""), _givenPass(false)
+	_socket(0), _nickName("*"), _givenPass(false)
 {
 
 }
@@ -81,12 +80,12 @@ void	Client::setGivenPass(bool truth)
 
 int	Client::registrationStatus() const
 {
+	if (!_givenPass)
+		return (NO_PASS);
 	if (_nickName == "*")
 		return (NO_NICK);
 	if (_userName.empty() || _realName.empty() || _hostName.empty())
 		return (NO_USER);
-	if (!_givenPass)
-		return (NO_PASS);
 	return (REGISTERED);
 }
 
