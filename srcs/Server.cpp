@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/05 20:02:57 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/06 19:03:12 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,7 @@ void	Server::sendToClients(std::string msg)
 void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string msg)
 {
 	std::stringstream		message;
+	std::string				tempMessage;
 	const char				*buffer;
 	std::string::size_type	size;
 
@@ -150,10 +151,13 @@ void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string m
 	if (code < 10)
 		message << "0";
 	message << code << " " << nick << " " << msg << "\r\n";
-	buffer = message.str().c_str();
-	size = message.str().size();
+	tempMessage = message.str();
+	message.str("");
+	buffer = tempMessage.c_str();
+	size = tempMessage.size();
 	std::cerr << buffer; //debug
 	send(socket, buffer, size, 0);
+	buffer = NULL;
 }
 
 int	Server::doesChannelExist(std::string nameChannel, std::vector<Channel> &channels)
@@ -171,12 +175,15 @@ int	Server::doesChannelExist(std::string nameChannel, std::vector<Channel> &chan
 void	Server::sendToOneClient(int socket, std::string msg)
 {
 	std::stringstream		message;
+	std::string				tempMessage;
 	const char				*buffer;
 	std::string::size_type	size;
 
 	message << msg;
-	buffer = message.str().c_str();
-	size = message.str().size();
+	tempMessage = message.str();
+	message.str("");
+	buffer = tempMessage.c_str();
+	size = tempMessage.size();
 	std::cerr << buffer; //debug
 	send(socket, buffer, size, 0);
 }
@@ -364,7 +371,7 @@ void	Server::_handleCommands(int socket)
 	bool		new_user = false;
 
 	int newline_pos = _serverSettings.clientBuffers.at(socket).find(EOM);
-    std::string full_command = _serverSettings.clientBuffers.at(socket).substr(0, newline_pos);
+	std::string full_command = _serverSettings.clientBuffers.at(socket).substr(0, newline_pos);
 	if (EOM == "\n")
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 1);
 	else
@@ -382,6 +389,7 @@ void	Server::_handleCommands(int socket)
 		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
 		return ;
 	}
+
 	switch(command)
 	{
 		case CAP:
@@ -458,6 +466,7 @@ void	Server::_handleCommands(int socket)
 		default:
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
 	}
+
 	if (_serverSettings.message.code)
 		_sendMessageFromStruct(socket, _serverSettings.message);
 	if (parser.getMessageCode())
