@@ -370,9 +370,10 @@ void	Server::_handleCommands(int socket)
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 1);
 	else
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 2);
-	std::cerr << full_command << std::endl;
 
+	std::cout << "[" << full_command << "]" << std::endl; //debug
 	_clearMessage();
+
 
 	if (_matchClient(socket).registrationStatus() != REGISTERED)
 		new_user = true;

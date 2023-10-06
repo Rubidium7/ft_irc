@@ -24,7 +24,7 @@
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
-# define EOM "\r\n"
+# define EOM "\n"
 # define USER_ID(nick, user, host) (nick + "!" + user + "@" + host)
 # define ON 1
 # define OFF 0

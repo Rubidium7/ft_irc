@@ -23,7 +23,7 @@ class Mode
 		Mode &operator=(const Mode &rhs);
 
 		static bool	_channelIssues(std::string nick, int socket, std::string chan_name,
-			std::vector<Channel> &channels, std::vector<std::string>::size_type	i);
+			std::vector<Channel> &channels, std::vector<std::string>::size_type i);
 };
 
 #endif

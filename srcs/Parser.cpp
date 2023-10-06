@@ -17,6 +17,8 @@ std::vector<std::string>	Parser::getArgs() const
 
 std::string	Parser::getCommand() const
 {
+	if (_args.empty())
+		return ("");
 	return (_args.at(0));
 }
 
