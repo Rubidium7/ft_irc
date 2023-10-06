@@ -15,6 +15,7 @@
 #include "irc.hpp"
 #include "Join.hpp"
 #include "Part.hpp"
+#include "Mode.hpp"
 #include "Nick.hpp"
 #include "User.hpp"
 #include "Pass.hpp"
@@ -400,8 +401,8 @@ void	Server::_handleCommands(int socket)
 			break ;
 		case MODE:
 			parser.parseMode(_matchClient(socket).getNick());
-			//if (!parser.getMessageCode())
-				//
+			if (!parser.getMessageCode())
+				Mode::modeCommand(_matchClient(socket), socket, parser.getArgs(), _serverSettings);
 			break ;
 		case WHO://might not need
 			break ;

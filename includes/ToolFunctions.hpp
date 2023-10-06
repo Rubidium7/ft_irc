@@ -25,6 +25,7 @@ class ToolFunctions
 		static void 		_split_command_in_parts(const std::string &full_command, std::vector<std::string> &command_parts);
 		static void 		_parse_into_parts(const std::vector<std::string> &command_parts, int part, std::vector<std::string> &temp_strings);
 		static std::string	_findNickName(const int socket, const Client clients[]);
+		static int			_findSocket(const std::string nick, const Client *clients);
 
 	private:
 
