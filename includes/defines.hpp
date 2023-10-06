@@ -26,6 +26,8 @@
 # define MSG_SIZE 512
 # define EOM "\n"
 # define USER_ID(nick, user, host) (nick + "!" + user + "@" + host)
+# define ON 1
+# define OFF 0
 
 typedef enum e_registration
 {
@@ -79,15 +81,18 @@ typedef enum e_code
 	ERR_NONICKNAMEGIVEN = 431,
 	ERR_ERRONEUSNICKNAME = 432,
 	ERR_NICKNAMEINUSE = 433,
+	ERR_USERNOTINCHANNEL = 441,
 	ERR_NOTONCHANNEL = 442,
 	ERR_USERONCHANNEL = 443, // Kaytan kun user on jo valmiiksi kanavalla oikeasti pitaisi kayttaa vain kun invite, kaytan myos kun JOIN ja on jo kanavalla, mietitaan tata myohemmin
 	ERR_NOTREGISTERED = 451,
 	ERR_NEEDMOREPARAMS = 461,
 	ERR_ALREADYREGISTERED = 462,
 	ERR_PASSWDMISMATCH = 464,
+	ERR_KEYSET = 467,
 	ERR_UNKNOWNMODE = 472,
 	ERR_INVITEONLYCHAN = 473,
-	ERR_BADCHANNELKEY = 475
+	ERR_BADCHANNELKEY = 475,
+	ERR_CHANOPRIVSNEEDED = 482
 }	t_code;
 
 typedef enum e_command

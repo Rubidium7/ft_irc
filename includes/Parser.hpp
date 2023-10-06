@@ -16,6 +16,7 @@ class Parser
 		t_message					getMessage() const;
 		std::vector<std::string>	getArgs() const;
 		std::string					getCommand() const;
+		static t_mode				identifyMode(std::string input);
 		void						parseCap();
 		void						parseJoin();
 		void						parseNick();
@@ -39,7 +40,6 @@ class Parser
 		bool	_isChannelFormatCorrect(size_t *amountOfChannels);
 		void	_saveArguments(std::string input);
 		std::vector<std::string>	_createVector(std::string string, char separator);
-		t_mode	_identifyMode(std::string input);
 		bool	_onlyNumeric(std::string input);
 
 		std::vector<std::string>	_args;

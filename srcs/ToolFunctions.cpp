@@ -46,3 +46,13 @@ std::string	ToolFunctions::_findNickName(const int socket, const Client clients[
 	}
 	return ("*");
 }
+
+int	ToolFunctions::_findSocket(const std::string nick, const Client *clients)
+{
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
+	{
+		if (clients[i].getNick() == nick)
+			return (clients[i].getSocket());
+	}
+	return (0);
+}

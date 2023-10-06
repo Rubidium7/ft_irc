@@ -56,11 +56,17 @@ class Channel
 		void		sendToAllChannelMembers(const std::string message);
 		const std::vector<int>& returnChannelMembers() const;
 		int 		hasOps(int socket) const;
+		void		giveOps(int socket);
+		void		removeOps(int socket);
+		void		setInviteMode(int mode);
+		void		setTopicMode(int mode);
+		void		setUserLimit(int amount);
+
 
 	private:
 
 		Channel();
-		
+
 
 		t_channel_mode _channelSettings;
 };

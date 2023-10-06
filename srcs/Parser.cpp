@@ -17,6 +17,8 @@ std::vector<std::string>	Parser::getArgs() const
 
 std::string	Parser::getCommand() const
 {
+	if (_args.empty())
+		return ("");
 	return (_args.at(0));
 }
 
@@ -99,7 +101,7 @@ bool	Parser::_isChannelFormatCorrect(size_t *amountOfChannels)
 	return (true);
 }
 
-t_mode	Parser::_identifyMode(std::string input)
+t_mode	Parser::identifyMode(std::string input)
 {
 	t_modes modes[10] = {
 		{"+i", I},
@@ -276,7 +278,7 @@ void	Parser::parseMode(std::string nick)
 	}
 	if (_args.size() == 2)
 		return ;
-	t_mode	mode = _identifyMode(_args.at(2));
+	t_mode	mode = identifyMode(_args.at(2));
 	switch (mode)
 	{
 		case I:
@@ -324,7 +326,7 @@ void	Parser::parseMode(std::string nick)
 			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(0) + " :only one parameter for " + _args.at(2));
 		else if (_args.size() != 4)
 			_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(2) + " :Not enough parameters");
-		else if (!_onlyNumeric(_args.at(3)))
+		else if (!_onlyNumeric(_args.at(3)) || _args.at(3).size() > 6)
 			_assignParserMessage(ERR_UNKNOWNMODE, _args.at(3) + " :should only include numbers for mode +l");
 			return ;
 		case L_OFF:

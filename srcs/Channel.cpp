@@ -19,8 +19,8 @@ Channel::Channel(const std::string name, int socketDescriptor)
 {
 	_channelSettings.nameOfChannel = name;
 	_channelSettings.channelMembers.push_back(socketDescriptor);
-	_channelSettings.i = 0;
-	_channelSettings.t = 0;
+	_channelSettings.i = OFF;
+	_channelSettings.t = OFF;
 	_channelSettings.l = MAX_AMOUNT_CLIENTS;
 }
 
@@ -83,7 +83,7 @@ void	Channel::removeInvitation(int socket)
 {
 	if (!isClientInvited(socket))
 		return ;
-	
+
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
 	{
 		if (_channelSettings.invitedClients.at(i) == socket)
@@ -92,7 +92,7 @@ void	Channel::removeInvitation(int socket)
 			_channelSettings.invitedClients.at(i) = _channelSettings.invitedClients.at(_channelSettings.invitedClients.size() - 1);
 			_channelSettings.invitedClients.at(_channelSettings.invitedClients.size() - 1) = temp;
 			_channelSettings.invitedClients.pop_back();
-		}		
+		}
 	}
 
 }
@@ -134,7 +134,7 @@ int	Channel::howManyMembersOnChannel() const
 
 int	Channel::isThereKey() const
 {
-	return (_channelSettings.k.size());		
+	return (_channelSettings.k.size());
 }
 
 void	Channel::setKey(std::string new_key)
@@ -196,7 +196,40 @@ int	Channel::hasOps(int socket) const
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); ++i)
 	{
 		if (_channelSettings.o.at(i) == socket)
-			return (1);	
+			return (1);
 	}
 	return (0);
+}
+
+void	Channel::giveOps(int socket)
+{
+	if (!hasOps(socket))
+		_channelSettings.o.push_back(socket);
+}
+
+void	Channel::removeOps(int socket)
+{
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); i++)
+	{
+		if (_channelSettings.o.at(i) == socket)
+		{
+			_channelSettings.o.erase(_channelSettings.o.begin() + i);
+			return ;
+		}
+	}
+}
+
+void	Channel::setInviteMode(int mode)
+{
+	_channelSettings.i = mode;
+}
+
+void	Channel::setTopicMode(int mode)
+{
+	_channelSettings.t = mode;
+}
+
+void	Channel::setUserLimit(int amount)
+{
+	_channelSettings.l = amount;
 }
