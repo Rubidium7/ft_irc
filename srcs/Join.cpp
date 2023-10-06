@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/05 20:15:29 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/06 14:32:27 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,27 +89,6 @@ void Join::joincmd(int socket, std::string full_command, t_server_mode	&_serverS
 							ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients);
 							ss << "!" << "localhost" <<  " JOIN" << " :" << _serverSettings.channels.at(k).getChannelName();
 							Server::sendToOneClient(socket, ss.str());
-							ss.clear();
-
-							// Print Channel members with or without "@" that means ops or not
-							const std::vector<int> &clients = _serverSettings.channels.at(k).returnChannelMembers();
-							//int firstClient = 0;
-							for (std::vector<int>::size_type i = 0; i < clients.size(); ++i)
-							{
-								std::cout << "JOIN else for loop" << std::endl;
-								//if (firstClient == 1)
-								//	ss << " ";
-								if (_serverSettings.channels.at(k).hasOps(clients.at(i)))
-									ss << ":@";
-								ss  << ToolFunctions::_findNickName(clients.at(i), _serverSettings.clients);
-								//firstClient  = 1;
-								Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), RPL_NAMREPLY, ss.str());
-								ss.clear();
-							}
-							//Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), RPL_NAMREPLY, ss.str());
-							//ss.clear();
-							std::cout << "Test printing before end of names list." << std::endl;
-							Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), RPL_ENDOFNAMES, ":End of NAMES list.");
 							ss.clear();
 							break;
 						}
