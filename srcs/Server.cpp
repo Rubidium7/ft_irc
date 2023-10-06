@@ -46,7 +46,7 @@ Server::Server(int port, std::string password)
 	FD_SET(_serverSettings.serverSocket, &_serverSettings.activeSockets);
 	_serverSettings.maxSocket = _serverSettings.serverSocket;
 	_serverSettings.clientBuffers.reserve(MAX_AMOUNT_CLIENTS + 4);
-	for(std::vector<std::string>::size_type i = 0; i < _serverSettings.clientBuffers.capacity(); ++i)
+	for (std::vector<std::string>::size_type i = 0; i < _serverSettings.clientBuffers.capacity(); i++)
 		_serverSettings.clientBuffers.push_back("");
 	_serverSettings.message.msg = "";
 	_serverSettings.message.code = EMPTY;
@@ -230,7 +230,7 @@ void	Server::receiveMessage(int socket)
 		//std::cout << "Client: " << socket << " " << "Sent: #" << _serverSettings.buffer << "#" << std::endl;
 
 		// Add buffer to clientbuffer
-		for(int i = 0; _serverSettings.buffer[i]; ++i)
+		for (int i = 0; _serverSettings.buffer[i]; i++)
 		{
 			_serverSettings.clientBuffers.at(socket).push_back(_serverSettings.buffer[i]);
 		}
@@ -299,15 +299,6 @@ void	Server::_messageOfTheDay(int socket, std::string &nick)
 	msg = ":                        ░                                      ";
 	sendAnswer(socket, nick, RPL_MOTD, msg);
 	msg.clear();
-	// msg = ":╦ ╦┌─┐┬  ┌─┐┌─┐┌┬┐┌─┐  ";
-	// sendAnswer(socket, nick, RPL_MOTD, msg);
-	// msg.clear();
-	// msg = ":║║║├┤ │  │  │ ││││├┤   ";
-	// sendAnswer(socket, nick, RPL_MOTD, msg);
-	// msg.clear();
-	// msg = ":╚╩╝└─┘┴─┘└─┘└─┘┴ ┴└─┘  ";
-	// sendAnswer(socket, nick, RPL_MOTD, msg);
-	// msg.clear();
 	sendAnswer(socket, nick, RPL_ENDOFMOTD, ":End of MOTD command.");
 }
 
@@ -319,9 +310,6 @@ void	Server::_newUserMessage(int socket, Client &client)
 	nick = client.getNick();
 	msg  = ":Welcome to the server ";
 	msg += USER_ID(nick, client.getUserName(), client.getHostName());
-	// msg += nick + "!";
-	// msg += client.getUserName() + "@";
-	// msg += client.getHostName();
 	sendAnswer(socket, nick, RPL_WELCOME, msg);
 	msg.clear();
 	msg = ":Your host is " + _hostName;
@@ -534,5 +522,3 @@ void	Server::_handlePing(int socket)
 {
 	sendToOneClient(socket, ":" + _hostName + " PONG " + _hostName + " :" + _hostName + "\r\n");
 }
-
-

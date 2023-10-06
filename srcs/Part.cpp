@@ -47,12 +47,15 @@ void Part::partcmd(int socket, std::string full_command, t_server_mode	&_serverS
 							ss << " :" << std::endl;
 							_serverSettings.channels.at(k).sendToAllChannelMembers(ss.str());
 							_serverSettings.channels.at(k).partFromChannel(socket);
-							
+
 							//Server::sendAnswer(socket, ToolFunctions::(socket, _serverSettings.clients), 666, "Already on channel")
 							break ;
 						}else
 						{
 							// What to send if not in channel?
+							// -> ERR_NOTONCHANNEL
+							// "<channel> :You're not on that channel"
+							// t. noel
 							Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, "No such channel exist");
 							break;
 						}
