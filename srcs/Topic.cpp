@@ -29,7 +29,9 @@ bool	Topic::_channelIssues(std::string nick, int socket, std::string chan_name,
 
 void	Topic::_displayTopic(std::string nick, int socket, Channel &channel)
 {
-	std::string	msg;
+	std::string			msg;
+	std::string			time_str;
+	std::stringstream	ss;
 
 	if (channel.getTopic().empty())
 	{
@@ -41,11 +43,13 @@ void	Topic::_displayTopic(std::string nick, int socket, Channel &channel)
 	msg += channel.getTopic();
 	Server::sendAnswer(socket, nick, RPL_TOPIC, msg);
 	msg.clear();
-	msg = channel.getChannelName();
+	msg =  channel.getChannelName();
 	msg += " " + nick + " ";
 
-	msg += std::time(NULL);
-	Server::sendAnswer(socket, nick, RPL_TOPICTIME, msg);
+	time_t time = std::time(NULL);
+	ss << time;
+	ss >> time_str;
+	Server::sendAnswer(socket, nick, RPL_TOPICTIME, msg + time_str);
 }
 
 void	Topic::topicCommand(int socket, Client &client,
@@ -70,7 +74,6 @@ void	Topic::topicCommand(int socket, Client &client,
 	if (input.size() > 255)
 		input.erase(255, std::string::npos);
 	serverSettings.channels.at(i).setTopic(input);
-	//serverSettings.channels.at(i).sendToAllChannelMembers
-	Server::sendToOneClient(socket, USER_ID(client.getNick(),
+	serverSettings.channels.at(i).sendToAllChannelMembers(USER_ID(client.getNick(),
 	client.getUserName()) + " TOPIC " + serverSettings.channels.at(i).getChannelName() + " :" + input + "\r\n");
 }
