@@ -6,14 +6,15 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/05 20:15:29 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/06 20:41:54 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/Join.hpp"
-#include "../includes/Channel.hpp"
-#include "../includes/Server.hpp"
-#include "../includes/ToolFunctions.hpp"
+#include "Join.hpp"
+#include "Part.hpp"
+#include "Channel.hpp"
+#include "Server.hpp"
+#include "ToolFunctions.hpp"
 #include <string>
 #include <vector>
 #include <sstream>
@@ -39,92 +40,97 @@ void Join::joincmd(int socket, std::string full_command, t_server_mode	&_serverS
 			break;
 
 		case 2:
-			if (commandParts.at(1) == ":")	// For compatibility with irssi
-				return ;					// ":" Is not in a Standard
+			if (commandParts.at(1) == ":")	// For compatibility with irssi, ":" Is not in a Standard
+				return ;
 			if (commandParts.at(1) == "0") // Part from all channels
 			{
-				for (std::vector<std::string>::size_type i = 0; i < _serverSettings.channels.size(); ++i)
-				{
-					if (_serverSettings.channels.at(i).isOnChannel(socket))
-					{
-						_serverSettings.channels.at(i).partFromChannel(socket);
-						std::stringstream ss;
-						ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients);
-						ss << "!" << "localhost" << " PART " << _serverSettings.channels.at(i).getChannelName() << " :0";
-						_serverSettings.channels.at(i).sendToAllChannelMembers(ss.str());
-						ss.clear();
-					}
-				}
+				Part::partFromAllChannels(socket, _serverSettings);
+				return ;
 			}
+
+		case 3:
+			
 			ToolFunctions::_parse_into_parts(commandParts, 1, tempChannels);
+			if (commandParts.size() == 3)
+				ToolFunctions::_parse_into_parts(commandParts, 2, tempKeys);
 			for (std::vector<std::string>::size_type i = 0; i < tempChannels.size(); ++i)
 			{
+				// Channel does not exist so create a new one
+				if (!Server::doesChannelExist(tempChannels.at(i), _serverSettings.channels))
+				{
+					_serverSettings.channels.push_back(Channel(tempChannels.at(i), socket));
+					std::stringstream ss;
+					ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients);
+					ss << "!" << "localhost" <<  " JOIN" << " :" << tempChannels.at(i) << std::endl;
+					Server::sendToOneClient(socket, ss.str());
+					ss.clear();
+					continue ;
+				}
 				for (std::vector<Channel>::size_type k = 0; k < _serverSettings.channels.size(); ++k)
 				{
 					if (tempChannels.at(i) == _serverSettings.channels.at(k).getChannelName())
 					{
-						std::cout << "Join channel exist" << std::endl;
+						std::cout << "Join channel exist" << std::endl; //Debug remove when final
 						if (_serverSettings.channels.at(k).isOnChannel(socket))
 						{
-							// Check with laptop what happens if already on channel?
-							std::stringstream ss;
-							ss << _serverSettings.channels.at(k).getChannelName();
-							ss << " :is already on channel";
-							Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_USERONCHANNEL, ss.str());
-							ss.clear();
+							// On purpose do nothing if already on a channel
+							// Different servers react differently
+							// Some do nothing some part and rejoin user
+							// There is no standard way to handle this
 							break;
 						}else if (_serverSettings.channels.at(k).isInviteOnly() && !_serverSettings.channels.at(k).isClientInvited(socket))
 						{
 							std::stringstream ss;
 							ss << _serverSettings.channels.at(k).getChannelName();
-							ss << " :Cannot join channel (+i)";
+							ss << " :Cannot join channel (+i)" << std::endl;
 							Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_INVITEONLYCHAN, ss.str());
 							ss.clear();
 							break;
 						} else
 						{
+							if (_serverSettings.channels.at(k).isThereKey()) // Does Channel have key set (password)
+							{
+								if (i < tempKeys.size()) 
+								{ // Client has given key
+									if (_serverSettings.channels.at(k).doesKeyMatch(tempKeys.at(i)))
+									{ // Key matches
+										_serverSettings.channels.at(k).addToChannel(socket);
+										std::stringstream ss;
+										ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients);
+										ss << "!" << "localhost" <<  " JOIN" << " :" << _serverSettings.channels.at(k).getChannelName() << std::endl;
+										Server::sendToOneClient(socket, ss.str());
+										ss.clear();
+										break;
+									}else // Key does not match
+									{
+										std::stringstream ss;
+										ss << _serverSettings.channels.at(k).getChannelName();
+										ss << " :Cannot join channel (+k)" << std::endl;
+										Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_BADCHANNELKEY, ss.str());
+										ss.clear();
+										break;
+									}
+								}else //Client does not provide key
+								{
+									std::stringstream ss;
+									ss << _serverSettings.channels.at(k).getChannelName();
+									ss << " :Cannot join channel (+k)" << std::endl;
+									Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_BADCHANNELKEY, ss.str());
+									ss.clear();
+									break;
+								}
+							}
 							_serverSettings.channels.at(k).addToChannel(socket);
-							// Remember to add channels joined in client
 							std::stringstream ss;
 							ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients);
-							ss << "!" << "localhost" <<  " JOIN" << " :" << _serverSettings.channels.at(k).getChannelName();
+							ss << "!" << "localhost" <<  " JOIN" << " :" << _serverSettings.channels.at(k).getChannelName() << std::endl;
 							Server::sendToOneClient(socket, ss.str());
-							ss.clear();
-
-							// Print Channel members with or without "@" that means ops or not
-							const std::vector<int> &clients = _serverSettings.channels.at(k).returnChannelMembers();
-							//int firstClient = 0;
-							for (std::vector<int>::size_type i = 0; i < clients.size(); ++i)
-							{
-								std::cout << "JOIN else for loop" << std::endl;
-								//if (firstClient == 1)
-								//	ss << " ";
-								if (_serverSettings.channels.at(k).hasOps(clients.at(i)))
-									ss << ":@";
-								ss  << ToolFunctions::_findNickName(clients.at(i), _serverSettings.clients);
-								//firstClient  = 1;
-								Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), RPL_NAMREPLY, ss.str());
-								ss.clear();
-							}
-							//Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), RPL_NAMREPLY, ss.str());
-							//ss.clear();
-							std::cout << "Test printing before end of names list." << std::endl;
-							Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), RPL_ENDOFNAMES, ":End of NAMES list.");
 							ss.clear();
 							break;
 						}
 					}
 				}
-				// Channel does not exist so create a new one
-				if (!Server::doesChannelExist(tempChannels.at(i), _serverSettings.channels))
-					_serverSettings.channels.push_back(Channel(tempChannels.at(i), socket));
 			}
-			break;
-		
-		case 3:
-			ToolFunctions::_parse_into_parts(commandParts, 1, tempChannels);
-			ToolFunctions::_parse_into_parts(commandParts, 2, tempKeys);
-			// Should we check if key checks out if there is no key 
 			break;
 		
 		default:
