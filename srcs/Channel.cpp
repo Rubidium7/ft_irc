@@ -203,6 +203,7 @@ void	Channel::sendToAllChannelMembers(const std::string msg)
 	{
 		if (_channelSettings.channelMembers.at(i) != 0)
 		{
+			std::cerr << buffer; //debug
 			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
 		}
 	}

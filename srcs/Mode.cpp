@@ -28,14 +28,26 @@ bool	Mode::_channelIssues(std::string nick, int socket, std::string chan_name,
 	return (false);
 }
 
+void	Mode::_modeMessage(Channel &channel, std::string user_id, std::string flag, std::string arg)
+{
+	std::string	msg;
+
+	msg = ":" + user_id + " MODE ";
+	msg += channel.getChannelName() + " ";
+	msg += flag;
+	if (!arg.empty())
+		msg += " " + arg;
+	msg += "\r\n";
+	channel.sendToAllChannelMembers(msg);
+}
+
 void	Mode::modeCommand(int socket, Client &client,
 	std::vector<std::string> args, t_server_mode &serverSettings)
 {
 	int	target_socket;
-
 	t_mode		mode = Parser::identifyMode(args.at(2));
 	std::vector<std::string>::size_type	i;
-
+	std::string	mode_arg;
 
 	if (args.at(1) == client.getNick())
 		return ;
@@ -50,16 +62,16 @@ void	Mode::modeCommand(int socket, Client &client,
 	{
 		case I:
 			serverSettings.channels.at(i).setInviteMode(ON);
-			return ;
+			break ;
 		case I_OFF:
 			serverSettings.channels.at(i).setInviteMode(OFF);
-			return ;
+			break ;
 		case T:
 			serverSettings.channels.at(i).setTopicMode(ON);
-			return ;
+			break ;
 		case T_OFF:
 			serverSettings.channels.at(i).setTopicMode(OFF);
-			return ;
+			break ;
 		case K:
 			if (serverSettings.channels.at(i).isThereKey())
 				Server::sendAnswer(socket, client.getNick(), ERR_KEYSET, args.at(1) + " :Channel key already set");
@@ -90,11 +102,15 @@ void	Mode::modeCommand(int socket, Client &client,
 			return ;
 		case L:
 			serverSettings.channels.at(i).setUserLimit(atoi(args.at(3).c_str()));
-			return ;
+			mode_arg = args.at(3);
+			break ;
 		case L_OFF:
 			serverSettings.channels.at(i).setUserLimit(MAX_AMOUNT_CLIENTS);
-			return ;
+			break ;
 		default:
 			std::cerr << "mode shouldn't get here" << std::endl;
+			return ;
 	}
+	_modeMessage(serverSettings.channels.at(i), USER_ID(client.getNick(), client.getUserName()),
+		args.at(2), mode_arg);
 }
