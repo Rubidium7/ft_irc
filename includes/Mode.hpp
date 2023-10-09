@@ -24,6 +24,8 @@ class Mode
 
 		static bool	_channelIssues(std::string nick, int socket, std::string chan_name,
 			std::vector<Channel> &channels, std::vector<std::string>::size_type i);
+		static void	_modeMessage(Channel &channel, std::string user_id,
+			std::string flag, std::string arg);
 };
 
 #endif

@@ -220,8 +220,8 @@ void	Server::clientExit(int socket, t_server_mode &_serverSettings)
 	close(socket);
 	_serverSettings.clientBuffers.at(socket).clear();
 	FD_CLR(socket, &_serverSettings.activeSockets);
-	_matchClient(socket).clearInfo();
 	Part::partFromAllChannels(socket, _serverSettings);
+	_matchClient(socket).clearInfo();
 }
 
 void	Server::receiveMessage(int socket)
