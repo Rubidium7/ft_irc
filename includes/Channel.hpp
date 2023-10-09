@@ -41,7 +41,10 @@ class Channel
 		Channel	&operator=(const Channel &copy_assignment);
 
 		std::string	getChannelName() const;
+		std::string	getTopic() const;
+		void		setTopic(std::string input);
 		int			isInviteOnly() const;
+		int			isTopicMode() const;
 		int			isClientInvited(int socket) const;
 		void		addInvitation(int socket);
 		void		removeInvitation(int socket);

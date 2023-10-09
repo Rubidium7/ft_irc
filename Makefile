@@ -17,7 +17,7 @@ FLAGS = -std=c++98 -Wall -Wextra -Werror -I includes -g
 
 OBJS_DIR = obj/
 SRCS_DIR = srcs/
-SRCS = main.cpp errors.cpp setup.cpp Server.cpp Client.cpp Channel.cpp Parser.cpp Join.cpp Nick.cpp User.cpp Pass.cpp Part.cpp ToolFunctions.cpp Debug.cpp Mode.cpp
+SRCS = main.cpp errors.cpp setup.cpp Server.cpp Client.cpp Channel.cpp Parser.cpp Join.cpp Nick.cpp User.cpp Pass.cpp Part.cpp ToolFunctions.cpp Debug.cpp Mode.cpp Topic.cpp
 
 OBJ_FILES = $(SRCS:.cpp=.o)
 
