@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/06 20:41:54 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/09 15:15:53 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ void Join::joincmd(int socket, std::string full_command, t_server_mode	&_serverS
 				{
 					if (tempChannels.at(i) == _serverSettings.channels.at(k).getChannelName())
 					{
-						std::cout << "Join channel exist" << std::endl; //Debug remove when final
 						if (_serverSettings.channels.at(k).isOnChannel(socket))
 						{
 							// On purpose do nothing if already on a channel

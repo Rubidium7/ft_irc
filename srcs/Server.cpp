@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/06 21:36:33 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/09 15:00:09 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,12 +214,13 @@ void	Server::newClient(void)
 	_serverSettings.clients[_clientIndex].setSocket(new_client);
 }
 
-void	Server::clientExit(int socket)
+void	Server::clientExit(int socket, t_server_mode &_serverSettings)
 {
 	close(socket);
 	_serverSettings.clientBuffers.at(socket).clear();
 	FD_CLR(socket, &_serverSettings.activeSockets);
 	_matchClient(socket).clearInfo();
+	Part::partFromAllChannels(socket, _serverSettings);
 }
 
 void	Server::receiveMessage(int socket)
@@ -227,7 +228,7 @@ void	Server::receiveMessage(int socket)
 	int	bytes_read = recv(socket, _serverSettings.buffer, MSG_SIZE, 0);
 	if (bytes_read <= 0)
 	{
-		clientExit(socket);
+		clientExit(socket, _serverSettings);
 	}
 	else
 	{
@@ -526,7 +527,7 @@ void	Server::_handleQuit(int socket, Client &client, std::vector<std::string> ar
 	}
 	(void)client;
 	//sendToChannel(channel(s?), USER_ID(client.getNick(), client.getUserName(), client.getHostName()) + " QUIT" + msg);
-	clientExit(socket);
+	clientExit(socket, _serverSettings);
 }
 
 void	Server::_handlePing(int socket)

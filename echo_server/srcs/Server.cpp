@@ -6,11 +6,12 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/09/29 20:19:15 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/09 14:30:41 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.hpp"
+#include "Part.hpp"
 
 Server::Server(int port, std::string password) : _password(password), _failure(NO_ERROR)
 {

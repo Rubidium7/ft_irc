@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:46:52 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/06 19:03:12 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/09 14:26:05 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class Server
 		void			newClient();
 		void			sendToClients(std::string msg);
 		static void		sendToOneClient(int socket, std::string msg);
-		void			clientExit(int socket);
+		void			clientExit(int socket, t_server_mode &_serverSettings);
 		void			receiveMessage(int socket);
 		static void		sendAnswer(int socket, std::string nick, t_code code, std::string msg);
 		static int      doesChannelExist(std::string nameChannel, std::vector<Channel> &channels);
