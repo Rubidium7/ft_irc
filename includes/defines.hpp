@@ -24,8 +24,8 @@
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?
 # define MSG_SIZE 512
-# define EOM "\n"
-# define USER_ID(nick, user, host) (nick + "!" + user + "@" + host)
+# define EOM "\r\n"
+# define USER_ID(nick, user) (nick + "!" + user + "@localhost")
 # define ON 1
 # define OFF 0
 
@@ -62,6 +62,9 @@ typedef enum e_code
 	RPL_MYINFO = 4,
 	RPL_BOUNCE = 5,
 	RPL_HELLO = 20,
+	RPL_NOTOPIC = 331,
+	RPL_TOPIC = 332,
+	RPL_TOPICTIME = 333,
 	RPL_NAMREPLY = 353,
 	RPL_ENDOFNAMES = 366,
 	RPL_MOTD = 372,

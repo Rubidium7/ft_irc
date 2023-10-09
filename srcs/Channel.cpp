@@ -21,6 +21,7 @@ Channel::Channel(const std::string name, int socketDescriptor)
 	_channelSettings.channelMembers.push_back(socketDescriptor);
 	_channelSettings.i = OFF;
 	_channelSettings.t = OFF;
+	_channelSettings.topic = "";
 	_channelSettings.l = MAX_AMOUNT_CLIENTS;
 }
 
@@ -57,9 +58,24 @@ std::string	Channel::getChannelName(void) const
 	return (_channelSettings.nameOfChannel);
 }
 
+std::string	Channel::getTopic(void) const
+{
+	return (_channelSettings.topic);
+}
+
+void	Channel::setTopic(std::string input)
+{
+	_channelSettings.topic = input;
+}
+
 int	Channel::isInviteOnly() const
 {
 	return (_channelSettings.i);
+}
+
+int	Channel::isTopicMode() const
+{
+	return (_channelSettings.t);
 }
 
 int	Channel::isClientInvited(int socket) const

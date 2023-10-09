@@ -28,7 +28,8 @@ bool	Mode::_channelIssues(std::string nick, int socket, std::string chan_name,
 	return (false);
 }
 
-void	Mode::modeCommand(Client &client, int socket, std::vector<std::string> args, t_server_mode &serverSettings)
+void	Mode::modeCommand(int socket, Client &client,
+	std::vector<std::string> args, t_server_mode &serverSettings)
 {
 	int	target_socket;
 

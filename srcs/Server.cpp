@@ -19,6 +19,7 @@
 #include "Nick.hpp"
 #include "User.hpp"
 #include "Pass.hpp"
+#include "Topic.hpp"
 #include "Debug.hpp"
 #include "Server.hpp"
 
@@ -317,7 +318,7 @@ void	Server::_newUserMessage(int socket, Client &client)
 
 	nick = client.getNick();
 	msg  = ":Welcome to the server ";
-	msg += USER_ID(nick, client.getUserName(), client.getHostName());
+	msg += USER_ID(nick, client.getUserName());
 	sendAnswer(socket, nick, RPL_WELCOME, msg);
 	msg.clear();
 	msg = ":Your host is " + _hostName;
@@ -332,7 +333,7 @@ void	Server::_newUserMessage(int socket, Client &client)
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
 	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=12";
-	msg += "TOPICLEN=255 KICKLEN=255 CHANNELLEN=50 CHANMODES=k,l,i,t";
+	msg += " TOPICLEN=255 KICKLEN=255 CHANNELLEN=50 CHANMODES=k,l,i,t";
 	msg += " :are supported by this server";
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
@@ -411,7 +412,7 @@ void	Server::_handleCommands(int socket)
 		case MODE:
 			parser.parseMode(_matchClient(socket).getNick());
 			if (!parser.getMessageCode())
-				Mode::modeCommand(_matchClient(socket), socket, parser.getArgs(), _serverSettings);
+				Mode::modeCommand(socket, _matchClient(socket), parser.getArgs(), _serverSettings);
 			break ;
 		case WHO://might not need
 			break ;
@@ -449,8 +450,8 @@ void	Server::_handleCommands(int socket)
 			break ;
 		case TOPIC:
 			parser.parseTopic();
-			//if (!parser.getMessageCode())
-				//
+			if (!parser.getMessageCode())
+				Topic::topicCommand(socket, _matchClient(socket), parser.getArgs(), _serverSettings);
 			break ;
 		case KICK:
 			parser.parseKick();

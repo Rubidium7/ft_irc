@@ -12,7 +12,7 @@ class Mode
 {
 	public:
 
-		static void	modeCommand(Client &client, int socket,
+		static void	modeCommand(int socket, Client &client,
 			std::vector<std::string> args, t_server_mode &serverSettings);
 
 	private:
