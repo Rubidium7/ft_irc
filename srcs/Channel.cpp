@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/05 18:55:48 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/09 18:14:58 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,19 +113,24 @@ void	Channel::removeInvitation(int socket)
 
 }
 
-int	Channel::isOnChannel(int id) const
+int	Channel::isOnChannel(int socket) const
 {
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
-		if (_channelSettings.channelMembers.at(i) == id)
+		if (_channelSettings.channelMembers.at(i) == socket)
 			return (1);
 	}
 	return (0);
 }
 
-void	Channel::addToChannel(int id)
-{
-	_channelSettings.channelMembers.push_back(id);
+void	Channel::addToChannel(int socket)
+{ // If client was invited then also invitation is removed
+	_channelSettings.channelMembers.push_back(socket);
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
+	{
+		if (_channelSettings.invitedClients.at(i) == socket)
+			_channelSettings.invitedClients.erase(_channelSettings.invitedClients.begin() + i--); // i-- because numbers move back
+	}
 }
 
 void	Channel::partFromChannel(int socket)
@@ -135,8 +140,9 @@ void	Channel::partFromChannel(int socket)
 		if (_channelSettings.channelMembers.at(i) == socket)
 		{
 			std::swap(_channelSettings.channelMembers.at(i),
-				_channelSettings.channelMembers.at(_channelSettings.channelMembers.size() -1));
+				_channelSettings.channelMembers.at(_channelSettings.channelMembers.size() - 1));
 				_channelSettings.channelMembers.pop_back();
+			Channel::removeOps(socket);
 			return ;
 		}
 	}
@@ -249,4 +255,12 @@ void	Channel::setTopicMode(int mode)
 void	Channel::setUserLimit(int amount)
 {
 	_channelSettings.l = amount;
+}
+
+void	Channel::setNewOpIfNoOp()
+{
+	if (_channelSettings.o.size() == 0 && _channelSettings.channelMembers.size() > 0)
+	{
+		_channelSettings.o.push_back(_channelSettings.channelMembers.at(0));
+	}
 }

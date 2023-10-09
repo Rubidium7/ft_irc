@@ -64,6 +64,7 @@ class Channel
 		void		setInviteMode(int mode);
 		void		setTopicMode(int mode);
 		void		setUserLimit(int amount);
+		void		setNewOpIfNoOp();
 
 
 	private:

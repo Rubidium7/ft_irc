@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/09 15:00:09 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/09 17:27:06 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include "Topic.hpp"
 #include "Debug.hpp"
 #include "Server.hpp"
+#include "Kick.hpp"
 
 std::string	Server::_hostName = "localhost";
 
@@ -457,7 +458,7 @@ void	Server::_handleCommands(int socket)
 		case KICK:
 			parser.parseKick();
 			//if (!parser.getMessageCode())
-				//
+			Kick::kickcmd(socket, full_command, _serverSettings);
 			break ;
 		case QUIT:
 			parser.parseQuit();
