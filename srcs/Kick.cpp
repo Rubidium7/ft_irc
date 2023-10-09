@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:34 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/09 18:19:17 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/09 19:49:26 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,6 @@ void Kick::kickcmd(int socket, std::string full_command, t_server_mode	&_serverS
 
 	switch(commandParts.size())
 	{
-		case 0:
-			std::cout << "kickcmd should not come to here" << std::endl;
-			break;
-
-		case 1:
-			std::cout << "kickcmd should not come to here" << std::endl;
-			break;
-
-		case 2:
-			std::cout << "kickcmd should not come to here" << std::endl;
-			break;
-		
 		case 3:
 			ToolFunctions::_parse_into_parts(commandParts, 1, tempChannels);
 			ToolFunctions::_parse_into_parts(commandParts, 2, tempUsers);
@@ -48,42 +36,40 @@ void Kick::kickcmd(int socket, std::string full_command, t_server_mode	&_serverS
 					ss << tempChannels.at(0);
 					ss << " :No such channel" << std::endl;
 					Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ss.str());
-					ss.clear();
+					ss.str("");
 					return ;
 				}
 				for (std::vector<Channel>::size_type i = 0; i < _serverSettings.channels.size(); ++i) // Channel exist
 				{
 					if (_serverSettings.channels.at(i).getChannelName() == tempChannels.at(0))
 					{
+						std::stringstream ss;
 						if (!_serverSettings.channels.at(i).hasOps(socket))
 						{
-							std::stringstream ss;
 							ss << tempChannels.at(0);
 							ss << " :You're not channel operator" << std::endl;
 							Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_CHANOPRIVSNEEDED, ss.str());
-							ss.clear();
+							ss.str("");
 							return ;
 						}
 						for (std::vector<std::string>::size_type k = 0; k < tempUsers.size(); ++k)
 						{
 							if (!_serverSettings.channels.at(i).isOnChannel(_returnClientSocket(tempUsers.at(k), _serverSettings)))
 							{
-								std::stringstream ss;
 								ss << tempChannels.at(0);
 								ss << " :User is not on that channel" << std::endl;
 								Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_USERNOTINCHANNEL, ss.str());
-								ss.clear();
+								ss.str("");
 								continue ;
 							}
 							{
 								_serverSettings.channels.at(i).partFromChannel(_returnClientSocket(tempUsers.at(k), _serverSettings));
 								_serverSettings.channels.at(i).setNewOpIfNoOp();
-								std::stringstream ss;
 								ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients);
-								ss << "!" << "localhost" <<  " KICK" << " :" << _serverSettings.channels.at(i).getChannelName() << std::endl;
+								ss << "!" << "localhost" <<  " KICK" << _serverSettings.channels.at(i).getChannelName() << ":" << std::endl;
 								Server::sendToOneClient(socket, ss.str());
 								Server::sendToOneClient(_returnClientSocket(tempUsers.at(k), _serverSettings), ss.str());
-								ss.clear();
+								ss.str("");
 								if (_serverSettings.channels.at(i).howManyMembersOnChannel() == 0)
 									_serverSettings.channels.erase(_serverSettings.channels.begin() + i);
 							}
@@ -91,13 +77,70 @@ void Kick::kickcmd(int socket, std::string full_command, t_server_mode	&_serverS
 						break ;
 					}
 				}
-			}else if (tempChannels.size() > 1)
+			}else if (tempChannels.size() > 1 && (tempChannels.size() == tempUsers.size()))
 			{
-				
+				for (std::vector<Channel>::size_type i = 0; i < tempChannels.size(); ++i)
+				{
+					if (!Server::doesChannelExist(tempChannels.at(i), _serverSettings.channels))
+					{
+						std::stringstream ss;
+						ss << tempChannels.at(i);
+						ss << " :No such channel" << std::endl;
+						Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ss.str());
+						ss..str("");
+						continue ;
+					}
+					for (std::vector<Channel>::size_type k = 0; k < _serverSettings.channels.size(); ++k) // Channel exist
+					{
+						if (_serverSettings.channels.at(k).getChannelName() == tempChannels.at(i))
+						{
+							std::stringstream ss;
+							if (!_serverSettings.channels.at(i).hasOps(socket))
+							{
+								ss << tempChannels.at(i);
+								ss << " :You're not channel operator" << std::endl;
+								Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_CHANOPRIVSNEEDED, ss.str());
+								ss.str("");
+								break ;
+							}
+							if (!_serverSettings.channels.at(k).isOnChannel(_returnClientSocket(tempUsers.at(i), _serverSettings)))
+							{
+								ss << tempChannels.at(i);
+								ss << " :User is not on that channel" << std::endl;
+								Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_USERNOTINCHANNEL, ss.str());
+								ss.str("");
+								break ;
+							}
+							{
+								_serverSettings.channels.at(k).partFromChannel(_returnClientSocket(tempUsers.at(i), _serverSettings));
+								_serverSettings.channels.at(k).setNewOpIfNoOp();
+								ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients);
+								ss << "!" << "localhost" <<  " KICK" << " :" << _serverSettings.channels.at(k).getChannelName() << std::endl;
+								Server::sendToOneClient(socket, ss.str());
+								Server::sendToOneClient(_returnClientSocket(tempUsers.at(i), _serverSettings), ss.str());
+								ss.str("");
+								if (_serverSettings.channels.at(k).howManyMembersOnChannel() == 0)
+									_serverSettings.channels.erase(_serverSettings.channels.begin() + k);
+							}
+						}
+						break ;
+					}
+				}
+			}else
+			{
+				std::cout << "KICKCMD SYNTAX ERROR" << std::endl;
 			}
-			break ;	
+			break ;
+					
 		default:
-			std::cout << "kickcmd should not come to here" << std::endl;
+			if (commandParts.size() > 3)
+			{
+				if (commandParts.at(3) == ":")
+					// Hoidellaan tasan samoin kuin case 3
+			}else
+			{
+				std::cout << "KICKCMD SYNTAX ERROR" << std::endl;
+			}
 			break ;
 	}
 }
