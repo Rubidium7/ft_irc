@@ -417,7 +417,7 @@ void	Server::_handleCommands(int socket)
 				Mode::modeCommand(socket, _matchClient(socket), parser.getArgs(), _serverSettings);
 			break ;
 		case INVITE:
-			parser.parseInvite();
+			//parser.parseInvite();
 			// if (!parser.getMessageCode())
 			// 	Invite::inviteCommand();
 		case NICK:
