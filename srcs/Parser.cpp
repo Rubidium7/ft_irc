@@ -264,7 +264,7 @@ void	Parser::parseTopic()
 
 void	Parser::parseMode(std::string nick)
 {
-	if (_args.size() < 2)
+	if (_args.size() < 3)
 	{
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
 		return ;
@@ -276,8 +276,8 @@ void	Parser::parseMode(std::string nick)
 		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
 		return ;
 	}
-	if (_args.size() == 2)
-		return ;
+	// if (_args.size() == 2)
+	// 	return ;
 	t_mode	mode = identifyMode(_args.at(2));
 	switch (mode)
 	{
