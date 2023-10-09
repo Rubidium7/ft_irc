@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:09:32 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/06 21:06:31 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/09 18:06:11 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void Part::partcmd(int socket, std::string full_command, t_server_mode	&_serverS
 							ss << " :" << std::endl;
 							Server::sendToOneClient(socket, ss.str());
 							_serverSettings.channels.at(k).partFromChannel(socket);
+							_serverSettings.channels.at(k).setNewOpIfNoOp();
 							ss.str("");
 							if (_serverSettings.channels.at(k).howManyMembersOnChannel() == 0)
 								_serverSettings.channels.erase(_serverSettings.channels.begin() + k--); // k-- because all channels move one step back
@@ -82,6 +83,7 @@ void Part::partFromAllChannels(int socket, t_server_mode &_serverSettings)
 			Server::sendToOneClient(socket, ss.str());
 			ss.clear();
 			_serverSettings.channels.at(i).partFromChannel(socket);
+			_serverSettings.channels.at(i).setNewOpIfNoOp();
 			if (_serverSettings.channels.at(i).howManyMembersOnChannel() == 0)
 				_serverSettings.channels.erase(_serverSettings.channels.begin() + i--); // i-- because all channels move one step back
 		}
