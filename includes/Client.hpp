@@ -37,6 +37,7 @@ class Client
 		void		setHostName(std::string hostName);
 		int			registrationStatus() const;
 		void		setGivenPass(bool truth);
+		void		clearInfo();
 		void		printDebug() const;
 
 	private:

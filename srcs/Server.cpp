@@ -212,7 +212,7 @@ void	Server::clientExit(int socket)
 	close(socket);
 	_serverSettings.clientBuffers.at(socket).clear();
 	FD_CLR(socket, &_serverSettings.activeSockets);
-	_matchClient(socket).setSocket(0);
+	_matchClient(socket).clearInfo();
 }
 
 void	Server::receiveMessage(int socket)
@@ -371,7 +371,7 @@ void	Server::_handleCommands(int socket)
 	else
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 2);
 
-	std::cout << "[" << full_command << "]" << std::endl; //debug
+	std::cout << full_command << std::endl; //debug
 	_clearMessage();
 
 

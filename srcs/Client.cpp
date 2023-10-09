@@ -78,6 +78,16 @@ void	Client::setGivenPass(bool truth)
 	_givenPass = truth;
 }
 
+void	Client::clearInfo()
+{
+	_socket = 0;
+	_nickName = "*";
+	_userName = "";
+	_realName = "";
+	_hostName = "";
+	_givenPass = false;
+}
+
 int	Client::registrationStatus() const
 {
 	if (!_givenPass)
