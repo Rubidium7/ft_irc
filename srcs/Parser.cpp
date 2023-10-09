@@ -246,7 +246,7 @@ void	Parser::parseKick()
 {
 	if (_args.size() < 3)
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
-	else if (_args.size() > 3 && _args.at(2).front() != ':')
+	else if (_args.size() > 3 && _args.at(3).front() != ':')
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Improper kick message format");
 	else if (_args.at(1).front() != '#' || _args.at(1).size() < 2)
 		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
