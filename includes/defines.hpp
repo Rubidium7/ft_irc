@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/09 15:29:12 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/10 19:25:06 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ typedef enum e_code
 	ERR_NOSUCHNICK = 401,
 	ERR_NOSUCHSERVER = 402,
 	ERR_NOSUCHCHANNEL = 403,
+	ERR_CANNOTSENDTOCHAN = 404,
 	ERR_TOOMANYTARGETS = 407,
 	ERR_NOSUCHSERVICE = 408,
 	ERR_NOORIGIN = 409,
