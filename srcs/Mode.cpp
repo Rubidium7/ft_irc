@@ -44,7 +44,7 @@ void	Mode::_modeMessage(Channel &channel, std::string user_id, std::string flag,
 void	Mode::modeCommand(int socket, Client &client,
 	std::vector<std::string> args, t_server_mode &serverSettings)
 {
-	int	target_socket;
+	int			target_socket;
 	t_mode		mode = Parser::identifyMode(args.at(2));
 	std::vector<std::string>::size_type	i;
 	std::string	mode_arg;

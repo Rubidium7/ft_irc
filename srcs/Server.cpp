@@ -20,6 +20,7 @@
 #include "User.hpp"
 #include "Pass.hpp"
 #include "Topic.hpp"
+#include "Invite.hpp"
 #include "Debug.hpp"
 #include "Server.hpp"
 #include "Kick.hpp"
@@ -158,6 +159,7 @@ void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string m
 	message.str("");
 	buffer = tempMessage.c_str();
 	size = tempMessage.size();
+	// std::cerr << "sending a message:" << std::endl; //debug
 	std::cerr << buffer; //debug
 	send(socket, buffer, size, 0);
 	buffer = NULL;
@@ -417,9 +419,10 @@ void	Server::_handleCommands(int socket)
 				Mode::modeCommand(socket, _matchClient(socket), parser.getArgs(), _serverSettings);
 			break ;
 		case INVITE:
-			//parser.parseInvite();
-			// if (!parser.getMessageCode())
-			// 	Invite::inviteCommand();
+			parser.parseInvite();
+			if (!parser.getMessageCode())
+			 	Invite::inviteCommand(socket, _matchClient(socket), parser.getArgs(), _serverSettings);
+			break ;
 		case NICK:
 			parser.parseNick();
 			if (!parser.getMessageCode())

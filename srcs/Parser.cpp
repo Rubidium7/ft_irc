@@ -185,6 +185,25 @@ void	Parser::parseJoin()
 		_isChannelKeyFormatCorrect(amountOfChannels);
 }
 
+void	Parser::parseInvite()
+{
+	if (_args.size() < 3)
+	{
+		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
+		return ;
+	}
+	if (_args.size() > 3)
+	{
+		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(3) + " :Too many targets");
+		return ;
+	}
+	if (_args.at(2).front() != '#' || _args.at(2).size() < 2)
+	{
+		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
+		return ;
+	}
+}
+
 void	Parser::parseNick()
 {
 	if (_args.size() < 2)
