@@ -19,6 +19,7 @@ class Parser
 		static t_mode				identifyMode(std::string input);
 		void						parseCap();
 		void						parseJoin();
+		void						parseInvite();
 		void						parseNick();
 		void						parseUser();
 		void						parsePass();

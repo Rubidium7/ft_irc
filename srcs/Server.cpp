@@ -20,6 +20,7 @@
 #include "User.hpp"
 #include "Pass.hpp"
 #include "Topic.hpp"
+#include "Invite.hpp"
 #include "Debug.hpp"
 #include "Server.hpp"
 #include "Kick.hpp"
@@ -158,6 +159,7 @@ void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string m
 	message.str("");
 	buffer = tempMessage.c_str();
 	size = tempMessage.size();
+	// std::cerr << "sending a message:" << std::endl; //debug
 	std::cerr << buffer; //debug
 	send(socket, buffer, size, 0);
 	buffer = NULL;
@@ -416,9 +418,10 @@ void	Server::_handleCommands(int socket)
 			if (!parser.getMessageCode())
 				Mode::modeCommand(socket, _matchClient(socket), parser.getArgs(), _serverSettings);
 			break ;
-		case WHO://might not need
-			break ;
-		case WHOIS://might not need
+		case INVITE:
+			parser.parseInvite();
+			if (!parser.getMessageCode())
+			 	Invite::inviteCommand(socket, _matchClient(socket), parser.getArgs(), _serverSettings);
 			break ;
 		case NICK:
 			parser.parseNick();
@@ -482,12 +485,11 @@ void	Server::_handleCommands(int socket)
 
 t_command		Server::_returnFirstPartOfCommand(std::string command) const
 {
-	t_commands commands[15] = {
+	t_commands commands[14] = {
 		{"CAP", CAP},
 		{"JOIN", JOIN},
 		{"MODE", MODE},
-		{"WHO", WHO},
-		{"WHOIS", WHOIS},
+		{"INVITE", INVITE},
 		{"NICK", NICK},
 		{"USER", USER},
 		{"PASS", PASS},
@@ -503,7 +505,7 @@ t_command		Server::_returnFirstPartOfCommand(std::string command) const
 	std::string first_part;
 
 	ss >> first_part;
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 14; i++)
 	{
 		if (commands[i].first_part == first_part)
 			return (commands[i].command);
