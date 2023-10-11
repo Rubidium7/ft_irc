@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/09 17:27:06 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/10 19:47:00 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include "Debug.hpp"
 #include "Server.hpp"
 #include "Kick.hpp"
+#include "Privmsg.hpp"
 
 std::string	Server::_hostName = "localhost";
 
@@ -447,7 +448,7 @@ void	Server::_handleCommands(int socket)
 		case PRIVMSG:
 			parser.parsePrivmsg();
 			//if (!parser.getMessageCode())
-				//
+			Privmsg::privmsgcmd(socket, full_command, _serverSettings);
 			break;
 		case PING:
 			parser.parsePing(_hostName);

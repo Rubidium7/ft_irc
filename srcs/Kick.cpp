@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:34 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/09 19:49:26 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/10 20:18:56 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,13 +81,13 @@ void Kick::kickcmd(int socket, std::string full_command, t_server_mode	&_serverS
 			{
 				for (std::vector<Channel>::size_type i = 0; i < tempChannels.size(); ++i)
 				{
-					if (!Server::doesChannelExist(tempChannels.at(i), _serverSettings.channels))
+					if (!Server::doesChannelExist(tempChannels.at(i), _serverSettings.channels)) // Channel does not exist
 					{
 						std::stringstream ss;
 						ss << tempChannels.at(i);
 						ss << " :No such channel" << std::endl;
 						Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ss.str());
-						ss..str("");
+						ss.str("");
 						continue ;
 					}
 					for (std::vector<Channel>::size_type k = 0; k < _serverSettings.channels.size(); ++k) // Channel exist
@@ -133,10 +133,10 @@ void Kick::kickcmd(int socket, std::string full_command, t_server_mode	&_serverS
 			break ;
 					
 		default:
-			if (commandParts.size() > 3)
+			if (commandParts.size() == 3)
 			{
 				if (commandParts.at(3) == ":")
-					// Hoidellaan tasan samoin kuin case 3
+					return ; // Hoidellaan tasan samoin kuin case 3 MUISTA SAATTAA LOPPUUN
 			}else
 			{
 				std::cout << "KICKCMD SYNTAX ERROR" << std::endl;
