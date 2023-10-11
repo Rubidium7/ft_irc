@@ -390,13 +390,14 @@ void	Server::_handleCommands(int socket)
 	if (_matchClient(socket).registrationStatus() != REGISTERED)
 		new_user = true;
 	Parser	parser(full_command);
+	if (!parser.getArgs().size())
+		return ;
 	if (new_user && (command != NICK && command != USER && command != QUIT &&
 			command != PASS && command != CAP && command != JOIN))
 	{
 		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
 		return ;
 	}
-
 	switch(command)
 	{
 		case CAP:
