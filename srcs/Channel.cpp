@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/09 18:14:58 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/13 21:32:09 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,11 +125,14 @@ int	Channel::isOnChannel(int socket) const
 
 void	Channel::addToChannel(int socket)
 { // If client was invited then also invitation is removed
-	_channelSettings.channelMembers.push_back(socket);
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
+	if (!isOnChannel(socket))
 	{
-		if (_channelSettings.invitedClients.at(i) == socket)
-			_channelSettings.invitedClients.erase(_channelSettings.invitedClients.begin() + i--); // i-- because numbers move back
+		_channelSettings.channelMembers.push_back(socket);
+		for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
+		{
+			if (_channelSettings.invitedClients.at(i) == socket)
+				_channelSettings.invitedClients.erase(_channelSettings.invitedClients.begin() + i--); // i-- because numbers move back
+		}
 	}
 }
 
@@ -138,15 +141,8 @@ void	Channel::partFromChannel(int socket)
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
 		if (_channelSettings.channelMembers.at(i) == socket)
-		{
-			std::swap(_channelSettings.channelMembers.at(i),
-				_channelSettings.channelMembers.at(_channelSettings.channelMembers.size() - 1));
-				_channelSettings.channelMembers.pop_back();
-			Channel::removeOps(socket);
-			return ;
-		}
+			_channelSettings.channelMembers.erase(_channelSettings.channelMembers.begin() + i--);
 	}
-	return ;
 }
 
 int	Channel::howManyMembersOnChannel() const

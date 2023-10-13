@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:46:52 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/09 14:26:05 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/13 21:09:16 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct s_server_mode
 	int							maxSocket;
 	char						buffer[MSG_SIZE]; //temporary solution
 	std::vector<std::string>	clientBuffers;
+	int							isGollumAwake;
 }	t_server_mode;
 
 class Server

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/10 19:25:06 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/13 21:04:28 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 # define USER_ID(nick, user) (nick + "!" + user + "@localhost")
 # define ON 1
 # define OFF 0
+# define GOLLUM_PASSWORD "MyPrecious"
 
 typedef enum e_registration
 {

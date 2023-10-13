@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:45 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/10 20:33:39 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/13 21:38:41 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,24 @@ void Privmsg::privmsgcmd(int socket, std::string full_command, t_server_mode &_s
 		}
 	}else // Target is a user
 	{
+		if (commandParts.at(1) == "Gollum")
+		{
+			if (_serverSettings.isGollumAwake)
+			{
+				return ;
+			}else
+			{
+				if (commandParts.size() == 5 && commandParts.at(2) == ":WAKE" && commandParts.at(3) == "UP" && commandParts.at(4) == GOLLUM_PASSWORD)
+				{
+					std::stringstream ss;
+					ss << "Good Smeagol will always serve the master of the precious" << std::endl;
+					Server::sendToOneClient(socket, ss.str());
+					ss.str("");
+					_serverSettings.isGollumAwake = 1;
+					return ;
+				}
+			}
+		}
 		int targetSocket = ToolFunctions::_findSocket(commandParts.at(1), _serverSettings.clients);
 		if (targetSocket == 0) // Nick not found
 		{

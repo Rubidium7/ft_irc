@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/12 17:10:31 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/13 21:32:36 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ Server::Server(int port, std::string password)
 		_serverSettings.clientBuffers.push_back("");
 	_serverSettings.message.msg = "";
 	_serverSettings.message.code = EMPTY;
+	_serverSettings.isGollumAwake = 0;
 }
 
 Server::~Server()
