@@ -85,7 +85,7 @@ void	Mode::modeCommand(int socket, Client &client,
 				serverSettings.channels.at(i).setKey("");
 			return ;
 		case O:
-			target_socket = ToolFunctions::_findSocket(args.at(3), serverSettings.clients);
+			target_socket = ToolFunctions::findSocketForClientFromName(args.at(3), serverSettings.clients);
 			if (!target_socket || !serverSettings.channels.at(i).isOnChannel(socket))
 				Server::sendAnswer(socket, client.getNick(), ERR_USERNOTINCHANNEL,
 					args.at(3) + " " + args.at(1) + " :They aren't on that channel");
@@ -93,7 +93,7 @@ void	Mode::modeCommand(int socket, Client &client,
 				serverSettings.channels.at(i).giveOps(target_socket);
 			return ;
 		case O_OFF:
-			target_socket = ToolFunctions::_findSocket(args.at(3), serverSettings.clients);
+			target_socket = ToolFunctions::findSocketForClientFromName(args.at(3), serverSettings.clients);
 			if (!target_socket || !serverSettings.channels.at(i).isOnChannel(socket))
 				Server::sendAnswer(socket, client.getNick(), ERR_USERNOTINCHANNEL,
 					args.at(3) + " " + args.at(1) + " :They aren't on that channel");

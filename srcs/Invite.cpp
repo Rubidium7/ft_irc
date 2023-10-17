@@ -29,7 +29,7 @@ void	Invite::inviteCommand(int socket, Client &client,
 			serverSettings.channels.at(i).getChannelName() + " :You're not channel operator");
 		return ;
 	}
-	target_socket = ToolFunctions::_findSocket(args.at(1), serverSettings.clients);
+	target_socket = ToolFunctions::findSocketForClientFromName(args.at(1), serverSettings.clients);
 	if (!target_socket)
 	{
 		Server::sendAnswer(socket, client.getNick(), ERR_NOSUCHNICK,

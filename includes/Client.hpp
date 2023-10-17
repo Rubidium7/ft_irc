@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:37:31 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/05 14:54:32 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/17 20:41:03 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class Client
 		int			registrationStatus() const;
 		void		setGivenPass(bool truth);
 		void		clearInfo();
-		void		printDebug() const;
+		void		printClientInformation(int socket) const;
 
 	private:
 		Client(const Client &src);

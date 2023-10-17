@@ -6,11 +6,13 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:38:35 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/05 14:55:57 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/17 20:40:39 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include "Server.hpp"
+#include <sstream>
 
 Client::Client():
 	_socket(0), _nickName("*"), _givenPass(false)
@@ -99,13 +101,34 @@ int	Client::registrationStatus() const
 	return (REGISTERED);
 }
 
-void	Client::printDebug() const
+void	Client::printClientInformation(int socket) const
 {
-	std::cout << "Client information:" << std::endl;
-	std::cout << "Socket: " << _socket << std::endl;
-	std::cout << "Nick: " << _nickName << std::endl;
-	std::cout << "Username: " << _userName << std::endl;
-	std::cout << "Realname: " << _realName << std::endl;
-	std::cout << "Hostname: " << _hostName << std::endl;
-	std::cout << "Pass given: " << _givenPass << std::endl;
+	std::stringstream ss;
+	ss << "Client information:" << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
+
+	ss << "Socket: " << _socket << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
+
+	ss << "Nick: " << _nickName << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
+
+	ss << "Username: " << _userName << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
+
+	ss << "Realname: " << _realName << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
+
+	ss << "Hostname: " << _hostName << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
+
+	ss << "Pass given: " << _givenPass << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
 }

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:34 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/12 20:36:23 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/17 19:14:31 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void Kick::kickcmd(int socket, std::string full_command, t_server_mode	&_serverS
 	{
 		for (std::vector<std::string>::size_type j = 0; j < data.tempChannels.size(); ++j)
 		{
-			if (!Server::doesChannelExist(data.tempChannels.at(j), _serverSettings.channels))
+			if (!ToolFunctions::doesChannelExistWithName(data.tempChannels.at(j), _serverSettings.channels))
 			{
 				_printDoesChannelExistError(data, j, _serverSettings);
 				continue ;
@@ -122,7 +122,7 @@ int Kick::_goThroughTempUsers(t_kickcmd_data &data, std::vector<std::string>::si
 {
 	for (std::vector<std::string>::size_type k = 0; k < data.tempUsers.size(); ++k)
 	{
-		if (!Server::doesChannelExist(data.tempChannels.at(j), _serverSettings.channels)) // If last user is deleted channel might not exist
+		if (!ToolFunctions::doesChannelExistWithName(data.tempChannels.at(j), _serverSettings.channels)) // If last user is deleted channel might not exist
 		{
 			_printDoesChannelExistError(data, j, _serverSettings);
 			return (1);

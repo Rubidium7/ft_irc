@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:52:44 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/05 16:22:12 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/17 21:38:39 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ std::string	ToolFunctions::_findNickName(const int socket, const Client clients[
 	return ("*");
 }
 
-int	ToolFunctions::_findSocket(const std::string nick, const Client *clients)
+int	ToolFunctions::findSocketForClientFromName(const std::string nick, const Client *clients)
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
@@ -55,4 +55,60 @@ int	ToolFunctions::_findSocket(const std::string nick, const Client *clients)
 			return (clients[i].getSocket());
 	}
 	return (0);
+}
+
+int ToolFunctions::findChannelIndex(const std::string channelName, std::vector<Channel> &channels)
+{
+	for (std::vector<Channel>::size_type i = 0; i < channels.size(); ++i)
+	{
+		if (channels.at(i).getChannelName() == channelName)
+			return (i);
+	}
+	return (-1);	
+}
+
+int ToolFunctions::_findClientIndexWithSocket(const int socket, const Client clients[])
+{
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
+	{
+		if (clients[i].getSocket() == socket)
+			return (i);
+	}
+	return (-1);
+}
+
+int	ToolFunctions::doesChannelExistWithName(std::string &nameChannel, std::vector<Channel> &channels)
+{
+	if (findChannelIndex(nameChannel, channels) == -1)
+		return (0);
+	return (1);
+}
+
+void	ToolFunctions::listChannelsToOneSocket(int socket, t_server_mode &_serverSettings, std::stringstream &ss)
+{
+	ss << "Here be list of channels my master:" << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
+
+	for (std::vector<Channel>::size_type i = 0; i < _serverSettings.channels.size(); ++i)
+	{
+		ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::_findNickName(socket, _serverSettings.clients) << " :";
+		ss << "Channel: " << _serverSettings.channels.at(i).getChannelName() << std::endl;
+		Server::sendToOneClient(socket, ss.str());
+		ss.str("");
+	}
+}
+
+void	ToolFunctions::listClientsToOneSocket(int socket, Client clients[], std::stringstream &ss)
+{
+	ss << "Here be list of clients my master:" << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
+
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
+	{
+		ss << "Socket: " << clients[i].getSocket() << " " << "Nick: " << clients[i].getNick() << std::endl;
+		Server::sendToOneClient(socket, ss.str());
+		ss.str("");
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:09:32 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/09 18:06:11 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/17 19:12:51 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void Part::partcmd(int socket, std::string full_command, t_server_mode	&_serverS
 			ToolFunctions::_parse_into_parts(commandParts, 1, tempChannels);
 			for (std::vector<std::string>::size_type i = 0; i < tempChannels.size(); ++i)
 			{
-				if (!Server::doesChannelExist(tempChannels.at(i), _serverSettings.channels))
+				if (!ToolFunctions::doesChannelExistWithName(tempChannels.at(i), _serverSettings.channels))
 					Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ":No such channel");
 				for (std::vector<Channel>::size_type k = 0; k < _serverSettings.channels.size(); ++k)
 				{

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/13 21:32:36 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/17 19:22:09 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 #include "Pass.hpp"
 #include "Topic.hpp"
 #include "Invite.hpp"
-#include "Debug.hpp"
 #include "Server.hpp"
 #include "Kick.hpp"
 #include "Privmsg.hpp"
@@ -167,6 +166,7 @@ void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string m
 	buffer = NULL;
 }
 
+/*
 int	Server::doesChannelExist(std::string nameChannel, std::vector<Channel> &channels)
 {
 	for (std::vector<Channel>::size_type i = 0; i < channels.size(); ++i)
@@ -178,6 +178,7 @@ int	Server::doesChannelExist(std::string nameChannel, std::vector<Channel> &chan
 	}
 	return (0);
 }
+*/
 
 void	Server::sendToOneClient(int socket, std::string msg)
 {
@@ -470,9 +471,6 @@ void	Server::_handleCommands(int socket)
 			parser.parseQuit();
 			if (!parser.getMessageCode())
 				_handleQuit(socket, _matchClient(socket), parser.getArgs());
-			break ;
-		case DEBUG:
-			Debug::debugcmd(socket, full_command, _serverSettings);
 			break ;
 		default:
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");

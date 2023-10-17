@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/09 17:37:23 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/17 19:12:16 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void Join::joincmd(int socket, std::string full_command, t_server_mode	&_serverS
 			for (std::vector<std::string>::size_type i = 0; i < tempChannels.size(); ++i)
 			{
 				// Channel does not exist so create a new one
-				if (!Server::doesChannelExist(tempChannels.at(i), _serverSettings.channels))
+				if (!ToolFunctions::doesChannelExistWithName(tempChannels.at(i), _serverSettings.channels))
 				{
 					_serverSettings.channels.push_back(Channel(tempChannels.at(i), socket));
 					_serverSettings.channels.at(_serverSettings.channels.size() - 1).giveOps(socket);

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:45 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/13 21:38:41 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/17 21:28:19 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void Privmsg::privmsgcmd(int socket, std::string full_command, t_server_mode &_s
 	}
 	if (commandParts.at(1).at(0) == '#') // Target is Channel
 	{
-		if(!Server::doesChannelExist(commandParts.at(1), _serverSettings.channels)) // Channel does not exist
+		if(!ToolFunctions::doesChannelExistWithName(commandParts.at(1), _serverSettings.channels)) // Channel does not exist
 		{
 			std::stringstream ss;
 			ss << commandParts.at(1);
@@ -71,23 +71,67 @@ void Privmsg::privmsgcmd(int socket, std::string full_command, t_server_mode &_s
 	{
 		if (commandParts.at(1) == "Gollum")
 		{
-			if (_serverSettings.isGollumAwake)
+			std::stringstream ss;
+			ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::_findNickName(socket, _serverSettings.clients) << " :";
+			if (_serverSettings.isGollumAwake && _serverSettings.isGollumAwake == socket)
 			{
-				return ;
+				if (commandParts.size() == 5 && commandParts.at(2) == ":WAKE" && commandParts.at(3) == "UP" && commandParts.at(4) == GOLLUM_PASSWORD)
+				{
+					ss << "Smeagol is already awake, leave me alone you nasty hobbitses." << std::endl;
+					Server::sendToOneClient(socket, ss.str());
+					ss.str("");
+				}else if (commandParts.size() == 5 && commandParts.at(2) == ":GOTO" && commandParts.at(3) == "SLEEP" && commandParts.at(4) == GOLLUM_PASSWORD)
+				{
+					ss << "Smeagol goes to sleep with the precious." << std::endl;
+					Server::sendToOneClient(socket, ss.str());
+					ss.str("");
+					_serverSettings.isGollumAwake = 0;
+				} else if (commandParts.size() == 3 && commandParts.at(2) == ":STATUS")
+				{
+					ToolFunctions::listChannelsToOneSocket(socket, _serverSettings.channels, ss);
+					ss << std::endl;
+					Server::sendToOneClient(socket, ss.str());
+					ss.str("");
+					ToolFunctions::listClientsToOneSocket(socket, _serverSettings.clients, ss);
+				} else if (commandParts.size() == 3 && commandParts.at(2) == ":CLIENTS")
+				{
+					ToolFunctions::listClientsToOneSocket(socket, _serverSettings.clients, ss);
+				} else if (commandParts.size() == 4 && commandParts.at(2) == ":CLIENTS"
+					&& ToolFunctions::findSocketForClientFromName(commandParts.at(3), _serverSettings.clients))
+				{
+					int index = ToolFunctions::_findClientIndexWithSocket(
+						ToolFunctions::findSocketForClientFromName(commandParts.at(3),
+							_serverSettings.clients), _serverSettings.clients);
+					_serverSettings.clients[index].printClientInformation(socket);
+				} else if (commandParts.size() == 3 && commandParts.at(2) == ":CHANNELS")
+				{
+					ToolFunctions::listChannelsToOneSocket(socket, _serverSettings.channels, ss);
+				} else if (commandParts.size() == 4 && commandParts.at(2) == ":CHANNELS"
+					&& ToolFunctions::doesChannelExistWithName(commandParts.at(3), _serverSettings.channels))
+				{
+					int index = ToolFunctions::findChannelIndex(commandParts.at(3), _serverSettings.channels);
+					_serverSettings.channels.at(index).printChannelInformation(socket);
+				} else if (commandParts.size() == 4 && commandParts.at(2) == ":TAKEOVER" && ToolFunctions::doesChannelExistWithName(commandParts.at(3), _serverSettings.channels))
+				{
+					ss << "There is another way. More secret. A dark way to " << commandParts.at(3) << " my precious." << std::endl;
+					Server::sendToOneClient(socket, ss.str());
+					ss.str("");
+					int index = ToolFunctions::findChannelIndex(commandParts.at(3), _serverSettings.channels);
+					_serverSettings.channels.at(index).takeOverChannel(socket);
+				}
 			}else
 			{
 				if (commandParts.size() == 5 && commandParts.at(2) == ":WAKE" && commandParts.at(3) == "UP" && commandParts.at(4) == GOLLUM_PASSWORD)
 				{
-					std::stringstream ss;
-					ss << "Good Smeagol will always serve the master of the precious" << std::endl;
+					ss << "Good Smeagol will always serve the master of the precious." << std::endl;
 					Server::sendToOneClient(socket, ss.str());
 					ss.str("");
-					_serverSettings.isGollumAwake = 1;
-					return ;
+					_serverSettings.isGollumAwake = socket;
 				}
 			}
+			return ;
 		}
-		int targetSocket = ToolFunctions::_findSocket(commandParts.at(1), _serverSettings.clients);
+		int targetSocket = ToolFunctions::findSocketForClientFromName(commandParts.at(1), _serverSettings.clients);
 		if (targetSocket == 0) // Nick not found
 		{
 			std::stringstream ss;
@@ -102,7 +146,7 @@ void Privmsg::privmsgcmd(int socket, std::string full_command, t_server_mode &_s
 		if (position != std::string::npos)
 			message = full_command.substr(position);
 		std::stringstream ss;
-		ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients) << "!localhost" << " PRIVMSG ";
+		ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients) << "!localhost PRIVMSG ";
 		ss << commandParts.at(1) << " " << message << std::endl;
 		Server::sendToOneClient(targetSocket, ss.str());
 		ss.str("");
