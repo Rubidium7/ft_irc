@@ -65,7 +65,7 @@ void Privmsg::privmsgcmd(int socket, std::string full_command, t_server_mode &_s
 				}
 				break ;
 			}
-			
+
 		}
 	}else // Target is a user
 	{
@@ -152,7 +152,7 @@ void Privmsg::privmsgcmd(int socket, std::string full_command, t_server_mode &_s
 		{
 			std::stringstream ss;
 			ss << commandParts.at(1);
-			ss << ":No such nick" << std::endl;
+			ss << " :No such nick" << std::endl;
 			Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_NOSUCHNICK, ss.str());
 			ss.str("");
 			return ;
