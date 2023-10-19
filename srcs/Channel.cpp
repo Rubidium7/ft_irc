@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:42:52 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 20:57:56 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ Channel	&Channel::operator=(const Channel &copy_assignment)
 	_channelSettings.k				= copy_assignment._channelSettings.k;
 	_channelSettings.o				= copy_assignment._channelSettings.o;
 	_channelSettings.l				= copy_assignment._channelSettings.l;
+	_channelSettings.b				= copy_assignment._channelSettings.b;
 
 	return (*this);
 }

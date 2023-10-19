@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:38:35 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:44:36 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 20:59:51 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ Client::Client()
 
 Client::~Client()
 {
-
+	// Empty on purpose
 }
 
 int	Client::getSocket() const

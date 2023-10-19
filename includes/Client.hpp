@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:37:31 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:32:55 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 20:53:05 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,19 +32,19 @@ class Client
 		Client();
 		~Client();
 
-		int			getSocket() const;
-		void		setSocket(int socket);
-		std::string	getNick() const;
-		void		setNick(std::string nickName);
-		std::string	getUserName() const;
-		void		setUserName(std::string userName);
-		std::string	getRealName() const;
-		void		setRealName(std::string realName);
-		std::string	getHostName() const;
-		void		setHostName(std::string hostName);
-		int			registrationStatus() const;
-		void		setGivenPass(bool truth);
-		void		clearInfo();
+		int					getSocket() const;
+		void				setSocket(int socket);
+		std::string			getNick() const;
+		void				setNick(std::string nickName);
+		std::string			getUserName() const;
+		void				setUserName(std::string userName);
+		std::string			getRealName() const;
+		void				setRealName(std::string realName);
+		std::string			getHostName() const;
+		void				setHostName(std::string hostName);
+		int					registrationStatus() const;
+		void				setGivenPass(bool truth);
+		void				clearInfo();
 		const t_client_mode	&giveClientSettings() const;
 
 	private:

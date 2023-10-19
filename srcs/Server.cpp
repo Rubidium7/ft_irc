@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/19 19:01:47 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 21:10:24 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ Server::Server(int port, std::string password)
 
 Server::~Server()
 {
-
+	// Empty on purpose
 }
 
 t_error_code	Server::checkFailure(void)
@@ -103,7 +103,7 @@ void	Server::_assignServerMessage(t_code code, std::string msg)
 
 void	Server::_sendMessageFromStruct(int socket, t_message message)
 {
-	std::cerr << message.msg << std::endl; //debug
+	std::cerr << message.msg << std::endl; //debug // Onko viela tarpeellinen?
 	sendAnswer(socket, _matchClient(socket).getNick(), message.code, message.msg);
 }
 
@@ -133,7 +133,7 @@ void	Server::sendToClients(std::string msg)
 		if (_serverSettings.clients[i].getSocket() != 0)
 		{
 			// for debug printing
-			std::cerr << "i = " << i << " client nro: " << _serverSettings.clients[i].getSocket() << std::endl;
+			std::cerr << "i = " << i << " client nro: " << _serverSettings.clients[i].getSocket() << std::endl; // Onko viela tarpeellinen?
 			send(_serverSettings.clients[i].getSocket(), buffer, size, 0);
 		}
 	}
@@ -157,24 +157,10 @@ void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string m
 	buffer = tempMessage.c_str();
 	size = tempMessage.size();
 	// std::cerr << "sending a message:" << std::endl; //debug
-	std::cerr << buffer; //debug
+	std::cerr << buffer; //debug // Onko viela tarpeellinen?
 	send(socket, buffer, size, 0);
 	buffer = NULL;
 }
-
-/*
-int	Server::doesChannelExist(std::string nameChannel, std::vector<Channel> &channels)
-{
-	for (std::vector<Channel>::size_type i = 0; i < channels.size(); ++i)
-	{
-		if (channels.at(i).getChannelName() == nameChannel)
-		{
-			return (1);
-		}
-	}
-	return (0);
-}
-*/
 
 void	Server::sendToOneClient(int socket, std::string msg)
 {
@@ -188,7 +174,7 @@ void	Server::sendToOneClient(int socket, std::string msg)
 	message.str("");
 	buffer = tempMessage.c_str();
 	size = tempMessage.size();
-	std::cerr << buffer; //debug
+	std::cerr << buffer; //debug // Viela tarpeellinen?
 	send(socket, buffer, size, 0);
 }
 
@@ -236,10 +222,8 @@ void	Server::receiveMessage(int socket)
 	else
 	{
 		_serverSettings.buffer[bytes_read] = '\0';
-		// Apparently command handling happens after this ???
-
 		// Print what client sent
-		std::cout << "Client: " << socket << " " << "Sent: #" << _serverSettings.buffer << "#" << std::endl;
+		//std::cout << "Client: " << socket << " " << "Sent: #" << _serverSettings.buffer << "#" << std::endl; // Viela tarpeellinen?
 
 		// Add buffer to clientbuffer
 		for (int i = 0; _serverSettings.buffer[i]; i++)
@@ -254,7 +238,7 @@ void	Server::receiveMessage(int socket)
 			_handleCommands(socket);
 		}
 
-		// sendToClients(_buffer); Needed ???
+		// sendToClients(_buffer); Needed ??? // Viela tarpeellinen?
 	}
 }
 
@@ -328,11 +312,11 @@ void	Server::_newUserMessage(int socket, Client &client)
 	msg += ", running version v0.1";
 	sendAnswer(socket, nick, RPL_YOURHOST, msg);
 	msg.clear();
-	msg = ":This server was created 17/08/2023 13:53:54"; //just made it up :p
+	msg = ":This server was created 17/08/2023 13:53:54"; //just made it up :p // ;)
 	sendAnswer(socket, nick, RPL_CREATED, msg);
 	msg.clear();
 	msg = _hostName + " v0.1 o iklot";
-	//<server_name> <version> <usermodes> <chanmodes>
+	//<server_name> <version> <usermodes> <chanmodes> // Selittaako tama jotain vai voiko poistaa?
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
 	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=12";
@@ -340,8 +324,8 @@ void	Server::_newUserMessage(int socket, Client &client)
 	msg += " :are supported by this server";
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
-	//much more info can be added to 005 msg ^^^
-	//maybe LUSERS cmd here or not
+	//much more info can be added to 005 msg ^^^	// Viela tarpeellinen?
+	//maybe LUSERS cmd here or not				 	// Viela tarpeellinenn?
 	_messageOfTheDay(socket, nick);
 }
 
@@ -368,7 +352,7 @@ void	Server::_printHost(int socket)
 		std::cout << "name: " << result->ai_canonname << std::endl;
 	freeaddrinfo(result);
 
-} //might use later
+} //might use later // Viela tarpeellinen ?
 
 void	Server::_handleCommands(int socket)
 {
@@ -382,9 +366,8 @@ void	Server::_handleCommands(int socket)
 	else
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 2);
 
-	std::cout << full_command << std::endl; //debug
+	std::cout << full_command << std::endl; //debug // Viela tarpeellinen?
 	_clearMessage();
-
 
 	if (_matchClient(socket).registrationStatus() != REGISTERED)
 		new_user = true;
@@ -445,7 +428,7 @@ void	Server::_handleCommands(int socket)
 			break ;
 		case PRIVMSG:
 			parser.parsePrivmsg();
-			//if (!parser.getMessageCode())
+			//if (!parser.getMessageCode()) // Onko tama parseri jo toimiva? Poistin nimittain aivan kaiken virhetarkastelut tasta komennosta
 			Privmsg::privmsgCommand(socket, full_command, _serverSettings);
 			break;
 		case PING:
@@ -460,7 +443,7 @@ void	Server::_handleCommands(int socket)
 			break ;
 		case KICK:
 			parser.parseKick();
-			//if (!parser.getMessageCode())
+			//if (!parser.getMessageCode()) // Onko tama parseri jo toimiva? Tama kasky ei enaa tarkasta yhtaan mitaan
 			Kick::kickCommand(socket, full_command, _serverSettings);
 			break ;
 		case QUIT:
@@ -526,8 +509,8 @@ void	Server::_handleQuit(int socket, Client &client, std::vector<std::string> ar
 		msg += " ";
 		msg += args.at(i);
 	}
-	(void)client;
-	//sendToChannel(channel(s?), USER_ID(client.getNick(), client.getUserName(), client.getHostName()) + " QUIT" + msg);
+	(void)client; // Voiko clientin poistaa tasta functiosta kokonaan? Myos inputista?
+	//sendToChannel(channel(s?), USER_ID(client.getNick(), client.getUserName(), client.getHostName()) + " QUIT" + msg); // Onko tarpeellinen?
 	clientExit(socket, _serverSettings);
 }
 

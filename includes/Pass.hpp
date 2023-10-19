@@ -16,7 +16,6 @@ class Pass
 		~Pass();
 
 		Pass &operator=(const Pass &rhs);
-
 };
 
 #endif

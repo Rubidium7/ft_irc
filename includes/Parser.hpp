@@ -36,12 +36,12 @@ class Parser
 		Parser(const Parser &src);
 		Parser &operator=(const Parser &rhs);
 
-		void	_assignParserMessage(t_code code, std::string msg);
-		bool	_isChannelKeyFormatCorrect(size_t amountOfChannels);
-		bool	_isChannelFormatCorrect(size_t *amountOfChannels);
-		void	_saveArguments(std::string input);
+		void						_assignParserMessage(t_code code, std::string msg);
+		bool						_isChannelKeyFormatCorrect(size_t amountOfChannels);
+		bool						_isChannelFormatCorrect(size_t *amountOfChannels);
+		void						_saveArguments(std::string input);
 		std::vector<std::string>	_createVector(std::string string, char separator);
-		bool	_onlyNumeric(std::string input);
+		bool						_onlyNumeric(std::string input);
 
 		std::vector<std::string>	_args;
 		t_message					_message;

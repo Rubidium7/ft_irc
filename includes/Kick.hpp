@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:34:24 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:35:13 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 20:48:41 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,17 @@ class Kick
 		Kick(Kick &copy_constructor);
 		Kick &operator=(Kick &copy_assignment);
 
-		static int _returnClientSocket(std::string nick, t_server_mode &_serverSettings);
-		
-		static void _printDoesChannelExistError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings);
-		static void _printYoureNotChannelOperatorError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings);
-		static void _printUserIsNotOnThatChannelError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings);
-		static void _kickUserFromChannel(t_kickcmd_data &data, std::vector<Channel>::size_type &i, std::vector<std::string>::size_type &k, t_server_mode &_serverSettings);
-		static int	_goThroughTempUsersLoopHelper(t_kickcmd_data &data, std::vector<std::string>::size_type &j, std::vector<Channel>::size_type &i, t_server_mode &_serverSettings);
+		static int	_returnClientSocket(std::string nick, t_server_mode &_serverSettings);
+		static void _printDoesChannelExistError(const t_kickcmd_data &data,
+			std::vector<std::string>::size_type &j, t_server_mode &_serverSettings);
+		static void _printYoureNotChannelOperatorError(t_kickcmd_data &data,
+			std::vector<std::string>::size_type &j, t_server_mode &_serverSettings);
+		static void _printUserIsNotOnThatChannelError(const t_kickcmd_data &data,
+			std::vector<std::string>::size_type &j, t_server_mode &_serverSettings);
+		static void _kickUserFromChannel(const t_kickcmd_data &data, std::vector<Channel>::size_type &i,
+			std::vector<std::string>::size_type &k, t_server_mode &_serverSettings);
+		static void	_goThroughTempUsersLoopHelper(const t_kickcmd_data &data, std::vector<std::string>::size_type &j,
+			std::vector<Channel>::size_type &i, t_server_mode &_serverSettings);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:34 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:48:48 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 20:27:46 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,21 +26,14 @@ void Kick::kickCommand(int socket, std::string full_command, t_server_mode	&_ser
 	for (std::vector<std::string>::size_type j = 0; j < data.temp_channels.size(); ++j) // Handle all channels and users at the same time against rfc2812 rule
 	{																					// Otherwise irssi will not work, pdf says we can modify behavior of server to fit client
 		if (!ToolFunctions::doesChannelExistWithName(data.temp_channels.at(j), _serverSettings.channels)) // Channel does not exist
-		{
-			_printDoesChannelExistError(data, j, _serverSettings);
-			continue ;
-		}
+			_printDoesChannelExistError(data, j, _serverSettings); continue ;
 		for (std::vector<Channel>::size_type i = 0; i < _serverSettings.channels.size(); ++i) // Channel exist
 		{
 			if (_serverSettings.channels.at(i).getChannelName() == data.temp_channels.at(j)) // Name of channel maches
 			{
 				if (!_serverSettings.channels.at(i).hasOps(data.socket)) // Client does not have ops
-				{
-					_printYoureNotChannelOperatorError(data, j, _serverSettings);
-					break ;
-				}
-				if (_goThroughTempUsersLoopHelper(data, j, i, _serverSettings)) // Client has ops
-					break;
+					_printYoureNotChannelOperatorError(data, j, _serverSettings); break ;
+				_goThroughTempUsersLoopHelper(data, j, i, _serverSettings); // Client has ops
 				break ;
 			}
 		}
@@ -57,7 +50,7 @@ int Kick::_returnClientSocket(std::string nick, t_server_mode &_serverSettings)
 	return (0);
 }
 
-void Kick::_printDoesChannelExistError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
+void Kick::_printDoesChannelExistError(const t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
 	ss << data.temp_channels.at(j);
@@ -75,7 +68,7 @@ void Kick::_printYoureNotChannelOperatorError(t_kickcmd_data &data, std::vector<
 	ss.str("");
 }
 
-void Kick::_printUserIsNotOnThatChannelError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
+void Kick::_printUserIsNotOnThatChannelError(const t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
 	ss << data.temp_channels.at(j);
@@ -84,7 +77,7 @@ void Kick::_printUserIsNotOnThatChannelError(t_kickcmd_data &data, std::vector<s
 	ss.str("");
 }
 
-void Kick::_kickUserFromChannel(t_kickcmd_data &data, std::vector<Channel>::size_type &i, std::vector<std::string>::size_type &k, t_server_mode &_serverSettings)
+void Kick::_kickUserFromChannel(const t_kickcmd_data &data, std::vector<Channel>::size_type &i, std::vector<std::string>::size_type &k, t_server_mode &_serverSettings)
 {
 	_serverSettings.channels.at(i).partFromChannel(_returnClientSocket(data.temp_users.at(k), _serverSettings));
 	_serverSettings.channels.at(i).setNewOpIfNoOp();
@@ -107,21 +100,20 @@ void Kick::_kickUserFromChannel(t_kickcmd_data &data, std::vector<Channel>::size
 		_serverSettings.channels.erase(_serverSettings.channels.begin() + i--);
 }
 
-int Kick::_goThroughTempUsersLoopHelper(t_kickcmd_data &data, std::vector<std::string>::size_type &j, std::vector<Channel>::size_type &i, t_server_mode &_serverSettings)
+void Kick::_goThroughTempUsersLoopHelper(const t_kickcmd_data &data, std::vector<std::string>::size_type &j, std::vector<Channel>::size_type &i, t_server_mode &_serverSettings)
 {
-	for (std::vector<std::string>::size_type k = 0; k < data.temp_users.size(); ++k) // Go through all candidate users
+	for (std::vector<std::string>::size_type temp_user_index = 0; temp_user_index < data.temp_users.size(); ++temp_user_index) // Go through all candidate users
 	{
 		if (!ToolFunctions::doesChannelExistWithName(data.temp_channels.at(j), _serverSettings.channels)) // If last user is deleted channel might not exist
 		{
 			_printDoesChannelExistError(data, j, _serverSettings);
-			return (1);
+			return ;
 		}
-		if (!_serverSettings.channels.at(i).isOnChannel(_returnClientSocket(data.temp_users.at(k), _serverSettings))) // User not in channel
+		if (!_serverSettings.channels.at(i).isOnChannel(_returnClientSocket(data.temp_users.at(temp_user_index), _serverSettings))) // User not in channel
 		{
 			_printUserIsNotOnThatChannelError(data, j, _serverSettings);
 			continue ;
 		}
-		_kickUserFromChannel(data, i, k, _serverSettings);
+		_kickUserFromChannel(data, i, temp_user_index, _serverSettings); 
 	}
-	return (0);
 }

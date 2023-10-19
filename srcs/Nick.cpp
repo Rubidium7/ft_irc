@@ -24,6 +24,6 @@ void	Nick::nickCommand(int socket, Client &client, std::string nick, t_server_mo
 		Server::sendAnswer(socket, client.getNick(), ERR_NICKNAMEINUSE, nick + " :Nickname is already in use.");
 		return ;
 	}
-	//sendToChannel(socket, USER_ID(client.getNick(), client.getUserName(), client.getHostName()) + " NICK " + nick);
+	//sendToChannel(socket, USER_ID(client.getNick(), client.getUserName(), client.getHostName()) + " NICK " + nick); // Onko tarpeellinen?
 	client.setNick(nick);
 }

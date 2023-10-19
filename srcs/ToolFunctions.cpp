@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:52:44 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 19:02:37 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 21:12:27 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,7 @@ void	ToolFunctions::printChannelInformation(int socket, const t_channel_mode &_c
 	Server::sendToOneClient(socket, ss.str());
 	ss.str("");
 
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i) // Print channel members
 	{
 		ss << begin_string;
 		ss << _channelSettings.channelMembers.at(i) << std::endl;
@@ -203,7 +203,7 @@ void	ToolFunctions::printChannelInformation(int socket, const t_channel_mode &_c
 	Server::sendToOneClient(socket, ss.str());
 	ss.str("");
 
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i) // Print invited clients
 	{
 		ss << begin_string;
 		ss << _channelSettings.invitedClients.at(i) << std::endl;
@@ -231,7 +231,7 @@ void	ToolFunctions::printChannelInformation(int socket, const t_channel_mode &_c
 	Server::sendToOneClient(socket, ss.str());
 	ss.str("");
 	
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); ++i)
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); ++i) // Print channel ops
 	{
 		ss << begin_string;
 		ss << _channelSettings.o.at(i) << std::endl;
