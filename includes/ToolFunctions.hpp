@@ -6,15 +6,13 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:53:10 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/17 21:24:05 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 13:40:02 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TOOLFUNCTIONS_HPP
 # define TOOLFUNCTIONS_HPP
 
-//# include "defines.hpp"
-//# include "Channel.hpp"
 # include "Server.hpp"
 # include <string>
 
@@ -29,8 +27,10 @@ class ToolFunctions
 		static int			findChannelIndex(const std::string channelName, std::vector<Channel> &channels);
 		static int			_findClientIndexWithSocket(const int socket, const Client clients[]);
 		static int			doesChannelExistWithName(std::string &nameChannel, std::vector<Channel> &channels);
-		static void			listChannelsToOneSocket(int socket, std::vector<Channel> &channels, std::stringstream &ss);
+		static void			listChannelsToOneSocket(int socket, t_server_mode &_serverSettings, std::stringstream &ss);
 		static void			listClientsToOneSocket(int socket, Client clients[], std::stringstream &ss);
+		static void			printClientInformation(int socket, const t_client_mode &_clientSettings, t_server_mode &_serverSettings);
+		static void			printChannelInformation(int socket, const t_channel_mode &_channelSettings, t_server_mode &_serverSettings);
 
 	private:
 

@@ -6,17 +6,25 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:37:31 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/17 20:41:03 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 13:34:24 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
 
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
 # include <iostream>
 # include "defines.hpp"
+
+typedef struct s_client_mode
+{
+	int			socket;
+	std::string	nickName;
+	std::string	userName;
+	std::string	realName;
+	std::string	hostName;
+	bool		givenPass;
+}	t_client_mode;
 
 class Client
 {
@@ -26,7 +34,6 @@ class Client
 
 		int			getSocket() const;
 		void		setSocket(int socket);
-
 		std::string	getNick() const;
 		void		setNick(std::string nickName);
 		std::string	getUserName() const;
@@ -38,18 +45,13 @@ class Client
 		int			registrationStatus() const;
 		void		setGivenPass(bool truth);
 		void		clearInfo();
-		void		printClientInformation(int socket) const;
+		const t_client_mode	&giveClientSettings() const;
 
 	private:
 		Client(const Client &src);
 		Client	&operator=(const Client &rhs);
 
-		int			_socket;
-		std::string	_nickName;
-		std::string	_userName;
-		std::string	_realName;
-		std::string	_hostName;
-		bool		_givenPass;
+		t_client_mode _clientSettings;
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:45 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/17 21:28:19 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 13:55:36 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,37 +86,53 @@ void Privmsg::privmsgcmd(int socket, std::string full_command, t_server_mode &_s
 					Server::sendToOneClient(socket, ss.str());
 					ss.str("");
 					_serverSettings.isGollumAwake = 0;
-				} else if (commandParts.size() == 3 && commandParts.at(2) == ":STATUS")
+				}else if (commandParts.size() == 3 && commandParts.at(2) == ":TIME")
 				{
-					ToolFunctions::listChannelsToOneSocket(socket, _serverSettings.channels, ss);
-					ss << std::endl;
+					std::time_t currentTime = std::time(NULL);
+					std::string localTime = std::ctime(&currentTime);
+					ss << "Is it time my master that you give Precious to me? " << localTime << std::endl;
 					Server::sendToOneClient(socket, ss.str());
 					ss.str("");
+				} else if (commandParts.size() == 3 && commandParts.at(2) == ":STATUS")
+				{
+					ToolFunctions::listChannelsToOneSocket(socket, _serverSettings, ss);
+					ss << std::endl;
+					Server::sendToOneClient(socket, ss.str());
 					ToolFunctions::listClientsToOneSocket(socket, _serverSettings.clients, ss);
+					ss.str("");
 				} else if (commandParts.size() == 3 && commandParts.at(2) == ":CLIENTS")
 				{
 					ToolFunctions::listClientsToOneSocket(socket, _serverSettings.clients, ss);
+					ss.str("");
 				} else if (commandParts.size() == 4 && commandParts.at(2) == ":CLIENTS"
 					&& ToolFunctions::findSocketForClientFromName(commandParts.at(3), _serverSettings.clients))
 				{
 					int index = ToolFunctions::_findClientIndexWithSocket(
 						ToolFunctions::findSocketForClientFromName(commandParts.at(3),
 							_serverSettings.clients), _serverSettings.clients);
-					_serverSettings.clients[index].printClientInformation(socket);
+					 ToolFunctions::printClientInformation(socket, _serverSettings.clients[index].giveClientSettings(), _serverSettings);
 				} else if (commandParts.size() == 3 && commandParts.at(2) == ":CHANNELS")
 				{
-					ToolFunctions::listChannelsToOneSocket(socket, _serverSettings.channels, ss);
+					ToolFunctions::listChannelsToOneSocket(socket, _serverSettings, ss);
+					ss.str("");
 				} else if (commandParts.size() == 4 && commandParts.at(2) == ":CHANNELS"
 					&& ToolFunctions::doesChannelExistWithName(commandParts.at(3), _serverSettings.channels))
 				{
 					int index = ToolFunctions::findChannelIndex(commandParts.at(3), _serverSettings.channels);
-					_serverSettings.channels.at(index).printChannelInformation(socket);
+					ToolFunctions::printChannelInformation(socket, _serverSettings.channels.at(index).giveChannelSettings(), _serverSettings);
 				} else if (commandParts.size() == 4 && commandParts.at(2) == ":TAKEOVER" && ToolFunctions::doesChannelExistWithName(commandParts.at(3), _serverSettings.channels))
 				{
 					ss << "There is another way. More secret. A dark way to " << commandParts.at(3) << " my precious." << std::endl;
 					Server::sendToOneClient(socket, ss.str());
 					ss.str("");
 					int index = ToolFunctions::findChannelIndex(commandParts.at(3), _serverSettings.channels);
+					if (!_serverSettings.channels.at(index).isOnChannel(socket))
+					{
+						ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients)
+							<< "!localcost JOIN " <<  commandParts.at(3) << std::endl;
+						Server::sendToOneClient(socket, ss.str());
+						ss.str("");
+					}
 					_serverSettings.channels.at(index).takeOverChannel(socket);
 				}
 			}else

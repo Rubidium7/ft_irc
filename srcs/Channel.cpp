@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/17 20:35:20 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 13:39:21 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "defines.hpp"
 #include "Channel.hpp"
 #include "Server.hpp"
+#include "ToolFunctions.hpp"
 
 Channel::Channel(const std::string name, int socketDescriptor)
 {
@@ -168,67 +169,6 @@ int	Channel::doesKeyMatch(const std::string &key) const
 	return (0);
 }
 
-void	Channel::printChannelInformation(int socket) const
-{
-	std::stringstream ss;
-	ss << "Channel name: " << _channelSettings.nameOfChannel << std::endl;
-	Server::sendToOneClient(socket, ss.str());
-	ss.str("");
-	
-	ss << "Channel members: " << std::endl;
-	Server::sendToOneClient(socket, ss.str());
-	ss.str("");
-
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
-	{
-		ss << _channelSettings.channelMembers.at(i) << std::endl;
-		Server::sendToOneClient(socket, ss.str());
-		ss.str("");
-	}
-
-	ss << "Invite only: " << _channelSettings.i << std::endl;
-	Server::sendToOneClient(socket, ss.str());
-	ss.str("");
-	
-	ss << "Invited Clients: " << std::endl;
-	Server::sendToOneClient(socket, ss.str());
-	ss.str("");
-
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
-	{
-		ss << _channelSettings.invitedClients.at(i) << std::endl;
-		Server::sendToOneClient(socket, ss.str());
-		ss.str("");
-	}
-	
-	ss << "t: " << _channelSettings.t << std::endl;
-	Server::sendToOneClient(socket, ss.str());
-	ss.str("");
-
-	ss << "Topic: " << _channelSettings.topic << std::endl;
-	Server::sendToOneClient(socket, ss.str());
-	ss.str("");
-	
-	ss << "Key: " << _channelSettings.k << std::endl;
-	Server::sendToOneClient(socket, ss.str());
-	ss.str("");
-	
-	ss << "Channel Ops: " << std::endl;
-	Server::sendToOneClient(socket, ss.str());
-	ss.str("");
-	
-	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); ++i)
-	{
-		ss << _channelSettings.o.at(i) << std::endl;
-		Server::sendToOneClient(socket, ss.str());
-		ss.str("");
-	}
-	
-	ss << "Limit how many users: " << _channelSettings.l << std::endl;
-	Server::sendToOneClient(socket, ss.str());
-	ss.str("");
-}
-
 void	Channel::sendToAllChannelMembers(const std::string msg)
 {
 	std::stringstream		message;
@@ -311,4 +251,9 @@ void	Channel::takeOverChannel(int socket)
 	while (_channelSettings.o.size())
 		_channelSettings.o.pop_back();
 	_channelSettings.o.push_back(socket);
+}
+
+const t_channel_mode	&Channel::giveChannelSettings() const
+{
+	return (_channelSettings);
 }

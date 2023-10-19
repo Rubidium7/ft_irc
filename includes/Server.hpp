@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:46:52 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/17 19:09:07 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 13:15:00 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 # define SERVER_HPP
 
 # include "defines.hpp"
+# include "Parser.hpp"
 # include "Client.hpp"
 # include "Channel.hpp"
-# include "Parser.hpp"
 # include <string>
 # include <vector>
 # include <sys/socket.h>
