@@ -71,7 +71,6 @@ class Channel
 
 		Channel();
 
-
 		t_channel_mode _channelSettings;
 };
 

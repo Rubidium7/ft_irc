@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/13 21:04:28 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 15:43:51 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,6 @@
 # include <netinet/in.h>
 # include <vector>
 # include <string>
-//# include <set>
-//# include "Client.hpp"
-//# include "Channel.hpp"
 
 # define MAX_AMOUNT_CLIENTS  5 //1023
 # define MAX_AMOUNT_CHANNELS 5 //?

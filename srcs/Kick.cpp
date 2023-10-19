@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:34 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/17 19:14:31 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 15:53:28 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,44 +17,33 @@ void Kick::kickcmd(int socket, std::string full_command, t_server_mode	&_serverS
 {
 	t_kickcmd_data data;
 
-	ToolFunctions::_split_command_in_parts(full_command, data.commandParts);
-	if (data.commandParts.size() < 3)
-		return ; // Needs allways atleast 3 parts
-
+	ToolFunctions::splitCommandInParts(full_command, data.command_parts);
 	data.socket = socket;
-	data.fullCommand = full_command;
-	ToolFunctions::_parse_into_parts(data.commandParts, 1, data.tempChannels);
-	ToolFunctions::_parse_into_parts(data.commandParts, 2, data.tempUsers);
+	data.full_command = full_command;
+	ToolFunctions::parseIntoParts(data.command_parts, 1, data.temp_channels);
+	ToolFunctions::parseIntoParts(data.command_parts, 2, data.temp_users);
 
-	std::cout << "kickcmd entered" << std::endl;
-	
-	if (data.tempChannels.size() >= 1 && data.tempUsers.size() >= 1) // handle all channels and users at the same time against rfc2812
-	{
-		for (std::vector<std::string>::size_type j = 0; j < data.tempChannels.size(); ++j)
+	for (std::vector<std::string>::size_type j = 0; j < data.temp_channels.size(); ++j) // Handle all channels and users at the same time against rfc2812 rule
+	{																					// Otherwise irssi will not work, pdf says we can modify behavior of server to fit client
+		if (!ToolFunctions::doesChannelExistWithName(data.temp_channels.at(j), _serverSettings.channels)) // Channel does not exist
 		{
-			if (!ToolFunctions::doesChannelExistWithName(data.tempChannels.at(j), _serverSettings.channels))
+			_printDoesChannelExistError(data, j, _serverSettings);
+			continue ;
+		}
+		for (std::vector<Channel>::size_type i = 0; i < _serverSettings.channels.size(); ++i) // Channel exist
+		{
+			if (_serverSettings.channels.at(i).getChannelName() == data.temp_channels.at(j)) // Name of channel maches
 			{
-				_printDoesChannelExistError(data, j, _serverSettings);
-				continue ;
-			}
-			for (std::vector<Channel>::size_type i = 0; i < _serverSettings.channels.size(); ++i) // Channel exist
-			{
-				if (_serverSettings.channels.at(i).getChannelName() == data.tempChannels.at(j))
+				if (!_serverSettings.channels.at(i).hasOps(data.socket)) // Client does not have ops
 				{
-					if (!_serverSettings.channels.at(i).hasOps(data.socket))
-					{
-						_printYoureNotChannelOperatorError(data, j, _serverSettings);
-						break ;
-					}
-					if (_goThroughTempUsers(data, j, i, _serverSettings))
-						break;
+					_printYoureNotChannelOperatorError(data, j, _serverSettings);
 					break ;
 				}
+				if (_goThroughTempUsersLoopHelper(data, j, i, _serverSettings)) // Client has ops
+					break;
+				break ;
 			}
 		}
-	}else
-	{
-		std::cout << "KICKCMD SYNTAX ERROR" << std::endl;
 	}
 }
 
@@ -71,63 +60,63 @@ int Kick::_returnClientSocket(std::string nick, t_server_mode &_serverSettings)
 void Kick::_printDoesChannelExistError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
-	ss << data.tempChannels.at(j);
+	ss << data.temp_channels.at(j);
 	ss << " :No such channel" << std::endl;
-	Server::sendAnswer(data.socket, ToolFunctions::_findNickName(data.socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ss.str());
+	Server::sendAnswer(data.socket, ToolFunctions::findNickName(data.socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ss.str());
 	ss.str("");
 }
 
 void Kick::_printYoureNotChannelOperatorError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
-	ss << data.tempChannels.at(j);
+	ss << data.temp_channels.at(j);
 	ss << " :You're not channel operator" << std::endl;
-	Server::sendAnswer(data.socket, ToolFunctions::_findNickName(data.socket, _serverSettings.clients), ERR_CHANOPRIVSNEEDED, ss.str());
+	Server::sendAnswer(data.socket, ToolFunctions::findNickName(data.socket, _serverSettings.clients), ERR_CHANOPRIVSNEEDED, ss.str());
 	ss.str("");
 }
 
 void Kick::_printUserIsNotOnThatChannelError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
-	ss << data.tempChannels.at(j);
+	ss << data.temp_channels.at(j);
 	ss << " :User is not on that channel" << std::endl;
-	Server::sendAnswer(data.socket, ToolFunctions::_findNickName(data.socket, _serverSettings.clients), ERR_USERNOTINCHANNEL, ss.str());
+	Server::sendAnswer(data.socket, ToolFunctions::findNickName(data.socket, _serverSettings.clients), ERR_USERNOTINCHANNEL, ss.str());
 	ss.str("");
 }
 
 void Kick::_kickUserFromChannel(t_kickcmd_data &data, std::vector<Channel>::size_type &i, std::vector<std::string>::size_type &k, t_server_mode &_serverSettings)
 {
-	_serverSettings.channels.at(i).partFromChannel(_returnClientSocket(data.tempUsers.at(k), _serverSettings));
+	_serverSettings.channels.at(i).partFromChannel(_returnClientSocket(data.temp_users.at(k), _serverSettings));
 	_serverSettings.channels.at(i).setNewOpIfNoOp();
 	std::stringstream ss;
-	ss << ":" << ToolFunctions::_findNickName(data.socket, _serverSettings.clients);
+	ss << ":" << ToolFunctions::findNickName(data.socket, _serverSettings.clients);
 	ss << "!" << "localhost" <<  " KICK " << _serverSettings.channels.at(i).getChannelName();
-	ss << " " << data.tempUsers.at(k);
+	ss << " " << data.temp_users.at(k);
 	
-	if (data.commandParts.size() >= 4)
+	if (data.command_parts.size() >= 4)
 	{
-		std::string::size_type position = data.fullCommand.find(":");
+		std::string::size_type position = data.full_command.find(":");
 		if (position != std::string::npos)
-			ss << " " << data.fullCommand.substr(position);
+			ss << " " << data.full_command.substr(position);
 	}
 	ss << std::endl;
 	Server::sendToOneClient(data.socket, ss.str());
-	Server::sendToOneClient(_returnClientSocket(data.tempUsers.at(k), _serverSettings), ss.str());
+	Server::sendToOneClient(_returnClientSocket(data.temp_users.at(k), _serverSettings), ss.str());
 	ss.str("");
 	if (_serverSettings.channels.at(i).howManyMembersOnChannel() == 0)
 		_serverSettings.channels.erase(_serverSettings.channels.begin() + i--);
 }
 
-int Kick::_goThroughTempUsers(t_kickcmd_data &data, std::vector<std::string>::size_type &j, std::vector<Channel>::size_type &i, t_server_mode &_serverSettings)
+int Kick::_goThroughTempUsersLoopHelper(t_kickcmd_data &data, std::vector<std::string>::size_type &j, std::vector<Channel>::size_type &i, t_server_mode &_serverSettings)
 {
-	for (std::vector<std::string>::size_type k = 0; k < data.tempUsers.size(); ++k)
+	for (std::vector<std::string>::size_type k = 0; k < data.temp_users.size(); ++k) // Go through all candidate users
 	{
-		if (!ToolFunctions::doesChannelExistWithName(data.tempChannels.at(j), _serverSettings.channels)) // If last user is deleted channel might not exist
+		if (!ToolFunctions::doesChannelExistWithName(data.temp_channels.at(j), _serverSettings.channels)) // If last user is deleted channel might not exist
 		{
 			_printDoesChannelExistError(data, j, _serverSettings);
 			return (1);
 		}
-		if (!_serverSettings.channels.at(i).isOnChannel(_returnClientSocket(data.tempUsers.at(k), _serverSettings)))
+		if (!_serverSettings.channels.at(i).isOnChannel(_returnClientSocket(data.temp_users.at(k), _serverSettings))) // User not in channel
 		{
 			_printUserIsNotOnThatChannelError(data, j, _serverSettings);
 			continue ;

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:37:31 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 13:34:24 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 15:43:00 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct s_client_mode
 class Client
 {
 	public:
+
 		Client();
 		~Client();
 

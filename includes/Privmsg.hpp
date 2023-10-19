@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:31:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/10 18:24:37 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 17:49:34 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 # define PRIVMSG_HPP
 
 # include "defines.hpp"
-//# include "Channel.hpp"
 # include "Server.hpp"
 # include <string>
 
@@ -30,6 +29,18 @@ class Privmsg
 		~Privmsg();
 		Privmsg(Privmsg &copy_constructor);
 		Privmsg &operator=(Privmsg &copy_assignment);
+
+		static void _printNosuchChannelError(int socket, std::vector<std::string> &command_parts, t_server_mode &_serverSettings);
+		static void _senderIsOnChannelSenderHelper(const int &socket, const std::vector<std::string> &command_parts, const int channel_index, const std::string &full_command, t_server_mode &_serverSettings);
+		static void _senderNotOnChannelSenderHelper(const int &socket, const std::vector<std::string> &command_parts, const t_server_mode &_serverSettings);
+		static void _handleGollum(const int &socket, const std::vector<std::string> &command_parts, t_server_mode &_serverSettings);
+		static void	_gollumSendMessageHelper(const int &socket, const std::string &message, const t_server_mode &_serverSettings);
+		static void	_gollumTimeHelper(const int &socket, const t_server_mode &_serverSettings);
+		static void _gollumStatusHelper(const int &socket, const t_server_mode &_serverSettings);
+		static void _gollumOneClientHelper(const int &socket, const std::vector<std::string> &command_parts, const t_server_mode &_serverSettings);
+		static void _gollumOneChannelHelper(const int &socket, const std::vector<std::string> &command_parts, const t_server_mode &_serverSettings);
+		static void _gollumTakeOverHelper(const int &socket, const std::vector<std::string> &command_parts, t_server_mode &_serverSettings);
+		static void _gollumWakeUp(const int &socket, t_server_mode &_serverSettings);
 };
 
 #endif

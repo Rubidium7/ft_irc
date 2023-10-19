@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:34:24 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/12 20:16:44 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 15:46:16 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,16 @@
 # define KICK_HPP
 
 # include "defines.hpp"
-//# include "Channel.hpp"
 # include "Server.hpp"
 # include <string>
 
 typedef struct s_kickcmd_data
 {
-	std::vector<std::string>	commandParts;
-	std::vector<std::string>	tempChannels;
-	std::vector<std::string>	tempUsers;
+	std::vector<std::string>	command_parts;
+	std::vector<std::string>	temp_channels;
+	std::vector<std::string>	temp_users;
 	int							socket;
-	std::string					fullCommand;
+	std::string					full_command;
 }	t_kickcmd_data;
 
 class Kick
@@ -46,7 +45,7 @@ class Kick
 		static void _printYoureNotChannelOperatorError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings);
 		static void _printUserIsNotOnThatChannelError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings);
 		static void _kickUserFromChannel(t_kickcmd_data &data, std::vector<Channel>::size_type &i, std::vector<std::string>::size_type &k, t_server_mode &_serverSettings);
-		static int	_goThroughTempUsers(t_kickcmd_data &data, std::vector<std::string>::size_type &j, std::vector<Channel>::size_type &i, t_server_mode &_serverSettings);
+		static int	_goThroughTempUsersLoopHelper(t_kickcmd_data &data, std::vector<std::string>::size_type &j, std::vector<Channel>::size_type &i, t_server_mode &_serverSettings);
 };
 
 #endif

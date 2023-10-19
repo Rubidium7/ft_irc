@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:09:07 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/06 20:24:09 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 15:47:05 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class Part
 		Part(Part &copy_constructor);
 		Part &operator=(Part &copy_assignment);
 
-		static std::string _return_last_part_of_string(int begin, std::string full_command);
+		static std::string _returnLastPartOfString(int begin, std::string full_command);
 };
 
 #endif

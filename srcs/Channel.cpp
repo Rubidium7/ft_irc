@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 13:39:21 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 15:14:33 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,6 @@ void	Channel::removeInvitation(int socket)
 			_channelSettings.invitedClients.pop_back();
 		}
 	}
-
 }
 
 int	Channel::isOnChannel(int socket) const
@@ -126,14 +125,14 @@ int	Channel::isOnChannel(int socket) const
 }
 
 void	Channel::addToChannel(int socket)
-{ // If client was invited then also invitation is removed
+{
 	if (!isOnChannel(socket))
 	{
 		_channelSettings.channelMembers.push_back(socket);
-		for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
+		for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i) // If client was invited then also invitation is removed
 		{
 			if (_channelSettings.invitedClients.at(i) == socket)
-				_channelSettings.invitedClients.erase(_channelSettings.invitedClients.begin() + i--); // i-- because numbers move back
+				_channelSettings.invitedClients.erase(_channelSettings.invitedClients.begin() + i--); // i-- because remaining numbers move back in erase
 		}
 	}
 }
@@ -143,7 +142,7 @@ void	Channel::partFromChannel(int socket)
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
 		if (_channelSettings.channelMembers.at(i) == socket)
-			_channelSettings.channelMembers.erase(_channelSettings.channelMembers.begin() + i--);
+			_channelSettings.channelMembers.erase(_channelSettings.channelMembers.begin() + i--); // i-- because remaining numbers move back in erase
 	}
 }
 

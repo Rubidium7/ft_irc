@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:09:32 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/17 19:12:51 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 15:51:28 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 
 void Part::partcmd(int socket, std::string full_command, t_server_mode	&_serverSettings)
 {
-	std::vector<std::string> commandParts;
-	std::vector<std::string> tempChannels;
-	ToolFunctions::_split_command_in_parts(full_command, commandParts);
+	std::vector<std::string> command_parts;
+	std::vector<std::string> temp_channels;
+	ToolFunctions::splitCommandInParts(full_command, command_parts);
 
 	std::cout << "partcmd entered" << std::endl;
 
-	switch(commandParts.size())
+	switch(command_parts.size())
 	{
 		case 0:
 			// Should not come to here
@@ -32,19 +32,19 @@ void Part::partcmd(int socket, std::string full_command, t_server_mode	&_serverS
 			break;
 
 		case 2:
-			ToolFunctions::_parse_into_parts(commandParts, 1, tempChannels);
-			for (std::vector<std::string>::size_type i = 0; i < tempChannels.size(); ++i)
+			ToolFunctions::parseIntoParts(command_parts, 1, temp_channels);
+			for (std::vector<std::string>::size_type i = 0; i < temp_channels.size(); ++i)
 			{
-				if (!ToolFunctions::doesChannelExistWithName(tempChannels.at(i), _serverSettings.channels))
-					Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ":No such channel");
+				if (!ToolFunctions::doesChannelExistWithName(temp_channels.at(i), _serverSettings.channels))
+					Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ":No such channel");
 				for (std::vector<Channel>::size_type k = 0; k < _serverSettings.channels.size(); ++k)
 				{
-					if (tempChannels.at(i) == _serverSettings.channels.at(k).getChannelName())
+					if (temp_channels.at(i) == _serverSettings.channels.at(k).getChannelName())
 					{
 						if (_serverSettings.channels.at(k).isOnChannel(socket))
 						{
 							std::stringstream ss;
-							ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients) << "!" << "localhost";
+							ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!" << "localhost";
 							ss << " PART" << " " << _serverSettings.channels.at(k).getChannelName();
 							ss << " :" << std::endl;
 							Server::sendToOneClient(socket, ss.str());
@@ -57,7 +57,7 @@ void Part::partcmd(int socket, std::string full_command, t_server_mode	&_serverS
 						}
 						else
 						{
-							Server::sendAnswer(socket, ToolFunctions::_findNickName(socket, _serverSettings.clients), ERR_NOTONCHANNEL, ":Not on that channel\n");
+							Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOTONCHANNEL, ":Not on that channel\n");
 							break ;
 						}
 					}
@@ -78,7 +78,7 @@ void Part::partFromAllChannels(int socket, t_server_mode &_serverSettings)
 		if (_serverSettings.channels.at(i).isOnChannel(socket))
 		{
 			std::stringstream ss;
-			ss << ":" << ToolFunctions::_findNickName(socket, _serverSettings.clients);
+			ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients);
 			ss << "!" << "localhost" << " PART " << _serverSettings.channels.at(i).getChannelName() << " :0" << std::endl;
 			Server::sendToOneClient(socket, ss.str());
 			ss.clear();
@@ -90,7 +90,7 @@ void Part::partFromAllChannels(int socket, t_server_mode &_serverSettings)
 	}
 }
 
-std::string Part::_return_last_part_of_string(int begin, std::string full_command)
+std::string Part::_returnLastPartOfString(int begin, std::string full_command)
 {
 	std::string temp;
 	std::string last_part;

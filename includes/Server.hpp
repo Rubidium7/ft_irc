@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:46:52 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/19 13:15:00 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 15:49:27 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,18 +75,12 @@ class Server
 		void			_messageOfTheDay(int socket, std::string &nick);
 		void			_newUserMessage(int socket, Client &client);
 		// void			_handleMode(int id);
-		// void			_handleWho(int id);
-		// void			_handleWhois(int id);
-		// void			_handlePart(int id);
-		// void			_handlePrivmsg(int id);
 		void			_handlePing(int socket);
 		// void			_handleTopic(int id);
-		// void			_handleKick(int id);
 		void			_handleQuit(int socket, Client &client, std::vector<std::string> args);
 		void			_handleJoinColon(int socket);
 		void			_handleNotCommand(int socket);
 		void			_printHost(int socket);
-
 
 		t_server_mode		_serverSettings;
 		static std::string	_hostName;
