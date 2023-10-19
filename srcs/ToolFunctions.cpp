@@ -6,12 +6,11 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:52:44 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 17:36:00 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 19:02:37 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ToolFunctions.hpp"
-#include "Server.hpp"
 
 void	ToolFunctions::splitCommandInParts(const std::string &full_command, std::vector<std::string> &command_parts)
 {

@@ -6,16 +6,14 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:34:24 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 15:46:16 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 18:35:13 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef KICK_HPP
 # define KICK_HPP
 
-# include "defines.hpp"
 # include "Server.hpp"
-# include <string>
 
 typedef struct s_kickcmd_data
 {
@@ -30,7 +28,7 @@ class Kick
 {
 	public:
 
-		static void kickcmd(int socket, std::string full_command, t_server_mode	&_serverSettings);
+		static void kickCommand(int socket, std::string full_command, t_server_mode	&_serverSettings);
 
 	private:
 

@@ -16,7 +16,6 @@ class Nick
 
 		Nick &operator=(const Nick &rhs);
 		static bool	_nickInUse(std::string &nick, Client *clients);
-
 };
 
 #endif

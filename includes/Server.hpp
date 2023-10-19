@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:46:52 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/19 15:49:27 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 18:25:47 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include <vector>
 # include <sys/socket.h>
 # include <netinet/in.h>
-# include <arpa/inet.h> //v
+# include <arpa/inet.h> //v // ARE THESE NEEDED ?
 # include <netdb.h> //only for printhost -> might not need
 
 typedef struct s_server_mode
@@ -36,7 +36,7 @@ typedef struct s_server_mode
 	fd_set						activeSockets;
 	fd_set						readySockets;
 	int							maxSocket;
-	char						buffer[MSG_SIZE]; //temporary solution
+	char						buffer[MSG_SIZE]; //temporary solution // Is it stil a temporary solution? STILL NEEDED?
 	std::vector<std::string>	clientBuffers;
 	int							isGollumAwake;
 }	t_server_mode;
@@ -74,9 +74,9 @@ class Server
 		void			_handleNewRegistration(int socket);
 		void			_messageOfTheDay(int socket, std::string &nick);
 		void			_newUserMessage(int socket, Client &client);
-		// void			_handleMode(int id);
+		// void			_handleMode(int id); // NEEDED?
 		void			_handlePing(int socket);
-		// void			_handleTopic(int id);
+		// void			_handleTopic(int id); // NEEDED ?
 		void			_handleQuit(int socket, Client &client, std::vector<std::string> args);
 		void			_handleJoinColon(int socket);
 		void			_handleNotCommand(int socket);

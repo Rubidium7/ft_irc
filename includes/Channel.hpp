@@ -14,9 +14,6 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-# include <string>
-# include <vector>
-
 typedef struct s_channel_mode
 {
 	std::string					nameOfChannel;	// Name of channel

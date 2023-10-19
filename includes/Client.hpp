@@ -6,14 +6,13 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:37:31 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 15:43:00 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 18:32:55 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-# include <iostream>
 # include "defines.hpp"
 
 typedef struct s_client_mode

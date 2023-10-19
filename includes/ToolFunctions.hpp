@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:53:10 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 17:36:16 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 18:39:07 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 # define TOOLFUNCTIONS_HPP
 
 # include "Server.hpp"
-# include <string>
 
 class ToolFunctions
 {

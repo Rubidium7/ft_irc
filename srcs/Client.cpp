@@ -6,13 +6,11 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/29 17:38:35 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 13:35:28 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 18:44:36 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
-#include "Server.hpp"
-#include "ToolFunctions.hpp"
 #include <sstream>
 
 Client::Client()

@@ -6,21 +6,15 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 15:22:04 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 18:47:27 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Join.hpp"
 #include "Part.hpp"
-#include "Channel.hpp"
-#include "Server.hpp"
 #include "ToolFunctions.hpp"
-#include <string>
-#include <vector>
-#include <sstream>
-#include <iostream>
 
-void Join::joincmd(int socket, std::string full_command, t_server_mode	&_serverSettings)
+void Join::joinCommand(int socket, std::string full_command, t_server_mode	&_serverSettings)
 {
 	std::vector<std::string> command_parts; // full_command is split into parts here
 	std::vector<std::string> temp_channels; // command_parts.at(1) is split into here

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 15:14:33 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 18:42:52 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 #include <sstream>
 #include "defines.hpp"
 #include "Channel.hpp"
-#include "Server.hpp"
-#include "ToolFunctions.hpp"
 
 Channel::Channel(const std::string name, int socketDescriptor)
 {
@@ -181,7 +179,7 @@ void	Channel::sendToAllChannelMembers(const std::string msg)
 	{
 		if (_channelSettings.channelMembers.at(i) != 0)
 		{
-			std::cerr << buffer; //debug
+			std::cerr << buffer; //debug // Tarvitaanko viela? Voisi harkita etta tehdaan joku muuttuja esim. DEBUG_PRINTING 1 tai 0 rippuen siita tulostetaanto serverin input ja output messageja
 			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
 		}
 	}

@@ -6,13 +6,10 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/17 19:22:09 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 19:01:47 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "defines.hpp"
-#include "Server.hpp"
-#include "irc.hpp"
 #include "Join.hpp"
 #include "Part.hpp"
 #include "Mode.hpp"
@@ -21,7 +18,6 @@
 #include "Pass.hpp"
 #include "Topic.hpp"
 #include "Invite.hpp"
-#include "Server.hpp"
 #include "Kick.hpp"
 #include "Privmsg.hpp"
 
@@ -413,7 +409,7 @@ void	Server::_handleCommands(int socket)
 			if (parser.getArgs().at(1) == ":")
 				_handleJoinColon(socket);
 			else if (_matchClient(socket).registrationStatus() == REGISTERED)
-				Join::joincmd(socket, full_command, _serverSettings);
+				Join::joinCommand(socket, full_command, _serverSettings);
 			else
 				_assignServerMessage(ERR_NOTREGISTERED, ":You have not registered");
 			break ;
@@ -445,12 +441,12 @@ void	Server::_handleCommands(int socket)
 		case PART:
 			parser.parsePart();
 			if (!parser.getMessageCode())
-				Part::partcmd(socket, full_command, _serverSettings);
+				Part::partCommand(socket, full_command, _serverSettings);
 			break ;
 		case PRIVMSG:
 			parser.parsePrivmsg();
 			//if (!parser.getMessageCode())
-			Privmsg::privmsgcmd(socket, full_command, _serverSettings);
+			Privmsg::privmsgCommand(socket, full_command, _serverSettings);
 			break;
 		case PING:
 			parser.parsePing(_hostName);
@@ -465,7 +461,7 @@ void	Server::_handleCommands(int socket)
 		case KICK:
 			parser.parseKick();
 			//if (!parser.getMessageCode())
-			Kick::kickcmd(socket, full_command, _serverSettings);
+			Kick::kickCommand(socket, full_command, _serverSettings);
 			break ;
 		case QUIT:
 			parser.parseQuit();

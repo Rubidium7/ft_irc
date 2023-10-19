@@ -6,14 +6,14 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:34 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 15:53:28 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 18:48:48 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Kick.hpp"
 #include "ToolFunctions.hpp"
 
-void Kick::kickcmd(int socket, std::string full_command, t_server_mode	&_serverSettings)
+void Kick::kickCommand(int socket, std::string full_command, t_server_mode	&_serverSettings)
 {
 	t_kickcmd_data data;
 

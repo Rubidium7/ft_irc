@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:45 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 17:55:14 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/19 18:58:43 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "ToolFunctions.hpp"
 
 void
-Privmsg::privmsgcmd(int socket,
+Privmsg::privmsgCommand(int socket,
 					std::string full_command,
 					t_server_mode &_serverSettings)
 {
@@ -25,41 +25,12 @@ Privmsg::privmsgcmd(int socket,
 	{
 		if(!ToolFunctions::doesChannelExistWithName(command_parts.at(1), _serverSettings.channels)) // Channel does not exist
 			_printNosuchChannelError(socket, command_parts, _serverSettings); return ;
-		for (std::vector<Channel>::size_type channel_index = 0; channel_index < _serverSettings.channels.size(); ++channel_index) // Channel exist
-		{
-			if (_serverSettings.channels.at(channel_index).getChannelName() == command_parts.at(1)) // Channel name matches
-			{
-				if (_serverSettings.channels.at(channel_index).isOnChannel(socket)) // Sender on channel
-					_senderIsOnChannelSenderHelper(socket, command_parts, channel_index, full_command, _serverSettings);
-				else // Sender not on channel
-					_senderNotOnChannelSenderHelper(socket, command_parts, _serverSettings);
-				return ;
-			}
-		}
+		_messageTargetIsChannel(socket, full_command, command_parts, _serverSettings);
 	}else // Target is a client
 	{
 		if (command_parts.at(1) == "Gollum") // Message target client is Gollum
 			_handleGollum(socket, command_parts, _serverSettings); return ;
-		// Message target client is not Gollum
-		int targetSocket = ToolFunctions::findSocketForClientFromName(command_parts.at(1), _serverSettings.clients);
-		if (targetSocket == 0) // Nick not found
-		{
-			std::stringstream ss;
-			ss << command_parts.at(1);
-			ss << ":No such nick" << std::endl;
-			Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOSUCHNICK, ss.str());
-			ss.str("");
-			return ;
-		}
-		std::string message;
-		std::string::size_type position = full_command.find(":");
-		if (position != std::string::npos)
-			message = full_command.substr(position);
-		std::stringstream ss;
-		ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost PRIVMSG ";
-		ss << command_parts.at(1) << " " << message << std::endl;
-		Server::sendToOneClient(targetSocket, ss.str());
-		ss.str("");
+		_messageTargetIsClientNotGollum(socket, full_command, command_parts, _serverSettings);
 	}
 }
 
@@ -230,4 +201,45 @@ Privmsg::_gollumWakeUp(const int &socket, t_server_mode &_serverSettings)
 	Server::sendToOneClient(socket, ss.str());
 	ss.str("");
 	_serverSettings.isGollumAwake = socket;
+}
+
+void
+Privmsg::_messageTargetIsChannel(const int &socket, const std::string &full_command, const std::vector<std::string> &command_parts, t_server_mode &_serverSettings)
+{
+	for (std::vector<Channel>::size_type channel_index = 0; channel_index < _serverSettings.channels.size(); ++channel_index) // Channel exist
+	{
+		if (_serverSettings.channels.at(channel_index).getChannelName() == command_parts.at(1)) // Channel name matches
+		{
+			if (_serverSettings.channels.at(channel_index).isOnChannel(socket)) // Sender on channel
+				_senderIsOnChannelSenderHelper(socket, command_parts, channel_index, full_command, _serverSettings);
+			else // Sender not on channel
+				_senderNotOnChannelSenderHelper(socket, command_parts, _serverSettings);
+			return ;
+		}
+	}
+}
+
+void
+Privmsg::_messageTargetIsClientNotGollum(const int &socket, const std::string &full_command, const std::vector<std::string> &command_parts, const t_server_mode &_serverSettings)
+{
+	int targetSocket = ToolFunctions::findSocketForClientFromName(command_parts.at(1), _serverSettings.clients);
+	if (targetSocket == 0) // Nick not found
+	{
+		std::stringstream ss;
+		ss << command_parts.at(1);
+		ss << ":No such nick" << std::endl;
+		Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOSUCHNICK, ss.str());
+		ss.str("");
+		return ;
+	}
+	// Nick found
+	std::string message;
+	std::string::size_type position = full_command.find(":");
+	if (position != std::string::npos)
+		message = full_command.substr(position);
+	std::stringstream ss;
+	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost PRIVMSG ";
+	ss << command_parts.at(1) << " " << message << std::endl;
+	Server::sendToOneClient(targetSocket, ss.str());
+	ss.str("");
 }
