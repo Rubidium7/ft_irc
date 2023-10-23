@@ -25,7 +25,6 @@ typedef struct s_channel_mode
 	std::string					k;				// channel key (password)
 	std::vector<int>			o;				// Who has the ops
 	int							l;				// Limit of how many users can join into a channel
-	std::vector<std::string>	b;				// List of banned sockets
 }	t_channel_mode;
 
 class Channel
@@ -53,6 +52,8 @@ class Channel
 		void					setKey(std::string new_key);
 		int						doesKeyMatch(const std::string &key) const;
 		void					sendToAllChannelMembers(const std::string message);
+		void					sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg);
+
 		const std::vector<int>& returnChannelMembers() const;
 		int 					hasOps(int socket) const;
 		void					giveOps(int socket);

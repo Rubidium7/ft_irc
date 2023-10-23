@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:45 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:58:43 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 16:03:13 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,21 @@ Privmsg::privmsgCommand(int socket,
 
 	if (command_parts.at(1).at(0) == '#') // Target is Channel
 	{
+		std::cerr << "privmsgCommand TARGET is CHANNEL" << std::endl;
 		if(!ToolFunctions::doesChannelExistWithName(command_parts.at(1), _serverSettings.channels)) // Channel does not exist
-			_printNosuchChannelError(socket, command_parts, _serverSettings); return ;
+		{
+			_printNosuchChannelError(socket, command_parts, _serverSettings);
+			return ;
+		}
 		_messageTargetIsChannel(socket, full_command, command_parts, _serverSettings);
 	}else // Target is a client
 	{
+		std::cerr << "privmsgCommand TARGET is CHANNEL" << std::endl;
 		if (command_parts.at(1) == "Gollum") // Message target client is Gollum
-			_handleGollum(socket, command_parts, _serverSettings); return ;
+		{
+			_handleGollum(socket, command_parts, _serverSettings);
+			return ;
+		}
 		_messageTargetIsClientNotGollum(socket, full_command, command_parts, _serverSettings);
 	}
 }
@@ -53,14 +61,18 @@ Privmsg::_senderIsOnChannelSenderHelper(const int &socket,
 										const std::string &full_command,
 										t_server_mode &_serverSettings)
 {
-	std::string message;
-	std::string::size_type position = full_command.find(":");
-	if (position != std::string::npos)
-		message = full_command.substr(position);
+	std::cerr << "senderIsOnChannelSenderHelper BEGIN" << std::endl;
 	std::stringstream ss;
 	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost" << " PRIVMSG ";
-	ss << command_parts.at(1) << " " << message << std::endl;
-	_serverSettings.channels.at(channel_index).sendToAllChannelMembers(ss.str());
+	ss << command_parts.at(1);
+	std::string::size_type position = full_command.find(":");
+	if (position != std::string::npos)
+	{	
+		ss << " ";
+		ss << full_command.substr(position) << std::endl;
+	}else
+		ss << " :" << std::endl;
+	_serverSettings.channels.at(channel_index).sendToAllChannelMembersExceptSocket(socket, ss.str());
 	ss.str("");
 }
 
@@ -206,10 +218,12 @@ Privmsg::_gollumWakeUp(const int &socket, t_server_mode &_serverSettings)
 void
 Privmsg::_messageTargetIsChannel(const int &socket, const std::string &full_command, const std::vector<std::string> &command_parts, t_server_mode &_serverSettings)
 {
+	std::cerr << "Channel name BEGIN" << std::endl;
 	for (std::vector<Channel>::size_type channel_index = 0; channel_index < _serverSettings.channels.size(); ++channel_index) // Channel exist
 	{
 		if (_serverSettings.channels.at(channel_index).getChannelName() == command_parts.at(1)) // Channel name matches
 		{
+			std::cerr << "Channel name matches" << std::endl;
 			if (_serverSettings.channels.at(channel_index).isOnChannel(socket)) // Sender on channel
 				_senderIsOnChannelSenderHelper(socket, command_parts, channel_index, full_command, _serverSettings);
 			else // Sender not on channel
@@ -233,13 +247,16 @@ Privmsg::_messageTargetIsClientNotGollum(const int &socket, const std::string &f
 		return ;
 	}
 	// Nick found
-	std::string message;
-	std::string::size_type position = full_command.find(":");
-	if (position != std::string::npos)
-		message = full_command.substr(position);
 	std::stringstream ss;
 	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost PRIVMSG ";
-	ss << command_parts.at(1) << " " << message << std::endl;
+	ss << command_parts.at(1);
+	std::string::size_type position = full_command.find(":");
+	if (position != std::string::npos)
+	{
+		ss << " ";
+		ss << full_command.substr(position) << std::endl;
+	}else
+		ss << " :" << std::endl;
 	Server::sendToOneClient(targetSocket, ss.str());
 	ss.str("");
 }

@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:09:32 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:57:36 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 14:30:01 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,16 @@ void Part::partCommand(int socket, std::string full_command, t_server_mode	&_ser
 					std::stringstream ss;
 					ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost";
 					ss << " PART" << " " << _serverSettings.channels.at(k).getChannelName();
-					ss << " :" << std::endl;
-					Server::sendToOneClient(socket, ss.str());
+					std::string::size_type position = full_command.find(":");
+					if (position == std::string::npos)
+						ss << " :" << std::endl;
+					else
+					{
+						ss << " ";
+						ss << full_command.substr(position)  << std::endl;
+					}
+					_serverSettings.channels.at(k).sendToAllChannelMembers(ss.str());
+					//Server::sendToOneClient(socket, ss.str());
 					_serverSettings.channels.at(k).partFromChannel(socket);
 					_serverSettings.channels.at(k).setNewOpIfNoOp();
 					ss.str("");
@@ -57,7 +65,7 @@ void Part::partFromAllChannels(int socket, t_server_mode &_serverSettings)
 		{
 			std::stringstream ss;
 			ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients);
-			ss << "!" << "localhost" << " PART " << _serverSettings.channels.at(i).getChannelName() << " :0" << std::endl;
+			ss << "!" << "localhost" << " PART " << _serverSettings.channels.at(i).getChannelName() << " :" << std::endl;
 			Server::sendToOneClient(socket, ss.str());
 			ss.clear();
 			_serverSettings.channels.at(i).partFromChannel(socket);

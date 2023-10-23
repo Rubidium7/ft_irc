@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 20:57:56 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 16:39:52 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Channel::Channel(const std::string name, int socketDescriptor)
 	_channelSettings.channelMembers.push_back(socketDescriptor);
 	_channelSettings.i = OFF;
 	_channelSettings.t = OFF;
-	_channelSettings.topic = "";
+	_channelSettings.topic = "Happy_days!";
 	_channelSettings.l = MAX_AMOUNT_CLIENTS;
 }
 
@@ -49,7 +49,6 @@ Channel	&Channel::operator=(const Channel &copy_assignment)
 	_channelSettings.k				= copy_assignment._channelSettings.k;
 	_channelSettings.o				= copy_assignment._channelSettings.o;
 	_channelSettings.l				= copy_assignment._channelSettings.l;
-	_channelSettings.b				= copy_assignment._channelSettings.b;
 
 	return (*this);
 }
@@ -179,6 +178,25 @@ void	Channel::sendToAllChannelMembers(const std::string msg)
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
 		if (_channelSettings.channelMembers.at(i) != 0)
+		{
+			std::cerr << buffer; //debug // Tarvitaanko viela? Voisi harkita etta tehdaan joku muuttuja esim. DEBUG_PRINTING 1 tai 0 rippuen siita tulostetaanto serverin input ja output messageja
+			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
+		}
+	}
+}
+
+void	Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg)
+{
+	std::stringstream		message;
+	const char				*buffer;
+	std::string::size_type	size;
+
+	message << msg;
+	buffer = message.str().c_str();
+	size = message.str().size();
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
+	{
+		if (_channelSettings.channelMembers.at(i) != 0 && socket != _channelSettings.channelMembers.at(i))
 		{
 			std::cerr << buffer; //debug // Tarvitaanko viela? Voisi harkita etta tehdaan joku muuttuja esim. DEBUG_PRINTING 1 tai 0 rippuen siita tulostetaanto serverin input ja output messageja
 			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
