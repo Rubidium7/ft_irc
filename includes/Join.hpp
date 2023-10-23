@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:17:30 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:34:09 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 19:29:10 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,19 @@ class Join
 		~Join();
 		Join(Join &copy_constructor);
 		Join &operator=(Join &copy_assignment);
+
+		static int	_handleSpecialCases(const int &socket, const std::vector<std::string> &command_parts, t_server_mode &_serverSettings);
+		static void _channelDoesNotExistHelper(const int &socket, const std::string &full_command,
+			const std::vector<std::string>::size_type &i, const std::vector<std::string> &temp_channels, t_server_mode &_serverSettings);
+		static void	_inviteOnlyErrorHelper(const int &socket, const std::vector<Channel>::size_type &k, t_server_mode &_serverSettings);
+		static void _keyMatchesHelper(const int &socket, const std::string &full_command,
+			const std::vector<Channel>::size_type &k, t_server_mode &_serverSettings);
+		static void _keyDoesNotMatchHelper(const int &socket, const std::vector<Channel>::size_type &k, t_server_mode &_serverSettings);
+		static void _clientDoesNotProvideKeyErrorHelper(const int &socket,
+			const std::vector<Channel>::size_type &k, const t_server_mode &_serverSettings);
+		static void _channelDoesNotHaveKeyHelper(const int &socket, const std::vector<Channel>::size_type &k,
+			const std::string &full_command, t_server_mode &_serverSettings);
+
 };
 
 #endif

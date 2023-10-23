@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:45 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/23 17:19:23 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 19:02:20 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ Privmsg::_senderIsOnChannelSenderHelper(const int &socket,
 										const std::string &full_command,
 										t_server_mode &_serverSettings)
 {
-	std::cerr << "senderIsOnChannelSenderHelper BEGIN" << std::endl;
 	std::stringstream ss;
 	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost" << " PRIVMSG ";
 	ss << command_parts.at(1);
@@ -205,7 +204,6 @@ void
 Privmsg::_gollumWakeUp(const int &socket, t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
-
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 	ss << "Good Smeagol will always serve the master of the precious." << std::endl;
 	Server::sendToOneClient(socket, ss.str());
@@ -216,12 +214,10 @@ Privmsg::_gollumWakeUp(const int &socket, t_server_mode &_serverSettings)
 void
 Privmsg::_messageTargetIsChannel(const int &socket, const std::string &full_command, const std::vector<std::string> &command_parts, t_server_mode &_serverSettings)
 {
-	std::cerr << "Channel name BEGIN" << std::endl;
 	for (std::vector<Channel>::size_type channel_index = 0; channel_index < _serverSettings.channels.size(); ++channel_index) // Channel exist
 	{
 		if (_serverSettings.channels.at(channel_index).getChannelName() == command_parts.at(1)) // Channel name matches
 		{
-			std::cerr << "Channel name matches" << std::endl;
 			if (_serverSettings.channels.at(channel_index).isOnChannel(socket)) // Sender on channel
 				_senderIsOnChannelSenderHelper(socket, command_parts, channel_index, full_command, _serverSettings);
 			else // Sender not on channel
