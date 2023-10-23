@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/06 21:35:45 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/23 16:03:13 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 17:19:23 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ Privmsg::privmsgCommand(int socket,
 
 	if (command_parts.at(1).at(0) == '#') // Target is Channel
 	{
-		std::cerr << "privmsgCommand TARGET is CHANNEL" << std::endl;
 		if(!ToolFunctions::doesChannelExistWithName(command_parts.at(1), _serverSettings.channels)) // Channel does not exist
 		{
 			_printNosuchChannelError(socket, command_parts, _serverSettings);
@@ -32,7 +31,6 @@ Privmsg::privmsgCommand(int socket,
 		_messageTargetIsChannel(socket, full_command, command_parts, _serverSettings);
 	}else // Target is a client
 	{
-		std::cerr << "privmsgCommand TARGET is CHANNEL" << std::endl;
 		if (command_parts.at(1) == "Gollum") // Message target client is Gollum
 		{
 			_handleGollum(socket, command_parts, _serverSettings);
@@ -121,7 +119,7 @@ Privmsg::_handleGollum(const int &socket, const std::vector<std::string> &comman
 			_gollumTakeOverHelper(socket, command_parts, _serverSettings);
 	}else // Gollum is sleeping
 	{
-		if (command_parts.size() == 5 && command_parts.at(2) == ":WAKE" && command_parts.at(3) == "UP" && command_parts.at(4) == GOLLUM_PASSWORD) // Gollum wakes up
+		if (_serverSettings.isGollumAwake == 0 && command_parts.size() == 5 && command_parts.at(2) == ":WAKE" && command_parts.at(3) == "UP" && command_parts.at(4) == GOLLUM_PASSWORD) // Gollum wakes up
 			_gollumWakeUp(socket, _serverSettings);
 	}
 }

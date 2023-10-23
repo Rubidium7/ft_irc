@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/23 16:39:52 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 17:08:38 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Channel::Channel(const std::string name, int socketDescriptor)
 	_channelSettings.channelMembers.push_back(socketDescriptor);
 	_channelSettings.i = OFF;
 	_channelSettings.t = OFF;
-	_channelSettings.topic = "Happy_days!";
+	_channelSettings.topic = "Happy days!";
 	_channelSettings.l = MAX_AMOUNT_CLIENTS;
 }
 
@@ -141,6 +141,11 @@ void	Channel::partFromChannel(int socket)
 	{
 		if (_channelSettings.channelMembers.at(i) == socket)
 			_channelSettings.channelMembers.erase(_channelSettings.channelMembers.begin() + i--); // i-- because remaining numbers move back in erase
+	}
+	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); ++i)
+	{
+		if (_channelSettings.o.at(i) == socket)
+			_channelSettings.o.erase(_channelSettings.o.begin() + i--); // i-- because remaining numbers move back in erase
 	}
 }
 
