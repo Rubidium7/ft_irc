@@ -53,7 +53,6 @@ class Channel
 		int						doesKeyMatch(const std::string &key) const;
 		void					sendToAllChannelMembers(const std::string message);
 		void					sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg);
-
 		const std::vector<int>& returnChannelMembers() const;
 		int 					hasOps(int socket) const;
 		void					giveOps(int socket);

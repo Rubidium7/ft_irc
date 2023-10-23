@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/23 19:31:58 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 19:36:36 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ void Join::_inviteOnlyErrorHelper(const int &socket, const std::vector<Channel>:
 	ss << _serverSettings.channels.at(k).getChannelName();
 	ss << " :Cannot join channel (+i)" << std::endl;
 	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_INVITEONLYCHAN, ss.str());
-	ss.clear();
+	ss.str("");
 }
 
 void Join::_keyMatchesHelper(const int &socket, const std::string &full_command, const std::vector<Channel>::size_type &k, t_server_mode &_serverSettings)
@@ -141,7 +141,7 @@ void Join::_keyDoesNotMatchHelper(const int &socket, const std::vector<Channel>:
 	ss << _serverSettings.channels.at(k).getChannelName();
 	ss << " :Cannot join channel (+k)" << std::endl;
 	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_BADCHANNELKEY, ss.str());
-	ss.clear();
+	ss.str("");
 }
 void Join::_clientDoesNotProvideKeyErrorHelper(const int &socket, const std::vector<Channel>::size_type &k, const t_server_mode &_serverSettings)
 {
@@ -149,7 +149,7 @@ void Join::_clientDoesNotProvideKeyErrorHelper(const int &socket, const std::vec
 	ss << _serverSettings.channels.at(k).getChannelName();
 	ss << " :Cannot join channel (+k)" << std::endl;
 	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_BADCHANNELKEY, ss.str());
-	ss.clear();
+	ss.str("");
 }
 
 void Join::_channelDoesNotHaveKeyHelper(const int &socket, const std::vector<Channel>::size_type &k, const std::string &full_command, t_server_mode &_serverSettings)
