@@ -233,3 +233,13 @@ void	ToolFunctions::printChannelInformation(int socket, const t_channel_mode &_c
 	Server::sendToOneClient(socket, ss.str());
 	ss.str("");
 }
+
+std::string	ToolFunctions::findUserName(const int socket, const Client clients[])
+{
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
+	{
+		if (clients[i].getSocket() == socket)
+			return (clients[i].getUserName());
+	}
+	return ("*");
+}

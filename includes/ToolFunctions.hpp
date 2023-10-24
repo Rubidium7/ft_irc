@@ -13,6 +13,7 @@ class ToolFunctions
 		static void 		parseIntoParts(const std::vector<std::string> &command_parts,
 			int part, std::vector<std::string> &temp_strings);
 		static std::string	findNickName(const int socket, const Client clients[]);
+		static std::string	findUserName(const int socket, const Client clients[]);
 		static int			findSocketForClientFromName(const std::string nick,
 			const Client *clients);
 		static int			findChannelIndex(const std::string channelName,

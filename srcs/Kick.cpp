@@ -75,8 +75,9 @@ void Kick::_printUserIsNotOnThatChannelError(const t_kickcmd_data &data, std::ve
 void Kick::_kickUserFromChannel(const t_kickcmd_data &data, std::vector<Channel>::size_type &i, std::vector<std::string>::size_type &k, t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
-	ss << ":" << ToolFunctions::findNickName(data.socket, _serverSettings.clients);
-	ss << "!localhost" << " KICK " << _serverSettings.channels.at(i).getChannelName();
+	ss << ":";
+	ss << USER_ID(ToolFunctions::findNickName(data.socket, _serverSettings.clients), ToolFunctions::findUserName(data.socket, _serverSettings.clients));
+	ss << " KICK " << _serverSettings.channels.at(i).getChannelName();
 	ss << " " << data.temp_users.at(k);
 	std::string::size_type position = data.full_command.find(":");
 	if (position != std::string::npos)

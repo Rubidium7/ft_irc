@@ -2,6 +2,7 @@
 #include "Join.hpp"
 #include "Part.hpp"
 #include "ToolFunctions.hpp"
+#include "defines.hpp"
 
 void
 Join::joinCommand(	const int		&socket,
@@ -92,8 +93,9 @@ Join::_channelDoesNotExistHelper(	const int 									&socket,
 		_serverSettings.channels.at(_serverSettings.channels.size() - 1).setKey(temp_keys.at(i));
 
 	std::stringstream ss;
-	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients); // Join message
-	ss << "!" << "localhost" <<  " JOIN " << temp_channels.at(i);
+	ss << ":"; // Join messsage
+	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
+	ss <<  " JOIN " << temp_channels.at(i);
 	std::string::size_type position = full_command.find(":");
 	if (position == std::string::npos)
 		ss << " :" << std::endl;
@@ -105,7 +107,9 @@ Join::_channelDoesNotExistHelper(	const int 									&socket,
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).sendToAllChannelMembers(ss.str());
 	ss.str("");
 			
-	ss << ":localhost " << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients); // Print topic
+	ss << ":"; // Print topic
+	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
+	ss << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
 	ss << " " << temp_channels.at(i) << " :";
 	ss << _serverSettings.channels.at(_serverSettings.channels.size() - 1).getTopic() << std::endl;
 	Server::sendToOneClient(socket, ss.str());
@@ -132,8 +136,9 @@ Join::_keyMatchesHelper(const int 								&socket,
 {
 	_serverSettings.channels.at(k).addToChannel(socket);
 	std::stringstream ss;
-	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients);
-	ss << "!" << "localhost" <<  " JOIN " << _serverSettings.channels.at(k).getChannelName();
+	ss << ":";
+	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
+	ss << " JOIN " << _serverSettings.channels.at(k).getChannelName();
 	std::string::size_type position = full_command.find(":");
 	if (position == std::string::npos)
 		ss << " :" << std::endl;
@@ -177,8 +182,9 @@ Join::_channelDoesNotHaveKeyHelper(	const int 								&socket,
 {
 	_serverSettings.channels.at(k).addToChannel(socket);
 	std::stringstream ss;
-	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients);
-	ss << "!" << "localhost" <<  " JOIN " << _serverSettings.channels.at(k).getChannelName();
+	ss << ":";
+	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
+	ss << " JOIN " << _serverSettings.channels.at(k).getChannelName();
 	std::string::size_type position = full_command.find(":");
 	if (position == std::string::npos)
 		ss << " :" << std::endl;
@@ -190,7 +196,9 @@ Join::_channelDoesNotHaveKeyHelper(	const int 								&socket,
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).sendToAllChannelMembers(ss.str());
 	ss.str("");
 						
-	ss << ":localhost " << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
+	ss << ":";
+	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
+	ss << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
 	ss << " " << _serverSettings.channels.at(k).getChannelName() << " :";
 	ss << _serverSettings.channels.at(k).getTopic() << std::endl;
 	Server::sendToOneClient(socket, ss.str());

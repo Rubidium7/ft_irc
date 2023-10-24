@@ -49,7 +49,9 @@ Privmsg::_senderIsOnChannelSenderHelper(const int &socket,
 										t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
-	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost" << " PRIVMSG ";
+	ss << ":";
+	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
+	ss << " PRIVMSG ";
 	ss << command_parts.at(1);
 	std::string::size_type position = full_command.find(":");
 	if (position != std::string::npos)
@@ -231,7 +233,9 @@ Privmsg::_messageTargetIsClientNotGollum(const int &socket, const std::string &f
 	}
 	// Nick found
 	std::stringstream ss;
-	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost PRIVMSG ";
+	ss << ":";
+	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
+	ss << " PRIVMSG ";
 	ss << command_parts.at(1);
 	std::string::size_type position = full_command.find(":");
 	if (position != std::string::npos)
