@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/17 13:53:54 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/19 21:10:24 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 14:15:30 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,6 +209,8 @@ void	Server::clientExit(int socket, t_server_mode &_serverSettings)
 	_serverSettings.clientBuffers.at(socket).clear();
 	FD_CLR(socket, &_serverSettings.activeSockets);
 	Part::partFromAllChannels(socket, _serverSettings);
+	if (socket == _serverSettings.isGollumAwake)
+		_serverSettings.isGollumAwake = 0;
 	_matchClient(socket).clearInfo();
 }
 

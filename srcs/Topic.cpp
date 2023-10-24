@@ -52,6 +52,19 @@ void	Topic::_displayTopic(std::string nick, int socket, Channel &channel)
 	Server::sendAnswer(socket, nick, RPL_TOPICTIME, msg + time_str);
 }
 
+std::string	Topic::_combineArgs(std::vector<std::string> args)
+{
+	std::string	combine;
+
+	combine = args.at(2);
+	for (size_t i = 3; i < args.size(); i++)
+	{
+		combine += " ";
+		combine += args.at(i);
+	}
+	return (combine);
+}
+
 void	Topic::topicCommand(int socket, Client &client,
 	std::vector<std::string> args, t_server_mode &serverSettings)
 {
@@ -69,7 +82,7 @@ void	Topic::topicCommand(int socket, Client &client,
 		return ;
 	if (!change_topic)
 		return (_displayTopic(client.getNick(), socket, serverSettings.channels.at(i)));
-	std::string input = args.at(2);
+	std::string input = _combineArgs(args);
 	input.erase(input.begin());
 	if (input.size() > 255)
 		input.erase(255, std::string::npos);

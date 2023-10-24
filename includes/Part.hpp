@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:09:07 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:35:57 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 19:43:22 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,10 @@ class Part
 		Part(Part &copy_constructor);
 		Part &operator=(Part &copy_assignment);
 
-		static std::string _returnLastPartOfString(int begin, std::string full_command);
+		static std::string	_returnLastPartOfString(int begin, std::string full_command);
+		static void 		_partCommandClientOnChannelHelper(const int &socket,
+			const std::string full_command, std::vector<Channel>::size_type &k, t_server_mode &_serverSettings);
+
 };
 
 #endif

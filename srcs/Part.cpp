@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/02 17:09:32 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/19 18:57:36 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/23 19:44:16 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,18 +29,7 @@ void Part::partCommand(int socket, std::string full_command, t_server_mode	&_ser
 			if (temp_channels.at(i) == _serverSettings.channels.at(k).getChannelName())
 			{
 				if (_serverSettings.channels.at(k).isOnChannel(socket)) // Client on channel
-				{
-					std::stringstream ss;
-					ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost";
-					ss << " PART" << " " << _serverSettings.channels.at(k).getChannelName();
-					ss << " :" << std::endl;
-					Server::sendToOneClient(socket, ss.str());
-					_serverSettings.channels.at(k).partFromChannel(socket);
-					_serverSettings.channels.at(k).setNewOpIfNoOp();
-					ss.str("");
-					if (_serverSettings.channels.at(k).howManyMembersOnChannel() == 0)
-						_serverSettings.channels.erase(_serverSettings.channels.begin() + k--); // k-- because all channels move one step back
-				}
+					_partCommandClientOnChannelHelper(socket, full_command, k, _serverSettings);
 				else // Client not on channel
 					Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOTONCHANNEL, ":Not on that channel\n");
 				break ;
@@ -57,7 +46,7 @@ void Part::partFromAllChannels(int socket, t_server_mode &_serverSettings)
 		{
 			std::stringstream ss;
 			ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients);
-			ss << "!" << "localhost" << " PART " << _serverSettings.channels.at(i).getChannelName() << " :0" << std::endl;
+			ss << "!" << "localhost" << " PART " << _serverSettings.channels.at(i).getChannelName() << " :" << std::endl;
 			Server::sendToOneClient(socket, ss.str());
 			ss.clear();
 			_serverSettings.channels.at(i).partFromChannel(socket);
@@ -86,4 +75,25 @@ std::string Part::_returnLastPartOfString(int begin, std::string full_command)
 		return (last_part);
     }else
 		return ("Error: no message even there should be");
+}
+
+void Part::_partCommandClientOnChannelHelper(const int &socket, const std::string full_command, std::vector<Channel>::size_type &k, t_server_mode &_serverSettings)
+{
+	std::stringstream ss;
+	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients) << "!localhost";
+	ss << " PART" << " " << _serverSettings.channels.at(k).getChannelName();
+	std::string::size_type position = full_command.find(":");
+	if (position == std::string::npos)
+		ss << " :" << std::endl;
+	else
+	{
+		ss << " ";
+		ss << full_command.substr(position)  << std::endl;
+	}
+	_serverSettings.channels.at(k).sendToAllChannelMembers(ss.str());
+	_serverSettings.channels.at(k).partFromChannel(socket);
+	_serverSettings.channels.at(k).setNewOpIfNoOp();
+	ss.str("");
+	if (_serverSettings.channels.at(k).howManyMembersOnChannel() == 0)
+		_serverSettings.channels.erase(_serverSettings.channels.begin() + k--); // k-- because all channels move one step back
 }
