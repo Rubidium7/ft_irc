@@ -503,14 +503,23 @@ void	Server::_handleJoinColon(int socket)
 void	Server::_handleQuit(int socket, Client &client, std::vector<std::string> args)
 {
 	std::string	msg;
+	bool		was_on_channel = false;
 
 	for (size_t i = 1; i != args.size(); i++)
 	{
 		msg += " ";
 		msg += args.at(i);
 	}
-	(void)client; // Voiko clientin poistaa tasta functiosta kokonaan? Myos inputista?
-	//sendToChannel(channel(s?), USER_ID(client.getNick(), client.getUserName(), client.getHostName()) + " QUIT" + msg); // Onko tarpeellinen?
+	for (size_t i = 0; i != _serverSettings.channels.size(); i++)
+	{
+		if (_serverSettings.channels.at(i).isOnChannel(socket))
+		{
+			_serverSettings.channels.at(i).sendToAllChannelMembers(":" + USER_ID(client.getNick(), client.getUserName()) + " QUIT" + msg + "\r\n");
+			was_on_channel = true;
+		}
+	}
+	if (!was_on_channel)
+		sendToOneClient(socket, ":" + USER_ID(client.getNick(), client.getUserName()) + " QUIT" + msg + "\r\n");
 	clientExit(socket, _serverSettings);
 }
 

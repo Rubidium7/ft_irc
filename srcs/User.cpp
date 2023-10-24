@@ -19,7 +19,6 @@ std::string	User::_parseRealName(std::vector<std::string> args)
 
 void	User::userCommand(int socket, Client &client, std::vector<std::string> args)
 {
-	//don't know if there's unnacceptable user names we should parse for // Yes there is Gollum for example // Bot name is Gollum
 	if (!client.getUserName().empty())
 	{
 		Server::sendAnswer(socket, client.getNick(), ERR_ALREADYREGISTERED, ":Already registered as " + client.getUserName());

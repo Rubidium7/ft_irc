@@ -19,11 +19,16 @@ void	Nick::nickCommand(int socket, Client &client, std::string nick, t_server_mo
 {
 	if (client.getNick() == nick)
 		return ; //idk if this should be an error or not
+	if (nick == "Gollum")
+	{
+		Server::sendAnswer(socket, client.getNick(), ERR_ERRONEUSNICKNAME, nick + " :Nickname reserved.");
+		return ;
+	}
 	if (_nickInUse(nick, serverSettings.clients))
 	{
 		Server::sendAnswer(socket, client.getNick(), ERR_NICKNAMEINUSE, nick + " :Nickname is already in use.");
 		return ;
 	}
-	//sendToChannel(socket, USER_ID(client.getNick(), client.getUserName(), client.getHostName()) + " NICK " + nick); // Onko tarpeellinen?
+	Server::sendToOneClient(socket, ":" + USER_ID(client.getNick(), client.getUserName()) + " NICK " + nick + "\r\n");
 	client.setNick(nick);
 }
