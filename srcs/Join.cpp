@@ -129,7 +129,7 @@ Join::_inviteOnlyErrorHelper(	const int 								&socket,
 {
 	std::stringstream ss;
 	ss << _serverSettings.channels.at(k).getChannelName();
-	ss << " :Cannot join channel (+i)" << std::endl;
+	ss << " :Cannot join channel (+i)";
 	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_INVITEONLYCHAN, ss.str());
 	ss.str("");
 }
@@ -163,7 +163,7 @@ Join::_keyDoesNotMatchHelper(	const int 								&socket,
 {
 	std::stringstream ss;
 	ss << _serverSettings.channels.at(k).getChannelName();
-	ss << " :Cannot join channel (+k)" << std::endl;
+	ss << " :Cannot join channel (+k)";
 	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_BADCHANNELKEY, ss.str());
 	ss.str("");
 }
@@ -174,7 +174,7 @@ Join::_clientDoesNotProvideKeyErrorHelper(	const int 								&socket,
 {
 	std::stringstream ss;
 	ss << _serverSettings.channels.at(k).getChannelName();
-	ss << " :Cannot join channel (+k)" << std::endl;
+	ss << " :Cannot join channel (+k)";
 	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_BADCHANNELKEY, ss.str());
 	ss.str("");
 }

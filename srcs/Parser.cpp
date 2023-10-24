@@ -171,7 +171,7 @@ void	Parser::parseJoin()
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(3) + " :Too many targets");
 		return ;
 	}
-	if (_args.at(1).at(0) == ':' || _args.at(1).at(0) == '0') //should we handle 0?
+	if (_args.at(1).at(0) == ':' || _args.at(1).at(0) == '0')
 	{
 		if (_args.size() != 2)
 			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(2) + " :Too many targets");

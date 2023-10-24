@@ -47,8 +47,8 @@ void Part::partFromAllChannels(int socket, t_server_mode &_serverSettings)
 			std::stringstream ss;
 			ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients);
 			ss << "!" << "localhost" << " PART " << _serverSettings.channels.at(i).getChannelName() << " :" << std::endl;
-			Server::sendToOneClient(socket, ss.str());
-			ss.clear();
+			_serverSettings.channels.at(i).sendToAllChannelMembers(ss.str());
+			ss.str("");
 			_serverSettings.channels.at(i).partFromChannel(socket);
 			_serverSettings.channels.at(i).setNewOpIfNoOp();
 			if (_serverSettings.channels.at(i).howManyMembersOnChannel() == 0)

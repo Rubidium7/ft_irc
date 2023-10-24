@@ -42,6 +42,9 @@ Server::Server(int port, std::string password)
 	if (!_serverSettings.failure && listen(_serverSettings.serverSocket, MAX_AMOUNT_CLIENTS) < 0)
 		_serverSettings.failure = SERV_LISTEN_FAILURE;
 
+	if (!_serverSettings.failure && fcntl(_serverSettings.serverSocket, F_SETFL, O_NONBLOCK))
+		_serverSettings.failure = SERV_FCNTL_FAILURE;
+
 	FD_ZERO(&_serverSettings.activeSockets);
 	FD_SET(_serverSettings.serverSocket, &_serverSettings.activeSockets);
 	_serverSettings.maxSocket = _serverSettings.serverSocket;
@@ -189,6 +192,11 @@ void	Server::newClient(void)
 		_serverSettings.failure = SERV_ACCEPT_FAILURE;
 		return ;
 	}
+	if (fcntl(new_client, F_SETFL, O_NONBLOCK))
+	{
+		_serverSettings.failure = SERV_FCNTL_FAILURE;
+		return ;
+	}
 	if (_clientIndex >= MAX_AMOUNT_CLIENTS)
 	{
 		print_error(TOO_MANY_CLIENTS);
@@ -203,8 +211,13 @@ void	Server::newClient(void)
 	_serverSettings.clients[_clientIndex].setSocket(new_client);
 }
 
-void	Server::clientExit(int socket, t_server_mode &_serverSettings)
+void	Server::clientExit(int socket, t_server_mode &_serverSettings, const std::string &msg)
 {
+	for (size_t i = 0; i != _serverSettings.channels.size(); i++)
+	{
+		if (_serverSettings.channels.at(i).isOnChannel(socket))
+			_serverSettings.channels.at(i).sendToAllChannelMembers(":" + USER_ID(_matchClient(socket).getNick(), _matchClient(socket).getUserName()) + " QUIT" + msg + "\r\n");
+	}
 	close(socket);
 	_serverSettings.clientBuffers.at(socket).clear();
 	FD_CLR(socket, &_serverSettings.activeSockets);
@@ -219,7 +232,7 @@ void	Server::receiveMessage(int socket)
 	int	bytes_read = recv(socket, _serverSettings.buffer, MSG_SIZE, 0);
 	if (bytes_read <= 0)
 	{
-		clientExit(socket, _serverSettings);
+		clientExit(socket, _serverSettings, " :");
 	}
 	else
 	{
@@ -327,34 +340,8 @@ void	Server::_newUserMessage(int socket, Client &client)
 	sendAnswer(socket, nick, RPL_MYINFO, msg);
 	msg.clear();
 	//much more info can be added to 005 msg ^^^	// Viela tarpeellinen?
-	//maybe LUSERS cmd here or not				 	// Viela tarpeellinenn?
 	_messageOfTheDay(socket, nick);
 }
-
-void	Server::_printHost(int socket)
-{
-	struct sockaddr_in	my_addr;
-
-	bzero(&my_addr, sizeof(my_addr));
-    socklen_t len = sizeof(my_addr);
-    getsockname(socket, (struct sockaddr *) &my_addr, &len);
-	std::cout << "ip: " << inet_ntoa(my_addr.sin_addr) << std::endl;
-
-	struct addrinfo *result;
-	struct addrinfo hints;
-
-	memset(&hints, 0, sizeof(hints));
-
-	hints.ai_flags = AI_CANONNAME;
-	hints.ai_family = AF_UNSPEC;
-
-	getaddrinfo(inet_ntoa(my_addr.sin_addr), NULL, &hints, &result);
-
-	if (result->ai_canonname)
-		std::cout << "name: " << result->ai_canonname << std::endl;
-	freeaddrinfo(result);
-
-} //might use later // Viela tarpeellinen ?
 
 void	Server::_handleCommands(int socket)
 {
@@ -430,8 +417,8 @@ void	Server::_handleCommands(int socket)
 			break ;
 		case PRIVMSG:
 			parser.parsePrivmsg();
-			//if (!parser.getMessageCode()) // Onko tama parseri jo toimiva? Poistin nimittain aivan kaiken virhetarkastelut tasta komennosta
-			Privmsg::privmsgCommand(socket, full_command, _serverSettings);
+			if (!parser.getMessageCode()) // Onko tama parseri jo toimiva? Poistin nimittain aivan kaiken virhetarkastelut tasta komennosta
+				Privmsg::privmsgCommand(socket, full_command, _serverSettings);
 			break;
 		case PING:
 			parser.parsePing(_hostName);
@@ -445,13 +432,13 @@ void	Server::_handleCommands(int socket)
 			break ;
 		case KICK:
 			parser.parseKick();
-			//if (!parser.getMessageCode()) // Onko tama parseri jo toimiva? Tama kasky ei enaa tarkasta yhtaan mitaan
-			Kick::kickCommand(socket, full_command, _serverSettings);
+			if (!parser.getMessageCode()) // Onko tama parseri jo toimiva? Tama kasky ei enaa tarkasta yhtaan mitaan
+				Kick::kickCommand(socket, full_command, _serverSettings);
 			break ;
 		case QUIT:
 			parser.parseQuit();
 			if (!parser.getMessageCode())
-				_handleQuit(socket, _matchClient(socket), parser.getArgs());
+				_handleQuit(socket, parser.getArgs());
 			break ;
 		default:
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
@@ -502,27 +489,16 @@ void	Server::_handleJoinColon(int socket)
 		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
 }
 
-void	Server::_handleQuit(int socket, Client &client, std::vector<std::string> args)
+void	Server::_handleQuit(int socket, std::vector<std::string> args)
 {
 	std::string	msg;
-	bool		was_on_channel = false;
 
 	for (size_t i = 1; i != args.size(); i++)
 	{
 		msg += " ";
 		msg += args.at(i);
 	}
-	for (size_t i = 0; i != _serverSettings.channels.size(); i++)
-	{
-		if (_serverSettings.channels.at(i).isOnChannel(socket))
-		{
-			_serverSettings.channels.at(i).sendToAllChannelMembers(":" + USER_ID(client.getNick(), client.getUserName()) + " QUIT" + msg + "\r\n");
-			was_on_channel = true;
-		}
-	}
-	if (!was_on_channel)
-		sendToOneClient(socket, ":" + USER_ID(client.getNick(), client.getUserName()) + " QUIT" + msg + "\r\n");
-	clientExit(socket, _serverSettings);
+	clientExit(socket, _serverSettings, msg);
 }
 
 void	Server::_handlePing(int socket)

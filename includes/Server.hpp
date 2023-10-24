@@ -21,8 +21,7 @@
 # include <vector>
 # include <sys/socket.h>
 # include <netinet/in.h>
-# include <arpa/inet.h> //v // ARE THESE NEEDED ?
-# include <netdb.h> //only for printhost -> might not need
+# include <fcntl.h>
 
 typedef struct s_server_mode
 {
@@ -55,7 +54,7 @@ class Server
 		void			newClient();
 		void			sendToClients(std::string msg);
 		static void		sendToOneClient(int socket, std::string msg);
-		void			clientExit(int socket, t_server_mode &_serverSettings);
+		void			clientExit(int socket, t_server_mode &_serverSettings, const std::string &msg);
 		void			receiveMessage(int socket);
 		static void		sendAnswer(int socket, std::string nick, t_code code, std::string msg);
 
@@ -74,13 +73,9 @@ class Server
 		void			_handleNewRegistration(int socket);
 		void			_messageOfTheDay(int socket, std::string &nick);
 		void			_newUserMessage(int socket, Client &client);
-		// void			_handleMode(int id); // NEEDED?
 		void			_handlePing(int socket);
-		// void			_handleTopic(int id); // NEEDED ?
-		void			_handleQuit(int socket, Client &client, std::vector<std::string> args);
+		void			_handleQuit(int socket, std::vector<std::string> args);
 		void			_handleJoinColon(int socket);
-		void			_handleNotCommand(int socket);
-		void			_printHost(int socket);
 
 		t_server_mode		_serverSettings;
 		static std::string	_hostName;

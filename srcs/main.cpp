@@ -12,8 +12,6 @@
 
 #include "irc.hpp"
 
-//fcntl(fd, F_SETFL, O_NONBLOCK); (!)
-
 int main(int ac, char **av)
 {
 	if (ac != 3)

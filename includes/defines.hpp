@@ -48,7 +48,8 @@ typedef enum e_error
 	SERV_BIND_FAILURE,
 	SERV_LISTEN_FAILURE,
 	SERV_SELECT_FAILURE,
-	SERV_ACCEPT_FAILURE
+	SERV_ACCEPT_FAILURE,
+	SERV_FCNTL_FAILURE
 }	t_error_code;
 
 typedef enum e_code

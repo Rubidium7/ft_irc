@@ -37,6 +37,6 @@ void	Invite::inviteCommand(int socket, Client &client,
 		return ;
 	}
 	serverSettings.channels.at(i).addInvitation(target_socket);
-	Server::sendToOneClient(socket, USER_ID(client.getNick(),
+	Server::sendToOneClient(target_socket, ":" + USER_ID(client.getNick(),
 		client.getUserName()) + " INVITE " + args.at(1) + " " + args.at(2) + "\r\n");
 }
