@@ -63,7 +63,6 @@ Join::joinCommand(	const int		&socket,
 	}
 }
 
-
 int
 Join::_handleSpecialCases(	const int						&socket,
 							const std::vector<std::string>	&command_parts,
@@ -87,7 +86,19 @@ Join::_channelDoesNotExistHelper(	const int 									&socket,
 									const std::vector<std::string>				&temp_keys,
 									t_server_mode 								&_serverSettings)
 {
-	_serverSettings.channels.push_back(Channel(temp_channels.at(i), socket)); // Create Channel
+	try
+	{
+		_serverSettings.channels.push_back(Channel(temp_channels.at(i), socket)); // Create Channel
+	} catch (const std::exception& e)
+	{
+		std::stringstream ss;
+		ss << temp_channels.at(i);
+		ss << " :Too many channels";
+		Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients),ERR_TOOMANYCHANNELS, ss.str());
+		ss.str("");
+		return ;
+	}
+	// Channel creation succesfull
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).giveOps(socket); //Give ops to only user
 	if (i < temp_keys.size())
 		_serverSettings.channels.at(_serverSettings.channels.size() - 1).setKey(temp_keys.at(i));
@@ -109,7 +120,7 @@ Join::_channelDoesNotExistHelper(	const int 									&socket,
 			
 	ss << ":"; // Print topic
 	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
-	ss << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
+	ss << " " << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
 	ss << " " << temp_channels.at(i) << " :";
 	ss << _serverSettings.channels.at(_serverSettings.channels.size() - 1).getTopic() << std::endl;
 	Server::sendToOneClient(socket, ss.str());
@@ -149,6 +160,14 @@ Join::_keyMatchesHelper(const int 								&socket,
 	}
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).sendToAllChannelMembers(ss.str());
 	ss.str("");
+
+	ss << ":";
+	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
+	ss << " " << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
+	ss << " " << _serverSettings.channels.at(k).getChannelName() << " :";
+	ss << _serverSettings.channels.at(k).getTopic() << std::endl;
+	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
 }
 
 void
@@ -162,6 +181,7 @@ Join::_keyDoesNotMatchHelper(	const int 								&socket,
 	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_BADCHANNELKEY, ss.str());
 	ss.str("");
 }
+
 void
 Join::_clientDoesNotProvideKeyErrorHelper(	const int 								&socket,
 											const std::vector<Channel>::size_type	&k,
@@ -198,7 +218,7 @@ Join::_channelDoesNotHaveKeyHelper(	const int 								&socket,
 						
 	ss << ":";
 	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
-	ss << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
+	ss << " " << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
 	ss << " " << _serverSettings.channels.at(k).getChannelName() << " :";
 	ss << _serverSettings.channels.at(k).getTopic() << std::endl;
 	Server::sendToOneClient(socket, ss.str());
