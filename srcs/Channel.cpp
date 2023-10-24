@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Channel.cpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/09/06 15:03:51 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/23 17:08:38 by tpoho            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include <iostream>
 #include <sstream>
@@ -277,4 +266,9 @@ void	Channel::takeOverChannel(int socket)
 const t_channel_mode	&Channel::giveChannelSettings() const
 {
 	return (_channelSettings);
+}
+
+int	Channel::getUserLimit() const
+{
+	return (_channelSettings.l);
 }

@@ -1,16 +1,4 @@
 
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Channel.hpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/09/06 15:16:14 by tpoho             #+#    #+#             */
-/*   Updated: 2023/09/29 16:40:41 by tpoho            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
@@ -60,6 +48,7 @@ class Channel
 		void					setInviteMode(int mode);
 		void					setTopicMode(int mode);
 		void					setUserLimit(int amount);
+		int						getUserLimit() const;
 		void					setNewOpIfNoOp();
 		void					takeOverChannel(int socket);
 		const t_channel_mode	&giveChannelSettings() const;

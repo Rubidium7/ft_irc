@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   defines.hpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/17 11:38:29 by nlonka            #+#    #+#             */
-/*   Updated: 2023/10/19 15:43:51 by tpoho            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef DEFINES_HPP
 # define DEFINES_HPP
@@ -18,8 +7,8 @@
 # include <vector>
 # include <string>
 
-# define MAX_AMOUNT_CLIENTS  5 //1023
-# define MAX_AMOUNT_CHANNELS 5 //?
+# define MAX_AMOUNT_CLIENTS  5
+# define MAX_AMOUNT_CHANNELS 5
 # define MSG_SIZE 512
 # define EOM "\n"
 # define USER_ID(nick, user) (nick + "!" + user + "@localhost")
@@ -93,6 +82,7 @@ typedef enum e_code
 	ERR_ALREADYREGISTERED = 462,
 	ERR_PASSWDMISMATCH = 464,
 	ERR_KEYSET = 467,
+	ERR_CHANNELISFULL = 471,
 	ERR_UNKNOWNMODE = 472,
 	ERR_INVITEONLYCHAN = 473,
 	ERR_BADCHANNELKEY = 475,

@@ -1,5 +1,4 @@
 
-
 #include "Mode.hpp"
 #include "ToolFunctions.hpp"
 #include "irc.hpp"

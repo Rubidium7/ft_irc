@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Join.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/24 15:37:53 by tpoho            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "Join.hpp"
 #include "Part.hpp"
@@ -19,9 +8,9 @@ Join::joinCommand(	const int		&socket,
 					std::string		full_command,
 					t_server_mode 	&_serverSettings)
 {
-	std::vector<std::string> command_parts; // full_command is split into parts here
-	std::vector<std::string> temp_channels; // command_parts.at(1) is split into here
-	std::vector<std::string> temp_keys;		// command_parts.at(2) is split into here
+	std::vector<std::string> command_parts;
+	std::vector<std::string> temp_channels;
+	std::vector<std::string> temp_keys;
 	ToolFunctions::splitCommandInParts(full_command, command_parts);
 
 	if (command_parts.size() == 2 && _handleSpecialCases(socket, command_parts, _serverSettings))
@@ -43,35 +32,36 @@ Join::joinCommand(	const int		&socket,
 				{	// On purpose do nothing if already on a channel, different servers react differently
 					// Some do nothing, some part and rejoin user, there is no standard way to handle this
 					break;
-				}else if (_serverSettings.channels.at(k).isInviteOnly() && !_serverSettings.channels.at(k).isClientInvited(socket)) // Invite only channel
+				} else if (_serverSettings.channels.at(k).howManyMembersOnChannel() >= _serverSettings.channels.at(k).getUserLimit())
+				{
+					_channelIsFullErrorHelper(socket, k, _serverSettings); break;
+				} else if (_serverSettings.channels.at(k).isInviteOnly() && !_serverSettings.channels.at(k).isClientInvited(socket)) // Invite only channel
 				{
 					_inviteOnlyErrorHelper(socket, k, _serverSettings); break;
-				} else
+				} else if (_serverSettings.channels.at(k).isThereKey()) // Does Channel have key set (password)
 				{
-					if (_serverSettings.channels.at(k).isThereKey()) // Does Channel have key set (password)
+					if (i < temp_keys.size()) // Client provides key
 					{
-						if (i < temp_keys.size()) // Client provides key
+						if (_serverSettings.channels.at(k).doesKeyMatch(temp_keys.at(i))) // Key matches
 						{
-							if (_serverSettings.channels.at(k).doesKeyMatch(temp_keys.at(i))) // Key matches
-							{
-								_keyMatchesHelper(socket, full_command, k, _serverSettings); break ;
-							}else // Key does not match
-							{
-								_keyDoesNotMatchHelper(socket, k, _serverSettings); break ;
-							}
-						}else // Client does not provide key
+							_keyMatchesHelper(socket, full_command, k, _serverSettings); break ;
+						}else // Key does not match
 						{
-							_clientDoesNotProvideKeyErrorHelper(socket, k, _serverSettings); break ;
+							_keyDoesNotMatchHelper(socket, k, _serverSettings); break ;
 						}
-					}else // Channel does not have a key
+					}else // Client does not provide key
 					{
-						_channelDoesNotHaveKeyHelper(socket, k, full_command, _serverSettings); break ;
+						_clientDoesNotProvideKeyErrorHelper(socket, k, _serverSettings); break ;
 					}
+				}else // Channel does not have a key
+				{
+					_channelDoesNotHaveKeyHelper(socket, k, full_command, _serverSettings); break ;
 				}
 			}
 		}
 	}
 }
+
 
 int
 Join::_handleSpecialCases(	const int						&socket,
@@ -204,5 +194,17 @@ Join::_channelDoesNotHaveKeyHelper(	const int 								&socket,
 	ss << " " << _serverSettings.channels.at(k).getChannelName() << " :";
 	ss << _serverSettings.channels.at(k).getTopic() << std::endl;
 	Server::sendToOneClient(socket, ss.str());
+	ss.str("");
+}
+
+void
+Join::_channelIsFullErrorHelper(const int 								&socket,
+								const std::vector<Channel>::size_type	&k,
+								const t_server_mode						&_serverSettings)
+{
+	std::stringstream ss;
+	ss << _serverSettings.channels.at(k).getChannelName();
+	ss << " :Cannot join channel (+l)";
+	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_BADCHANNELKEY, ss.str());
 	ss.str("");
 }
