@@ -6,7 +6,7 @@
 /*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/23 19:36:36 by tpoho            ###   ########.fr       */
+/*   Updated: 2023/10/24 15:28:50 by tpoho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void Join::joinCommand(int socket, std::string full_command, t_server_mode	&_ser
 	{
 		if (!ToolFunctions::doesChannelExistWithName(temp_channels.at(i), _serverSettings.channels)) // Channel does not exist so create a new one
 		{
-			_channelDoesNotExistHelper(socket, full_command, i, temp_channels, _serverSettings); continue ;
+			_channelDoesNotExistHelper(socket, full_command, i, temp_channels, temp_keys, _serverSettings); continue ;
 		}
 		for (std::vector<Channel>::size_type k = 0; k < _serverSettings.channels.size(); ++k) // Find existing channels
 		{
@@ -82,11 +82,13 @@ int Join::_handleSpecialCases(const int &socket, const std::vector<std::string> 
 	return (0);
 }
 
-void Join::_channelDoesNotExistHelper(const int &socket, const std::string &full_command, const std::vector<std::string>::size_type &i, const std::vector<std::string> &temp_channels, t_server_mode &_serverSettings)
+void Join::_channelDoesNotExistHelper(const int &socket, const std::string &full_command, const std::vector<std::string>::size_type &i, const std::vector<std::string> &temp_channels, const std::vector<std::string> &temp_keys, t_server_mode &_serverSettings)
 {
 	_serverSettings.channels.push_back(Channel(temp_channels.at(i), socket)); // Create Channel
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).giveOps(socket); //Give ops to only user
-	
+	if (i < temp_keys.size())
+		_serverSettings.channels.at(_serverSettings.channels.size() - 1).setKey(temp_keys.at(i));
+
 	std::stringstream ss;
 	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients); // Join message
 	ss << "!" << "localhost" <<  " JOIN " << temp_channels.at(i);
@@ -122,7 +124,7 @@ void Join::_keyMatchesHelper(const int &socket, const std::string &full_command,
 	_serverSettings.channels.at(k).addToChannel(socket);
 	std::stringstream ss;
 	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients);
-	ss << "!" << "localhost" <<  " JOIN " << _serverSettings.channels.at(k).getChannelName() << std::endl;
+	ss << "!" << "localhost" <<  " JOIN " << _serverSettings.channels.at(k).getChannelName();
 	std::string::size_type position = full_command.find(":");
 	if (position == std::string::npos)
 		ss << " :" << std::endl;
