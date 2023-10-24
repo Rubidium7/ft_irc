@@ -24,7 +24,8 @@ Channel::Channel(const Channel &copy_constructor)
 	*this = copy_constructor;
 }
 
-Channel	&Channel::operator=(const Channel &copy_assignment)
+Channel	&
+Channel::operator=(const Channel &copy_assignment)
 {
 	if (this == &copy_assignment)
 		return (*this);
@@ -42,32 +43,38 @@ Channel	&Channel::operator=(const Channel &copy_assignment)
 	return (*this);
 }
 
-std::string	Channel::getChannelName(void) const
+std::string
+Channel::getChannelName(void) const
 {
 	return (_channelSettings.nameOfChannel);
 }
 
-std::string	Channel::getTopic(void) const
+std::string
+Channel::getTopic(void) const
 {
 	return (_channelSettings.topic);
 }
 
-void	Channel::setTopic(std::string input)
+void
+Channel::setTopic(std::string input)
 {
 	_channelSettings.topic = input;
 }
 
-int	Channel::isInviteOnly() const
+int
+Channel::isInviteOnly() const
 {
 	return (_channelSettings.i);
 }
 
-int	Channel::isTopicMode() const
+int
+Channel::isTopicMode() const
 {
 	return (_channelSettings.t);
 }
 
-int	Channel::isClientInvited(int socket) const
+int
+Channel::isClientInvited(int socket) const
 {
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i)
 	{
@@ -77,14 +84,16 @@ int	Channel::isClientInvited(int socket) const
 	return (0);
 }
 
-void	Channel::addInvitation(int socket)
+void
+Channel::addInvitation(int socket)
 {
 	if (isClientInvited(socket))
 		return ;
 	_channelSettings.invitedClients.push_back(socket);
 }
 
-void	Channel::removeInvitation(int socket)
+void
+Channel::removeInvitation(int socket)
 {
 	if (!isClientInvited(socket))
 		return ;
@@ -101,7 +110,8 @@ void	Channel::removeInvitation(int socket)
 	}
 }
 
-int	Channel::isOnChannel(int socket) const
+int
+Channel::isOnChannel(int socket) const
 {
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
@@ -111,7 +121,8 @@ int	Channel::isOnChannel(int socket) const
 	return (0);
 }
 
-void	Channel::addToChannel(int socket)
+void
+Channel::addToChannel(int socket)
 {
 	if (!isOnChannel(socket))
 	{
@@ -124,7 +135,8 @@ void	Channel::addToChannel(int socket)
 	}
 }
 
-void	Channel::partFromChannel(int socket)
+void
+Channel::partFromChannel(int socket)
 {
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
@@ -138,29 +150,34 @@ void	Channel::partFromChannel(int socket)
 	}
 }
 
-int	Channel::howManyMembersOnChannel() const
+int
+Channel::howManyMembersOnChannel() const
 {
 	return (_channelSettings.channelMembers.size());
 }
 
-int	Channel::isThereKey() const
+int
+Channel::isThereKey() const
 {
 	return (_channelSettings.k.size());
 }
 
-void	Channel::setKey(std::string new_key)
+void
+Channel::setKey(std::string new_key)
 {
 	_channelSettings.k = new_key;
 }
 
-int	Channel::doesKeyMatch(const std::string &key) const
+int
+Channel::doesKeyMatch(const std::string &key) const
 {
 	if (_channelSettings.k == key)
 		return (1);
 	return (0);
 }
 
-void	Channel::sendToAllChannelMembers(const std::string msg)
+void
+Channel::sendToAllChannelMembers(const std::string msg)
 {
 	std::stringstream		message;
 	const char				*buffer;
@@ -179,7 +196,8 @@ void	Channel::sendToAllChannelMembers(const std::string msg)
 	}
 }
 
-void	Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg)
+void
+Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg)
 {
 	std::stringstream		message;
 	const char				*buffer;
@@ -198,12 +216,14 @@ void	Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::
 	}
 }
 
-const std::vector<int>& Channel::returnChannelMembers() const
+const std::vector<int>&
+Channel::returnChannelMembers() const
 {
 	return (_channelSettings.channelMembers);
 }
 
-int	Channel::hasOps(int socket) const
+int
+Channel::hasOps(int socket) const
 {
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); ++i)
 	{
@@ -213,13 +233,15 @@ int	Channel::hasOps(int socket) const
 	return (0);
 }
 
-void	Channel::giveOps(int socket)
+void
+Channel::giveOps(int socket)
 {
 	if (!hasOps(socket))
 		_channelSettings.o.push_back(socket);
 }
 
-void	Channel::removeOps(int socket)
+void
+Channel::removeOps(int socket)
 {
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); i++)
 	{
@@ -231,22 +253,26 @@ void	Channel::removeOps(int socket)
 	}
 }
 
-void	Channel::setInviteMode(int mode)
+void
+Channel::setInviteMode(int mode)
 {
 	_channelSettings.i = mode;
 }
 
-void	Channel::setTopicMode(int mode)
+void
+Channel::setTopicMode(int mode)
 {
 	_channelSettings.t = mode;
 }
 
-void	Channel::setUserLimit(int amount)
+void
+Channel::setUserLimit(int amount)
 {
 	_channelSettings.l = amount;
 }
 
-void	Channel::setNewOpIfNoOp()
+void
+Channel::setNewOpIfNoOp()
 {
 	if (_channelSettings.o.size() == 0 && _channelSettings.channelMembers.size() > 0)
 	{
@@ -254,7 +280,8 @@ void	Channel::setNewOpIfNoOp()
 	}
 }
 
-void	Channel::takeOverChannel(int socket)
+void
+Channel::takeOverChannel(int socket)
 {
 	if (!isOnChannel(socket))
 		_channelSettings.channelMembers.push_back(socket);
@@ -263,12 +290,14 @@ void	Channel::takeOverChannel(int socket)
 	_channelSettings.o.push_back(socket);
 }
 
-const t_channel_mode	&Channel::giveChannelSettings() const
+const t_channel_mode &
+Channel::giveChannelSettings() const
 {
 	return (_channelSettings);
 }
 
-int	Channel::getUserLimit() const
+int
+Channel::getUserLimit() const
 {
 	return (_channelSettings.l);
 }

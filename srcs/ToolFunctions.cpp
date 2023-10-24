@@ -1,7 +1,9 @@
 
 #include "ToolFunctions.hpp"
 
-void	ToolFunctions::splitCommandInParts(const std::string &full_command, std::vector<std::string> &command_parts)
+void
+ToolFunctions::splitCommandInParts(	const std::string 			&full_command,
+									std::vector<std::string>	&command_parts)
 {
 	std::stringstream	ss(full_command);
 	std::string			part;
@@ -10,7 +12,10 @@ void	ToolFunctions::splitCommandInParts(const std::string &full_command, std::ve
 		command_parts.push_back(part);
 }
 
-void	ToolFunctions::parseIntoParts(const std::vector<std::string> &command_parts, int part, std::vector<std::string> &temp_strings)
+void
+ToolFunctions::parseIntoParts(	const std::vector<std::string>	&command_parts,
+								int 							part,
+								std::vector<std::string>		&temp_strings)
 {
 	std::stringstream	ss(command_parts.at(part));	// Initialize stringstream with a string
 	std::string			temp;
@@ -25,7 +30,9 @@ void	ToolFunctions::parseIntoParts(const std::vector<std::string> &command_parts
 	}
 }
 
-std::string	ToolFunctions::findNickName(const int socket, const Client clients[])
+std::string
+ToolFunctions::findNickName(const int		socket,
+										const Client	clients[])
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
@@ -35,7 +42,9 @@ std::string	ToolFunctions::findNickName(const int socket, const Client clients[]
 	return ("*");
 }
 
-int	ToolFunctions::findSocketForClientFromName(const std::string nick, const Client *clients)
+int
+ToolFunctions::findSocketForClientFromName(	const std::string	nick,
+												const Client 		*clients)
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
@@ -57,7 +66,9 @@ ToolFunctions::findChannelIndex(const std::string channelName,
 	return (-1);	
 }
 
-int ToolFunctions::findClientIndexWithSocket(const int socket, const Client clients[])
+int
+ToolFunctions::findClientIndexWithSocket(	const int		socket,
+											const Client	clients[])
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
@@ -76,7 +87,9 @@ ToolFunctions::doesChannelExistWithName(const std::string &nameChannel,
 	return (1);
 }
 
-void	ToolFunctions::listChannelsToOneSocket(int socket, const t_server_mode &_serverSettings)
+void
+ToolFunctions::listChannelsToOneSocket(	int					socket,
+										const t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
 
@@ -95,7 +108,9 @@ void	ToolFunctions::listChannelsToOneSocket(int socket, const t_server_mode &_se
 	}
 }
 
-void	ToolFunctions::listClientsToOneSocket(int socket, const Client clients[])
+void
+ToolFunctions::listClientsToOneSocket(	int				socket,
+										const Client	clients[])
 {
 	std::stringstream ss;
 
@@ -115,7 +130,10 @@ void	ToolFunctions::listClientsToOneSocket(int socket, const Client clients[])
 	}
 }
 
-void	ToolFunctions::printClientInformation(int socket, const t_client_mode &_clientSettings, const t_server_mode &_serverSettings)
+void
+ToolFunctions::printClientInformation(	int					socket,
+										const t_client_mode &_clientSettings,
+										const t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
 	
@@ -155,7 +173,10 @@ void	ToolFunctions::printClientInformation(int socket, const t_client_mode &_cli
 	ss.str("");
 }
 
-void	ToolFunctions::printChannelInformation(int socket, const t_channel_mode &_channelSettings, const t_server_mode &_serverSettings)
+void
+ToolFunctions::printChannelInformation(	int						socket,
+										const t_channel_mode	&_channelSettings,
+										const t_server_mode		&_serverSettings)
 {
 	std::stringstream ss;
 	std::string begin_string;
@@ -234,7 +255,9 @@ void	ToolFunctions::printChannelInformation(int socket, const t_channel_mode &_c
 	ss.str("");
 }
 
-std::string	ToolFunctions::findUserName(const int socket, const Client clients[])
+std::string
+ToolFunctions::findUserName(const int		socket,
+							const Client	clients[])
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{

@@ -2,7 +2,10 @@
 #include "ToolFunctions.hpp"
 #include "Part.hpp"
 
-void Part::partCommand(int socket, std::string full_command, t_server_mode	&_serverSettings)
+void
+Part::partCommand(	int 			socket,
+					std::string 	full_command,
+					t_server_mode	&_serverSettings)
 {
 	std::vector<std::string> command_parts;
 	std::vector<std::string> temp_channels;
@@ -27,7 +30,9 @@ void Part::partCommand(int socket, std::string full_command, t_server_mode	&_ser
 	}
 }
 
-void Part::partFromAllChannels(int socket, t_server_mode &_serverSettings)
+void
+Part::partFromAllChannels(	int 			socket,
+							t_server_mode	&_serverSettings)
 {
 	for (std::vector<std::string>::size_type i = 0; i < _serverSettings.channels.size(); ++i)
 	{
@@ -47,7 +52,9 @@ void Part::partFromAllChannels(int socket, t_server_mode &_serverSettings)
 	}
 }
 
-std::string Part::_returnLastPartOfString(int begin, std::string full_command)
+std::string
+Part::_returnLastPartOfString(	int			begin,
+								std::string full_command)
 {
 	std::string temp;
 	std::string last_part;
@@ -63,7 +70,11 @@ std::string Part::_returnLastPartOfString(int begin, std::string full_command)
 	return (last_part);
 }
 
-void Part::_partCommandClientOnChannelHelper(const int &socket, const std::string full_command, std::vector<Channel>::size_type &k, t_server_mode &_serverSettings)
+void
+Part::_partCommandClientOnChannelHelper(const int 						&socket,
+										const std::string 				full_command,
+										std::vector<Channel>::size_type &k,
+										t_server_mode 					&_serverSettings)
 {
 	std::stringstream ss;
 	ss << ":";

@@ -50,56 +50,66 @@ Server::~Server()
 	// Empty on purpose
 }
 
-t_error_code	Server::checkFailure(void)
+t_error_code
+Server::checkFailure(void)
 {
 	return (_serverSettings.failure);
 }
 
-void	Server::setReadySockets(void)
+void
+Server::setReadySockets(void)
 {
 	_serverSettings.readySockets = _serverSettings.activeSockets;
 }
 
-void	Server::monitorSockets(void)
+void
+Server::monitorSockets(void)
 {
 	if (select(_serverSettings.maxSocket + 1, &_serverSettings.readySockets, NULL, NULL, NULL) < 0)
 		_serverSettings.failure = SERV_SELECT_FAILURE;
 }
 
-int		Server::getMaxSocket()
+int
+Server::getMaxSocket()
 {
 	return (_serverSettings.maxSocket);
 }
 
-bool	Server::isInSet(int socket)
+bool
+Server::isInSet(int socket)
 {
 	return (FD_ISSET(socket, &_serverSettings.readySockets));
 }
 
-int		Server::getServerSocket(void)
+int
+Server::getServerSocket(void)
 {
 	return (_serverSettings.serverSocket);
 }
 
-void	Server::_clearMessage()
+void
+Server::_clearMessage()
 {
 	_serverSettings.message.msg = "";
 	_serverSettings.message.code = EMPTY;
 }
 
-void	Server::_assignServerMessage(t_code code, std::string msg)
+void
+Server::_assignServerMessage(t_code code, std::string msg)
 {
 	_serverSettings.message.msg = msg;
 	_serverSettings.message.code = code;
 }
 
-void	Server::_sendMessageFromStruct(int socket, t_message message)
+void
+Server::_sendMessageFromStruct(int socket, t_message message)
 {
 	std::cerr << message.msg << std::endl; //debug // Onko viela tarpeellinen?
 	sendAnswer(socket, _matchClient(socket).getNick(), message.code, message.msg);
 }
 
-Client	&Server::_matchClient(int socket)
+Client	&
+Server::_matchClient(int socket)
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
@@ -111,7 +121,8 @@ Client	&Server::_matchClient(int socket)
 	return (_serverSettings.clients[0]);
 }
 
-void	Server::sendToClients(std::string msg)
+void
+Server::sendToClients(std::string msg)
 {
 	std::stringstream		message;
 	const char				*buffer;
@@ -131,7 +142,8 @@ void	Server::sendToClients(std::string msg)
 	}
 }
 
-void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string msg)
+void
+Server::sendAnswer(int socket, std::string nick, t_code code, std::string msg)
 {
 	std::stringstream		message;
 	std::string				tempMessage;
@@ -154,7 +166,8 @@ void	Server::sendAnswer(int socket, std::string nick, t_code code, std::string m
 	buffer = NULL;
 }
 
-void	Server::sendToOneClient(int socket, std::string msg)
+void
+Server::sendToOneClient(int socket, std::string msg)
 {
 	std::stringstream		message;
 	std::string				tempMessage;
@@ -170,7 +183,8 @@ void	Server::sendToOneClient(int socket, std::string msg)
 	send(socket, buffer, size, 0);
 }
 
-void	Server::newClient(void)
+void
+Server::newClient(void)
 {
 	int	new_client;
 	int _clientIndex = _findSmallestFreeClientIndex();
@@ -200,7 +214,8 @@ void	Server::newClient(void)
 	_serverSettings.clients[_clientIndex].setSocket(new_client);
 }
 
-void	Server::clientExit(int socket, t_server_mode &_serverSettings, const std::string &msg)
+void
+Server::clientExit(int socket, t_server_mode &_serverSettings, const std::string &msg)
 {
 	for (size_t i = 0; i != _serverSettings.channels.size(); i++)
 	{
@@ -216,7 +231,8 @@ void	Server::clientExit(int socket, t_server_mode &_serverSettings, const std::s
 	_matchClient(socket).clearInfo();
 }
 
-void	Server::receiveMessage(int socket)
+void
+Server::receiveMessage(int socket)
 {
 	int	bytes_read = recv(socket, _serverSettings.buffer, MSG_SIZE, 0);
 	if (bytes_read <= 0)
@@ -246,7 +262,8 @@ void	Server::receiveMessage(int socket)
 	}
 }
 
-int	Server::_findSmallestFreeClientIndex(void) const
+int
+Server::_findSmallestFreeClientIndex(void) const
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
@@ -258,7 +275,9 @@ int	Server::_findSmallestFreeClientIndex(void) const
 	return (MAX_AMOUNT_CLIENTS);
 }
 
-void	Server::_messageOfTheDay(int socket, std::string &nick)
+void
+Server::_messageOfTheDay(	int socket,
+							std::string &nick)
 {
 	std::string	msg;
 
@@ -302,7 +321,9 @@ void	Server::_messageOfTheDay(int socket, std::string &nick)
 	sendAnswer(socket, nick, RPL_ENDOFMOTD, ":End of MOTD command.");
 }
 
-void	Server::_newUserMessage(int socket, Client &client)
+void
+Server::_newUserMessage(int socket,
+						Client &client)
 {
 	std::string	msg;
 	std::string	nick;
@@ -332,7 +353,8 @@ void	Server::_newUserMessage(int socket, Client &client)
 	_messageOfTheDay(socket, nick);
 }
 
-void	Server::_handleCommands(int socket)
+void
+Server::_handleCommands(int socket)
 {
 	t_command	command = _returnFirstPartOfCommand(_serverSettings.clientBuffers.at(socket));
 	bool		new_user = false;
@@ -441,7 +463,8 @@ void	Server::_handleCommands(int socket)
 		_newUserMessage(socket, _matchClient(socket));
 }
 
-t_command		Server::_returnFirstPartOfCommand(std::string command) const
+t_command
+Server::_returnFirstPartOfCommand(std::string command) const
 {
 	t_commands commands[14] = {
 		{"CAP", CAP},
@@ -471,14 +494,16 @@ t_command		Server::_returnFirstPartOfCommand(std::string command) const
 	return (NOT_COMMAND);
 }
 
-void	Server::_handleJoinColon(int socket)
+void
+Server::_handleJoinColon(int socket)
 {
 	sendAnswer(socket, _matchClient(socket).getNick(), RPL_HELLO, ":Please wait while we process your connection.");
 	if (_matchClient(socket).registrationStatus() != REGISTERED)
 		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
 }
 
-void	Server::_handleQuit(int socket, std::vector<std::string> args)
+void
+Server::_handleQuit(int socket, std::vector<std::string> args)
 {
 	std::string	msg;
 
@@ -490,7 +515,8 @@ void	Server::_handleQuit(int socket, std::vector<std::string> args)
 	clientExit(socket, _serverSettings, msg);
 }
 
-void	Server::_handlePing(int socket)
+void
+Server::_handlePing(int socket)
 {
 	sendToOneClient(socket, ":" + _hostName + " PONG " + _hostName + " :" + _hostName + "\r\n");
 }

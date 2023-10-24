@@ -2,7 +2,10 @@
 #include "Kick.hpp"
 #include "ToolFunctions.hpp"
 
-void Kick::kickCommand(int socket, std::string full_command, t_server_mode	&_serverSettings)
+void
+Kick::kickCommand(	int				socket,
+					std::string		full_command,
+					 t_server_mode	&_serverSettings)
 {
 	t_kickcmd_data data;
 
@@ -35,7 +38,9 @@ void Kick::kickCommand(int socket, std::string full_command, t_server_mode	&_ser
 	}
 }
 
-int Kick::_returnClientSocket(std::string nick, t_server_mode &_serverSettings)
+int
+Kick::_returnClientSocket(	std::string		nick,
+							t_server_mode	&_serverSettings)
 {
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
@@ -45,7 +50,10 @@ int Kick::_returnClientSocket(std::string nick, t_server_mode &_serverSettings)
 	return (0);
 }
 
-void Kick::_printDoesChannelExistError(const t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
+void
+Kick::_printDoesChannelExistError(	const t_kickcmd_data 				&data,
+									std::vector<std::string>::size_type &j,
+									t_server_mode						&_serverSettings)
 {
 	std::stringstream ss;
 	ss << data.temp_channels.at(j);
@@ -54,7 +62,10 @@ void Kick::_printDoesChannelExistError(const t_kickcmd_data &data, std::vector<s
 	ss.str("");
 }
 
-void Kick::_printYoureNotChannelOperatorError(t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
+void
+Kick::_printYoureNotChannelOperatorError(	t_kickcmd_data						&data,
+											std::vector<std::string>::size_type &j,
+											t_server_mode						&_serverSettings)
 {
 	std::stringstream ss;
 	ss << data.temp_channels.at(j);
@@ -63,7 +74,10 @@ void Kick::_printYoureNotChannelOperatorError(t_kickcmd_data &data, std::vector<
 	ss.str("");
 }
 
-void Kick::_printUserIsNotOnThatChannelError(const t_kickcmd_data &data, std::vector<std::string>::size_type &j, t_server_mode &_serverSettings)
+void
+Kick::_printUserIsNotOnThatChannelError(const t_kickcmd_data				&data,
+										std::vector<std::string>::size_type &j,
+										t_server_mode						&_serverSettings)
 {
 	std::stringstream ss;
 	ss << data.temp_channels.at(j);
@@ -72,7 +86,11 @@ void Kick::_printUserIsNotOnThatChannelError(const t_kickcmd_data &data, std::ve
 	ss.str("");
 }
 
-void Kick::_kickUserFromChannel(const t_kickcmd_data &data, std::vector<Channel>::size_type &i, std::vector<std::string>::size_type &k, t_server_mode &_serverSettings)
+void
+Kick::_kickUserFromChannel(	const t_kickcmd_data				&data,
+							std::vector<Channel>::size_type		&i,
+							std::vector<std::string>::size_type &k,
+							t_server_mode						&_serverSettings)
 {
 	std::stringstream ss;
 	ss << ":";
@@ -91,7 +109,11 @@ void Kick::_kickUserFromChannel(const t_kickcmd_data &data, std::vector<Channel>
 		_serverSettings.channels.erase(_serverSettings.channels.begin() + i--);
 }
 
-void Kick::_goThroughTempUsersLoopHelper(const t_kickcmd_data &data, std::vector<std::string>::size_type &j, std::vector<Channel>::size_type &i, t_server_mode &_serverSettings)
+void
+Kick::_goThroughTempUsersLoopHelper(const t_kickcmd_data 				&data,
+									std::vector<std::string>::size_type &j,
+									std::vector<Channel>::size_type 	&i,
+									t_server_mode 						&_serverSettings)
 {
 	for (std::vector<std::string>::size_type temp_user_index = 0; temp_user_index < data.temp_users.size(); ++temp_user_index) // Go through all candidate users
 	{
