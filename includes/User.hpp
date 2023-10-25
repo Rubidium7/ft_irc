@@ -9,7 +9,7 @@ class Client;
 class User
 {
 	public:
-		static void userCommand(int socket, Client &client, std::vector<std::string> args);
+		static void userCommand(int socket, Client &client, std::vector<std::string> args, bool debug);
 
 	private:
 		static std::string	_parseRealName(std::vector<std::string> args);

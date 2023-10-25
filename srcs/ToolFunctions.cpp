@@ -20,7 +20,7 @@ ToolFunctions::parseIntoParts(	const std::vector<std::string>	&command_parts,
 	std::stringstream	ss(command_parts.at(part));	// Initialize stringstream with a string
 	std::string			temp;
 
-	while (std::getline(ss, temp, ',')) // Read strings separated with commas 
+	while (std::getline(ss, temp, ',')) // Read strings separated with commas
 		temp_strings.push_back(temp);
 	for (std::vector<std::string>::size_type i = 0; i < temp_strings.size(); ++i) // Remove ',' from strings
 	{
@@ -63,7 +63,7 @@ ToolFunctions::findChannelIndex(const std::string channelName,
 		if (channels.at(i).getChannelName() == channelName)
 			return (i);
 	}
-	return (-1);	
+	return (-1);
 }
 
 int
@@ -95,7 +95,7 @@ ToolFunctions::listChannelsToOneSocket(	int					socket,
 
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 	ss << "Here be list of channels my maqster:" << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	for (std::vector<Channel>::size_type i = 0; i < _serverSettings.channels.size(); ++i)
@@ -103,29 +103,29 @@ ToolFunctions::listChannelsToOneSocket(	int					socket,
 		ss.str("");
 		ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 		ss << "Channel: " << _serverSettings.channels.at(i).getChannelName() << std::endl;
-		Server::sendToOneClient(socket, ss.str());
+		Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 		ss.str("");
 	}
 }
 
 void
 ToolFunctions::listClientsToOneSocket(	int				socket,
-										const Client	clients[])
+										const Client	clients[], bool debug)
 {
 	std::stringstream ss;
 
 	ss.str("");
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, clients) << " :";
 	ss << "Here be list of clients my master:" << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), debug);
 	ss.str("");
 
 	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
 	{
 		ss.str("");
-		ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, clients) << " :";	
+		ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, clients) << " :";
 		ss << "Socket: " << clients[i].getSocket() << " " << "Nick: " << clients[i].getNick() << std::endl;
-		Server::sendToOneClient(socket, ss.str());
+		Server::sendToOneClient(socket, ss.str(), debug);
 		ss.str("");
 	}
 }
@@ -136,40 +136,40 @@ ToolFunctions::printClientInformation(	int					socket,
 										const t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
-	
+
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 	ss << "Client information:" << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 	ss << "Socket: " << _clientSettings.socket << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 	ss << "Nick: " << _clientSettings.nickName << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 	ss << "Username: " << _clientSettings.userName << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 	ss << "Realname: " << _clientSettings.realName << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 	ss << "Hostname: " << _clientSettings.hostName << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
 	ss << "Pass given: " << _clientSettings.givenPass << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 }
 
@@ -187,71 +187,71 @@ ToolFunctions::printChannelInformation(	int						socket,
 
 	ss << begin_string;
 	ss << "Channel name: " << _channelSettings.nameOfChannel << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
-	
+
 	ss << begin_string;
 	ss << "Channel members: " << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i) // Print channel members
 	{
 		ss << begin_string;
 		ss << _channelSettings.channelMembers.at(i) << std::endl;
-		Server::sendToOneClient(socket, ss.str());
+		Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 		ss.str("");
 	}
 
 	ss << begin_string;
 	ss << "Invite only: " << _channelSettings.i << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << begin_string;
 	ss << "Invited Clients: " << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.invitedClients.size(); ++i) // Print invited clients
 	{
 		ss << begin_string;
 		ss << _channelSettings.invitedClients.at(i) << std::endl;
-		Server::sendToOneClient(socket, ss.str());
+		Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 		ss.str("");
 	}
-	
+
 	ss << begin_string;
 	ss << "t: " << _channelSettings.t << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << begin_string;
 	ss << "Topic: " << _channelSettings.topic << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << begin_string;
 	ss << "Key: " << _channelSettings.k << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 
 	ss << begin_string;
 	ss << "Channel Ops: " << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
-	
+
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.o.size(); ++i) // Print channel ops
 	{
 		ss << begin_string;
 		ss << _channelSettings.o.at(i) << std::endl;
-		Server::sendToOneClient(socket, ss.str());
+		Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 		ss.str("");
 	}
-	
+
 	ss << begin_string;
 	ss << "Limit how many users: " << _channelSettings.l << std::endl;
-	Server::sendToOneClient(socket, ss.str());
+	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 }
 

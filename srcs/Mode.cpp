@@ -1,33 +1,45 @@
 
 #include "Mode.hpp"
+#include "Kick.hpp"
 #include "ToolFunctions.hpp"
 #include "irc.hpp"
 
+void	Mode::_kickOffExcessUsers(int socket, Channel &channel, t_server_mode &serverSettings)
+{
+	while (channel.howManyMembersOnChannel() > channel.getUserLimit())
+	{
+		std::string	kick_cmd = "KICK " + channel.getChannelName() + " ";
+		kick_cmd += ToolFunctions::findNickName(channel.getLastUsersSocket(), serverSettings.clients);
+		kick_cmd += " :User limit exceeded\r\n";
+		Kick::kickCommand(socket, kick_cmd, serverSettings);
+	}
+}
+
 bool	Mode::_channelIssues(std::string nick, int socket, std::string chan_name,
-	std::vector<Channel> &channels, std::vector<std::string>::size_type	i)
+	std::vector<Channel> &channels, std::vector<std::string>::size_type	i, bool debug)
 {
 	if (i == channels.size())
 	{
 		Server::sendAnswer(socket, nick,
-			ERR_NOSUCHCHANNEL, chan_name + " :No such channel");
+			ERR_NOSUCHCHANNEL, chan_name + " :No such channel", debug);
 		return (true);
 	}
 	if (!channels.at(i).isOnChannel(socket))
 	{
 		Server::sendAnswer(socket, nick,
-			ERR_NOTONCHANNEL, chan_name + " :You're not on that channel");
+			ERR_NOTONCHANNEL, chan_name + " :You're not on that channel", debug);
 		return (true);
 	}
 	if (!channels.at(i).hasOps(socket))
 	{
 		Server::sendAnswer(socket, nick,
-			ERR_CHANOPRIVSNEEDED, chan_name + " :You're not channel operator");
+			ERR_CHANOPRIVSNEEDED, chan_name + " :You're not channel operator", debug);
 		return (true);
 	}
 	return (false);
 }
 
-void	Mode::_modeMessage(Channel &channel, std::string user_id, std::string flag, std::string arg)
+void	Mode::_modeMessage(Channel &channel, std::string user_id, std::string flag, std::string arg, bool debug)
 {
 	std::string	msg;
 
@@ -37,7 +49,7 @@ void	Mode::_modeMessage(Channel &channel, std::string user_id, std::string flag,
 	if (!arg.empty())
 		msg += " " + arg;
 	msg += "\r\n";
-	channel.sendToAllChannelMembers(msg);
+	channel.sendToAllChannelMembers(msg, debug);
 }
 
 void	Mode::modeCommand(int socket, Client &client,
@@ -55,7 +67,7 @@ void	Mode::modeCommand(int socket, Client &client,
 		if (serverSettings.channels.at(i).getChannelName() == args.at(1))
 			break ;
 	}
-	if (_channelIssues(client.getNick(), socket, args.at(1), serverSettings.channels, i))
+	if (_channelIssues(client.getNick(), socket, args.at(1), serverSettings.channels, i, serverSettings.debug))
 		return ;
 	switch (mode)
 	{
@@ -73,13 +85,13 @@ void	Mode::modeCommand(int socket, Client &client,
 			break ;
 		case K:
 			if (serverSettings.channels.at(i).isThereKey())
-				Server::sendAnswer(socket, client.getNick(), ERR_KEYSET, args.at(1) + " :Channel key already set");
+				Server::sendAnswer(socket, client.getNick(), ERR_KEYSET, args.at(1) + " :Channel key already set", serverSettings.debug);
 			else
 				serverSettings.channels.at(i).setKey(args.at(3));
 			return ;
 		case K_OFF:
 			if (!serverSettings.channels.at(i).doesKeyMatch(args.at(3)))
-				Server::sendAnswer(socket, client.getNick(), ERR_BADCHANNELKEY, args.at(3) + " :Key doesn't match.");
+				Server::sendAnswer(socket, client.getNick(), ERR_BADCHANNELKEY, args.at(3) + " :Key doesn't match.", serverSettings.debug);
 			else
 				serverSettings.channels.at(i).setKey("");
 			return ;
@@ -87,7 +99,7 @@ void	Mode::modeCommand(int socket, Client &client,
 			target_socket = ToolFunctions::findSocketForClientFromName(args.at(3), serverSettings.clients);
 			if (!target_socket || !serverSettings.channels.at(i).isOnChannel(socket))
 				Server::sendAnswer(socket, client.getNick(), ERR_USERNOTINCHANNEL,
-					args.at(3) + " " + args.at(1) + " :They aren't on that channel");
+					args.at(3) + " " + args.at(1) + " :They aren't on that channel", serverSettings.debug);
 			else
 				serverSettings.channels.at(i).giveOps(target_socket);
 			return ;
@@ -95,7 +107,7 @@ void	Mode::modeCommand(int socket, Client &client,
 			target_socket = ToolFunctions::findSocketForClientFromName(args.at(3), serverSettings.clients);
 			if (!target_socket || !serverSettings.channels.at(i).isOnChannel(socket))
 				Server::sendAnswer(socket, client.getNick(), ERR_USERNOTINCHANNEL,
-					args.at(3) + " " + args.at(1) + " :They aren't on that channel");
+					args.at(3) + " " + args.at(1) + " :They aren't on that channel", serverSettings.debug);
 			else
 				serverSettings.channels.at(i).removeOps(target_socket);
 			return ;
@@ -111,5 +123,6 @@ void	Mode::modeCommand(int socket, Client &client,
 			return ;
 	}
 	_modeMessage(serverSettings.channels.at(i), USER_ID(client.getNick(), client.getUserName()),
-		args.at(2), mode_arg);
+		args.at(2), mode_arg, serverSettings.debug);
+	_kickOffExcessUsers(socket, serverSettings.channels.at(i), serverSettings);
 }

@@ -17,9 +17,9 @@ class Topic
 
 	private:
 
-		static void	_displayTopic(std::string nick, int socket, Channel &channel);
+		static void	_displayTopic(std::string nick, int socket, Channel &channel, bool debug);
 		static bool	_channelIssues(std::string nick, int socket, std::string chan_name,
-			std::vector<Channel> &channels, std::vector<std::string>::size_type	i, bool change_topic);
+			std::vector<Channel> &channels, std::vector<std::string>::size_type	i, bool change_topic, bool debug);
 		static std::string	_combineArgs(std::vector<std::string> args);
 		Topic();
 		Topic(const Topic &src);

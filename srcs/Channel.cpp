@@ -10,7 +10,7 @@ Channel::Channel(const std::string name, int socketDescriptor)
 	_channelSettings.channelMembers.push_back(socketDescriptor);
 	_channelSettings.i = OFF;
 	_channelSettings.t = OFF;
-	_channelSettings.topic = "Happy days!";
+	_channelSettings.topic = "";
 	_channelSettings.l = MAX_AMOUNT_CLIENTS;
 }
 
@@ -177,7 +177,7 @@ Channel::doesKeyMatch(const std::string &key) const
 }
 
 void
-Channel::sendToAllChannelMembers(const std::string msg)
+Channel::sendToAllChannelMembers(const std::string msg, bool debug)
 {
 	std::stringstream		message;
 	const char				*buffer;
@@ -190,14 +190,15 @@ Channel::sendToAllChannelMembers(const std::string msg)
 	{
 		if (_channelSettings.channelMembers.at(i) != 0)
 		{
-			std::cerr << buffer; //debug // Tarvitaanko viela? Voisi harkita etta tehdaan joku muuttuja esim. DEBUG_PRINTING 1 tai 0 rippuen siita tulostetaanto serverin input ja output messageja
+			if (debug)
+				std::cout << buffer; //debug
 			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
 		}
 	}
 }
 
 void
-Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg)
+Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg, bool debug)
 {
 	std::stringstream		message;
 	const char				*buffer;
@@ -210,7 +211,8 @@ Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::strin
 	{
 		if (_channelSettings.channelMembers.at(i) != 0 && socket != _channelSettings.channelMembers.at(i))
 		{
-			std::cerr << buffer; //debug // Tarvitaanko viela? Voisi harkita etta tehdaan joku muuttuja esim. DEBUG_PRINTING 1 tai 0 rippuen siita tulostetaanto serverin input ja output messageja
+			if (debug)
+				std::cerr << buffer; //debug
 			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
 		}
 	}
@@ -300,4 +302,9 @@ int
 Channel::getUserLimit() const
 {
 	return (_channelSettings.l);
+}
+
+int Channel::getLastUsersSocket() const
+{
+	return (_channelSettings.channelMembers.back());
 }

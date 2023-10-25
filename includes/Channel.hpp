@@ -39,8 +39,8 @@ class Channel
 		int						isThereKey() const;
 		void					setKey(std::string new_key);
 		int						doesKeyMatch(const std::string &key) const;
-		void					sendToAllChannelMembers(const std::string message);
-		void					sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg);
+		void					sendToAllChannelMembers(const std::string message, bool debug);
+		void					sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg, bool debug);
 		const std::vector<int>& returnChannelMembers() const;
 		int 					hasOps(int socket) const;
 		void					giveOps(int socket);
@@ -49,6 +49,7 @@ class Channel
 		void					setTopicMode(int mode);
 		void					setUserLimit(int amount);
 		int						getUserLimit() const;
+		int						getLastUsersSocket() const;
 		void					setNewOpIfNoOp();
 		void					takeOverChannel(int socket);
 		const t_channel_mode	&giveChannelSettings() const;

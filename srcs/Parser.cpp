@@ -369,6 +369,14 @@ void	Parser::parsePrivmsg()
 		_assignParserMessage(ERR_NOTEXTTOSEND, ":No text to send");
 }
 
+void	Parser::parseWhoIs()
+{
+	if (_args.size() < 2)
+		_assignParserMessage(ERR_NONICKNAMEGIVEN, ":No nickname given");
+	else if (_args.size() > 2)
+		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(2) + " :Too many targets");
+}
+
 void	Parser::parsePing(std::string serverName)
 {
 	if (_args.size() < 2)

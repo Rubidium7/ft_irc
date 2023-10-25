@@ -17,11 +17,11 @@ std::string	User::_parseRealName(std::vector<std::string> args)
 	return (real_name);
 }
 
-void	User::userCommand(int socket, Client &client, std::vector<std::string> args)
+void	User::userCommand(int socket, Client &client, std::vector<std::string> args, bool debug)
 {
 	if (!client.getUserName().empty())
 	{
-		Server::sendAnswer(socket, client.getNick(), ERR_ALREADYREGISTERED, ":Already registered as " + client.getUserName());
+		Server::sendAnswer(socket, client.getNick(), ERR_ALREADYREGISTERED, ":Unauthorized command (already registered)", debug);
 		return ;
 	}
 	client.setUserName(args.at(1));

@@ -20,23 +20,23 @@ void	Invite::inviteCommand(int socket, Client &client,
 	if (!serverSettings.channels.at(i).isOnChannel(socket))
 	{
 		Server::sendAnswer(socket, client.getNick(), ERR_NOTONCHANNEL,
-			serverSettings.channels.at(i).getChannelName() + " :You're not on that channel");
+			serverSettings.channels.at(i).getChannelName() + " :You're not on that channel", serverSettings.debug);
 		return ;
 	}
 	if (serverSettings.channels.at(i).isInviteOnly() && !serverSettings.channels.at(i).hasOps(socket))
 	{
 		Server::sendAnswer(socket, client.getNick(), ERR_CHANOPRIVSNEEDED,
-			serverSettings.channels.at(i).getChannelName() + " :You're not channel operator");
+			serverSettings.channels.at(i).getChannelName() + " :You're not channel operator", serverSettings.debug);
 		return ;
 	}
 	target_socket = ToolFunctions::findSocketForClientFromName(args.at(1), serverSettings.clients);
 	if (!target_socket)
 	{
 		Server::sendAnswer(socket, client.getNick(), ERR_NOSUCHNICK,
-			args.at(1) + " :No such nick");
+			args.at(1) + " :No such nick", serverSettings.debug);
 		return ;
 	}
 	serverSettings.channels.at(i).addInvitation(target_socket);
 	Server::sendToOneClient(target_socket, ":" + USER_ID(client.getNick(),
-		client.getUserName()) + " INVITE " + args.at(1) + " " + args.at(2) + "\r\n");
+		client.getUserName()) + " INVITE " + args.at(1) + " " + args.at(2) + "\r\n", serverSettings.debug);
 }

@@ -31,6 +31,7 @@ class Client
 		void				setRealName(std::string realName);
 		std::string			getHostName() const;
 		void				setHostName(std::string hostName);
+		bool				hasGivenPass() const;
 		int					registrationStatus() const;
 		void				setGivenPass(bool truth);
 		void				clearInfo();

@@ -21,14 +21,15 @@ void	Nick::nickCommand(int socket, Client &client, std::string nick, t_server_mo
 		return ; //idk if this should be an error or not
 	if (nick == "Gollum")
 	{
-		Server::sendAnswer(socket, client.getNick(), ERR_ERRONEUSNICKNAME, nick + " :Nickname reserved.");
+		Server::sendAnswer(socket, client.getNick(), ERR_ERRONEUSNICKNAME, nick + " :Nickname reserved.", serverSettings.debug);
 		return ;
 	}
 	if (_nickInUse(nick, serverSettings.clients))
 	{
-		Server::sendAnswer(socket, client.getNick(), ERR_NICKNAMEINUSE, nick + " :Nickname is already in use.");
+		Server::sendAnswer(socket, client.getNick(), ERR_NICKNAMEINUSE, nick + " :Nickname is already in use.", serverSettings.debug);
 		return ;
 	}
-	Server::sendToOneClient(socket, ":" + USER_ID(client.getNick(), client.getUserName()) + " NICK " + nick + "\r\n");
+	Server::sendToOneClient(socket, ":" + USER_ID(client.getNick(),
+		client.getUserName()) + " NICK " + nick + "\r\n", serverSettings.debug);
 	client.setNick(nick);
 }

@@ -22,10 +22,11 @@ class Mode
 
 		Mode &operator=(const Mode &rhs);
 
+		static void	_kickOffExcessUsers(int socket, Channel &channel, t_server_mode &serverSettings);
 		static bool	_channelIssues(std::string nick, int socket, std::string chan_name,
-			std::vector<Channel> &channels, std::vector<std::string>::size_type i);
+			std::vector<Channel> &channels, std::vector<std::string>::size_type i, bool debug);
 		static void	_modeMessage(Channel &channel, std::string user_id,
-			std::string flag, std::string arg);
+			std::string flag, std::string arg, bool debug);
 };
 
 #endif

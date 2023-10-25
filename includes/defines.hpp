@@ -18,10 +18,10 @@
 
 typedef enum e_registration
 {
-	NO_NICK,
-	NO_USER,
+	REGISTERED,
 	NO_PASS,
-	REGISTERED
+	NO_NICK,
+	NO_USER
 }	t_registration;
 
 typedef enum e_error
@@ -50,6 +50,8 @@ typedef enum e_code
 	RPL_MYINFO = 4,
 	RPL_BOUNCE = 5,
 	RPL_HELLO = 20,
+	RPL_WHOISUSER = 311,
+	RPL_ENDOFWHOIS = 318,
 	RPL_NOTOPIC = 331,
 	RPL_TOPIC = 332,
 	RPL_TOPICTIME = 333,
@@ -106,7 +108,7 @@ typedef enum e_command
 	TOPIC,
 	KICK,
 	QUIT,
-	DEBUG
+	WHOIS
 }	t_command;
 
 typedef enum e_mode

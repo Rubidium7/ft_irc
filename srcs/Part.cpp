@@ -15,7 +15,7 @@ Part::partCommand(	int 			socket,
 	for (std::vector<std::string>::size_type i = 0; i < temp_channels.size(); ++i)
 	{
 		if (!ToolFunctions::doesChannelExistWithName(temp_channels.at(i), _serverSettings.channels))
-			Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ":No such channel");
+			Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ":No such channel", _serverSettings.debug);
 		for (std::vector<Channel>::size_type k = 0; k < _serverSettings.channels.size(); ++k)
 		{
 			if (temp_channels.at(i) == _serverSettings.channels.at(k).getChannelName())
@@ -23,7 +23,7 @@ Part::partCommand(	int 			socket,
 				if (_serverSettings.channels.at(k).isOnChannel(socket)) // Client on channel
 					_partCommandClientOnChannelHelper(socket, full_command, k, _serverSettings);
 				else // Client not on channel
-					Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOTONCHANNEL, ":Not on that channel");
+					Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOTONCHANNEL, ":Not on that channel", _serverSettings.debug);
 				break ;
 			}
 		}
@@ -42,7 +42,7 @@ Part::partFromAllChannels(	int 			socket,
 			ss << ":";
 			ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
 			ss << " PART " << _serverSettings.channels.at(i).getChannelName() << " :" << std::endl;
-			_serverSettings.channels.at(i).sendToAllChannelMembers(ss.str());
+			_serverSettings.channels.at(i).sendToAllChannelMembers(ss.str(), _serverSettings.debug);
 			ss.str("");
 			_serverSettings.channels.at(i).partFromChannel(socket);
 			_serverSettings.channels.at(i).setNewOpIfNoOp();
@@ -88,7 +88,7 @@ Part::_partCommandClientOnChannelHelper(const int 						&socket,
 		ss << " ";
 		ss << full_command.substr(position)  << std::endl;
 	}
-	_serverSettings.channels.at(k).sendToAllChannelMembers(ss.str());
+	_serverSettings.channels.at(k).sendToAllChannelMembers(ss.str(), _serverSettings.debug);
 	_serverSettings.channels.at(k).partFromChannel(socket);
 	_serverSettings.channels.at(k).setNewOpIfNoOp();
 	ss.str("");

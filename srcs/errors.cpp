@@ -4,7 +4,7 @@
 int	print_error(t_error_code type)
 {
 	if (type == WRONG_ARGS)
-		std::cerr << "[USAGE]: ./ircserv <port> <password>" << std::endl;
+		std::cerr << "[USAGE]: ./ircserv <port> <password> optional: debug" << std::endl;
 	if (type == PASSWD_TOO_LONG)
 		std::cerr << "password has to be 100 characters or less" << std::endl;
 	if (type == PASSWD_NON_CHAR)

@@ -9,13 +9,15 @@
 #include "Invite.hpp"
 #include "Kick.hpp"
 #include "Privmsg.hpp"
+#include "WhoIs.hpp"
 
 std::string	Server::_hostName = "localhost";
 
-Server::Server(int port, std::string password)
+Server::Server(int port, std::string password, bool debug)
 {
 	_serverSettings.password = password;
 	_serverSettings.failure = NO_ERROR;
+	_serverSettings.debug = debug;
 	memset(_serverSettings.socketSettings.sin_zero, 0, sizeof(_serverSettings.socketSettings.sin_zero));
 	_serverSettings.socketSettings.sin_family = AF_INET;
 	_serverSettings.socketSettings.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
@@ -104,14 +106,15 @@ Server::_assignServerMessage(t_code code, std::string msg)
 void
 Server::_sendMessageFromStruct(int socket, t_message message)
 {
-	std::cerr << message.msg << std::endl; //debug // Onko viela tarpeellinen?
-	sendAnswer(socket, _matchClient(socket).getNick(), message.code, message.msg);
+	if (_serverSettings.debug)
+		std::cerr << message.msg << std::endl; //debug
+	sendAnswer(socket, _matchClient(socket).getNick(), message.code, message.msg, _serverSettings.debug);
 }
 
 Client	&
 Server::_matchClient(int socket)
 {
-	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
+	for (int i = 0; i < MAX_AMOUNT_CLIENTS; i++)
 	{
 		if (_serverSettings.clients[i].getSocket() == socket)
 		{
@@ -122,28 +125,7 @@ Server::_matchClient(int socket)
 }
 
 void
-Server::sendToClients(std::string msg)
-{
-	std::stringstream		message;
-	const char				*buffer;
-	std::string::size_type	size;
-
-	message << msg;
-	buffer = message.str().c_str();
-	size = message.str().size();
-	for (int i = 0; i < MAX_AMOUNT_CLIENTS; i++)
-	{
-		if (_serverSettings.clients[i].getSocket() != 0)
-		{
-			// for debug printing
-			std::cerr << "i = " << i << " client nro: " << _serverSettings.clients[i].getSocket() << std::endl; // Onko viela tarpeellinen?
-			send(_serverSettings.clients[i].getSocket(), buffer, size, 0);
-		}
-	}
-}
-
-void
-Server::sendAnswer(int socket, std::string nick, t_code code, std::string msg)
+Server::sendAnswer(int socket, std::string nick, t_code code, std::string msg, bool debug)
 {
 	std::stringstream		message;
 	std::string				tempMessage;
@@ -160,14 +142,14 @@ Server::sendAnswer(int socket, std::string nick, t_code code, std::string msg)
 	message.str("");
 	buffer = tempMessage.c_str();
 	size = tempMessage.size();
-	// std::cerr << "sending a message:" << std::endl; //debug
-	std::cerr << buffer; //debug // Onko viela tarpeellinen?
+	if (debug)
+		std::cerr << buffer; //debug
 	send(socket, buffer, size, 0);
 	buffer = NULL;
 }
 
 void
-Server::sendToOneClient(int socket, std::string msg)
+Server::sendToOneClient(int socket, std::string msg, bool debug)
 {
 	std::stringstream		message;
 	std::string				tempMessage;
@@ -179,7 +161,8 @@ Server::sendToOneClient(int socket, std::string msg)
 	message.str("");
 	buffer = tempMessage.c_str();
 	size = tempMessage.size();
-	std::cerr << buffer; //debug // Viela tarpeellinen?
+	if (debug)
+		std::cerr << buffer; //debug
 	send(socket, buffer, size, 0);
 }
 
@@ -203,7 +186,7 @@ Server::newClient(void)
 	if (_clientIndex >= MAX_AMOUNT_CLIENTS)
 	{
 		print_error(TOO_MANY_CLIENTS);
-		sendAnswer(new_client, "*", RPL_BOUNCE, ":Server is full");
+		sendAnswer(new_client, "*", RPL_BOUNCE, ":Server is full", _serverSettings.debug);
 		close(new_client);
 		FD_CLR(new_client, &_serverSettings.activeSockets);
 		return ;
@@ -220,7 +203,8 @@ Server::clientExit(int socket, t_server_mode &_serverSettings, const std::string
 	for (size_t i = 0; i != _serverSettings.channels.size(); i++)
 	{
 		if (_serverSettings.channels.at(i).isOnChannel(socket))
-			_serverSettings.channels.at(i).sendToAllChannelMembers(":" + USER_ID(_matchClient(socket).getNick(), _matchClient(socket).getUserName()) + " QUIT" + msg + "\r\n");
+			_serverSettings.channels.at(i).sendToAllChannelMembers(":" + USER_ID(_matchClient(socket).getNick(),
+				_matchClient(socket).getUserName()) + " QUIT" + msg + "\r\n", _serverSettings.debug);
 	}
 	close(socket);
 	_serverSettings.clientBuffers.at(socket).clear();
@@ -242,9 +226,6 @@ Server::receiveMessage(int socket)
 	else
 	{
 		_serverSettings.buffer[bytes_read] = '\0';
-		// Print what client sent
-		//std::cout << "Client: " << socket << " " << "Sent: #" << _serverSettings.buffer << "#" << std::endl; // Viela tarpeellinen?
-
 		// Add buffer to clientbuffer
 		for (int i = 0; _serverSettings.buffer[i]; i++)
 		{
@@ -253,12 +234,9 @@ Server::receiveMessage(int socket)
 
 		while (_serverSettings.clientBuffers.at(socket).find(EOM) != std::string::npos)
 		{
-		//	std::cout << "client id: " << socket << " buffer contents is:" << std::endl
-		//	<< _clientBuffers.at(socket) << std::endl;
 			_handleCommands(socket);
 		}
 
-		// sendToClients(_buffer); Needed ??? // Viela tarpeellinen?
 	}
 }
 
@@ -283,42 +261,42 @@ Server::_messageOfTheDay(	int socket,
 
 	msg = ":- " + _hostName;
 	msg += " Message of the Day -";
-	sendAnswer(socket, nick, RPL_MOTDSTART, msg);
+	sendAnswer(socket, nick, RPL_MOTDSTART, msg, _serverSettings.debug);
 	msg.clear();
 	msg = "Hello this is the server woo";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ": █     █░▓█████  ██▓     ▄████▄   ▒█████   ███▄ ▄███▓▓█████    ";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":▓█░ █ ░█░▓█   ▀ ▓██▒    ▒██▀ ▀█  ▒██▒  ██▒▓██▒▀█▀ ██▒▓█   ▀    ";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":▒█░ █ ░█ ▒███   ▒██░    ▒▓█    ▄ ▒██░  ██▒▓██    ▓██░▒███      ";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":░█░ █ ░█ ▒▓█  ▄ ▒██░    ▒▓▓▄ ▄██▒▒██   ██░▒██    ▒██ ▒▓█  ▄    ";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":░░██▒██▓ ░▒████▒░██████▒▒ ▓███▀ ░░ ████▓▒░▒██▒   ░██▒░▒████▒   ";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":░ ▓░▒ ▒  ░░ ▒░ ░░ ▒░▓  ░░ ░▒ ▒  ░░ ▒░▒░▒░ ░ ▒░   ░  ░░░ ▒░ ░   ";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":  ▒ ░ ░   ░ ░  ░░ ░ ▒  ░  ░  ▒     ░ ▒ ▒░ ░  ░      ░ ░ ░  ░   ";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":  ░   ░     ░     ░ ░   ░        ░ ░ ░ ▒  ░      ░      ░      ";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":    ░       ░  ░    ░  ░░ ░          ░ ░         ░      ░  ░";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":                        ░                                      ";
-	sendAnswer(socket, nick, RPL_MOTD, msg);
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
-	sendAnswer(socket, nick, RPL_ENDOFMOTD, ":End of MOTD command.");
+	sendAnswer(socket, nick, RPL_ENDOFMOTD, ":End of MOTD command.", _serverSettings.debug);
 }
 
 void
@@ -331,33 +309,57 @@ Server::_newUserMessage(int socket,
 	nick = client.getNick();
 	msg  = ":Welcome to the server ";
 	msg += USER_ID(nick, client.getUserName());
-	sendAnswer(socket, nick, RPL_WELCOME, msg);
+	sendAnswer(socket, nick, RPL_WELCOME, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":Your host is " + _hostName;
 	msg += ", running version v0.1";
-	sendAnswer(socket, nick, RPL_YOURHOST, msg);
+	sendAnswer(socket, nick, RPL_YOURHOST, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ":This server was created 17/08/2023 13:53:54"; //just made it up :p // ;)
-	sendAnswer(socket, nick, RPL_CREATED, msg);
+	sendAnswer(socket, nick, RPL_CREATED, msg, _serverSettings.debug);
 	msg.clear();
 	msg = _hostName + " v0.1 o iklot";
 	//<server_name> <version> <usermodes> <chanmodes> // Selittaako tama jotain vai voiko poistaa?
-	sendAnswer(socket, nick, RPL_MYINFO, msg);
+	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
 	msg.clear();
 	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=12";
 	msg += " TOPICLEN=255 KICKLEN=255 CHANNELLEN=50 CHANMODES=k,l,i,t";
 	msg += " :are supported by this server";
-	sendAnswer(socket, nick, RPL_MYINFO, msg);
+	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
 	msg.clear();
 	//much more info can be added to 005 msg ^^^	// Viela tarpeellinen?
 	_messageOfTheDay(socket, nick);
+}
+
+bool
+Server::_notRegisteredIssue(int socket, Client &client, t_command command, std::vector<std::string> args)
+{
+	if (command == NOT_COMMAND)
+	{
+		sendAnswer(socket, client.getNick(), ERR_UNKNOWNCOMMAND, args.at(0) + " :Unknown command", _serverSettings.debug);
+		return (true);
+	}
+	if (command == CAP || (command == JOIN && args.size() == 2 && args.at(1) == ":"))
+		return (false);
+	if (command != PASS && !client.hasGivenPass())
+	{
+		sendAnswer(socket, client.getNick(), ERR_PASSWDMISMATCH, ":You need to give a password", _serverSettings.debug);
+		clientExit(socket, _serverSettings, " :");
+		return (true);
+	}
+	if (command != NICK && command != USER && command != PASS && command != QUIT)
+	{
+		sendAnswer(socket, client.getNick(), ERR_NOTREGISTERED, ":You have not registered", _serverSettings.debug);
+		return (true);
+	}
+	return (false);
 }
 
 void
 Server::_handleCommands(int socket)
 {
 	t_command	command = _returnFirstPartOfCommand(_serverSettings.clientBuffers.at(socket));
-	bool		new_user = false;
+	int			beginning_status;
 
 	int newline_pos = _serverSettings.clientBuffers.at(socket).find(EOM);
 	std::string full_command = _serverSettings.clientBuffers.at(socket).substr(0, newline_pos);
@@ -366,20 +368,16 @@ Server::_handleCommands(int socket)
 	else
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 2);
 
-	std::cout << full_command << std::endl; //debug // Viela tarpeellinen?
+	if (_serverSettings.debug)
+		std::cout << full_command << std::endl; //debug
 	_clearMessage();
 
-	if (_matchClient(socket).registrationStatus() != REGISTERED)
-		new_user = true;
+	beginning_status = _matchClient(socket).registrationStatus();
 	Parser	parser(full_command);
 	if (!parser.getArgs().size())
 		return ;
-	if (new_user && (command != NICK && command != USER && command != QUIT &&
-			command != PASS && command != CAP && command != JOIN))
-	{
-		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
+	if (beginning_status && _notRegisteredIssue(socket, _matchClient(socket), command, parser.getArgs()))
 		return ;
-	}
 	switch(command)
 	{
 		case CAP:
@@ -391,10 +389,8 @@ Server::_handleCommands(int socket)
 				break ;
 			if (parser.getArgs().at(1) == ":")
 				_handleJoinColon(socket);
-			else if (_matchClient(socket).registrationStatus() == REGISTERED)
-				Join::joinCommand(socket, full_command, _serverSettings);
 			else
-				_assignServerMessage(ERR_NOTREGISTERED, ":You have not registered");
+				Join::joinCommand(socket, full_command, _serverSettings);
 			break ;
 		case MODE:
 			parser.parseMode(_matchClient(socket).getNick());
@@ -414,7 +410,7 @@ Server::_handleCommands(int socket)
 		case USER:
 			parser.parseUser();
 			if (!parser.getMessageCode())
-				User::userCommand(socket, _matchClient(socket), parser.getArgs());
+				User::userCommand(socket, _matchClient(socket), parser.getArgs(), _serverSettings.debug);
 			break ;
 		case PASS:
 			parser.parsePass();
@@ -428,7 +424,7 @@ Server::_handleCommands(int socket)
 			break ;
 		case PRIVMSG:
 			parser.parsePrivmsg();
-			if (!parser.getMessageCode()) // Onko tama parseri jo toimiva? Poistin nimittain aivan kaiken virhetarkastelut tasta komennosta
+			if (!parser.getMessageCode())
 				Privmsg::privmsgCommand(socket, full_command, _serverSettings);
 			break;
 		case PING:
@@ -443,13 +439,18 @@ Server::_handleCommands(int socket)
 			break ;
 		case KICK:
 			parser.parseKick();
-			if (!parser.getMessageCode()) // Onko tama parseri jo toimiva? Tama kasky ei enaa tarkasta yhtaan mitaan
+			if (!parser.getMessageCode())
 				Kick::kickCommand(socket, full_command, _serverSettings);
 			break ;
 		case QUIT:
 			parser.parseQuit();
 			if (!parser.getMessageCode())
 				_handleQuit(socket, parser.getArgs());
+			break ;
+		case WHOIS:
+			parser.parseWhoIs();
+			if (!parser.getMessageCode())
+				WhoIs::whoIsCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
 			break ;
 		default:
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
@@ -459,7 +460,7 @@ Server::_handleCommands(int socket)
 		_sendMessageFromStruct(socket, _serverSettings.message);
 	if (parser.getMessageCode())
 		_sendMessageFromStruct(socket, parser.getMessage());
-	if (_matchClient(socket).registrationStatus() == REGISTERED && new_user)
+	if (_matchClient(socket).registrationStatus() == REGISTERED && beginning_status)
 		_newUserMessage(socket, _matchClient(socket));
 }
 
@@ -480,7 +481,7 @@ Server::_returnFirstPartOfCommand(std::string command) const
 		{"TOPIC", TOPIC},
 		{"KICK", KICK},
 		{"QUIT", QUIT},
-		{"DEBUG", DEBUG}
+		{"WHOIS", WHOIS}
 	};
 	std::stringstream ss(command);
 	std::string first_part;
@@ -497,9 +498,9 @@ Server::_returnFirstPartOfCommand(std::string command) const
 void
 Server::_handleJoinColon(int socket)
 {
-	sendAnswer(socket, _matchClient(socket).getNick(), RPL_HELLO, ":Please wait while we process your connection.");
+	sendAnswer(socket, _matchClient(socket).getNick(), RPL_HELLO, ":Please wait while we process your connection.", _serverSettings.debug);
 	if (_matchClient(socket).registrationStatus() != REGISTERED)
-		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered");
+		sendAnswer(socket, _matchClient(socket).getNick(), ERR_NOTREGISTERED, ":You have not registered", _serverSettings.debug);
 }
 
 void
@@ -518,5 +519,5 @@ Server::_handleQuit(int socket, std::vector<std::string> args)
 void
 Server::_handlePing(int socket)
 {
-	sendToOneClient(socket, ":" + _hostName + " PONG " + _hostName + " :" + _hostName + "\r\n");
+	sendToOneClient(socket, ":" + _hostName + " PONG " + _hostName + " :" + _hostName + "\r\n", _serverSettings.debug);
 }

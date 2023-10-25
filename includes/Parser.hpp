@@ -25,6 +25,7 @@ class Parser
 		void						parsePass();
 		void						parsePart();
 		void						parseQuit();
+		void						parseWhoIs();
 		void						parseKick();
 		void						parseTopic();
 		void						parsePrivmsg();

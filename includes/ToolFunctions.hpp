@@ -22,7 +22,7 @@ class ToolFunctions
 		static int			doesChannelExistWithName(const std::string &nameChannel,
 			const std::vector<Channel> &channels);
 		static void			listChannelsToOneSocket(int socket, const t_server_mode &_serverSettings);
-		static void			listClientsToOneSocket(int socket, const Client clients[]);
+		static void			listClientsToOneSocket(int socket, const Client clients[], bool debug);
 		static void			printClientInformation(int socket,
 			const t_client_mode &_clientSettings, const t_server_mode &_serverSettings);
 		static void			printChannelInformation(int socket,

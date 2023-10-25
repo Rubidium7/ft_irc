@@ -91,15 +91,21 @@ Client::clearInfo()
 	_clientSettings.givenPass = false;
 }
 
+bool
+Client::hasGivenPass() const
+{
+	return (_clientSettings.givenPass);
+}
+
 int
 Client::registrationStatus() const
 {
-	if (!_clientSettings.givenPass)
-		return (NO_PASS);
 	if (_clientSettings.nickName == "*")
 		return (NO_NICK);
 	if (_clientSettings.userName.empty() || _clientSettings.realName.empty() || _clientSettings.hostName.empty())
 		return (NO_USER);
+	if (!_clientSettings.givenPass)
+		return (NO_PASS);
 	return (REGISTERED);
 }
 

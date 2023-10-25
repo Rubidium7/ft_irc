@@ -16,6 +16,7 @@ typedef struct s_server_mode
 {
 	std::string					password;
 	t_error_code				failure;
+	bool						debug;
 	t_message					message;
 	int							serverSocket;
 	struct sockaddr_in			socketSettings;
@@ -32,7 +33,7 @@ typedef struct s_server_mode
 class Server
 {
 	public:
-		Server(int port, std::string password);
+		Server(int port, std::string password, bool debug);
 		~Server();
 		t_error_code	checkFailure();
 		void			setReadySockets();
@@ -41,11 +42,10 @@ class Server
 		bool			isInSet(int index);
 		int				getServerSocket();
 		void			newClient();
-		void			sendToClients(std::string msg);
-		static void		sendToOneClient(int socket, std::string msg);
+		static void		sendToOneClient(int socket, std::string msg, bool debug);
 		void			clientExit(int socket, t_server_mode &_serverSettings, const std::string &msg);
 		void			receiveMessage(int socket);
-		static void		sendAnswer(int socket, std::string nick, t_code code, std::string msg);
+		static void		sendAnswer(int socket, std::string nick, t_code code, std::string msg, bool debug);
 
 	private:
 		Server();
@@ -57,6 +57,7 @@ class Server
 		void			_sendMessageFromStruct(int socket, t_message message);
 		Client			&_matchClient(int socket);
 		int				_findSmallestFreeClientIndex() const;
+		bool			_notRegisteredIssue(int socket, Client &client, t_command command, std::vector<std::string> args);
 		void			_handleCommands(int socket);
 		t_command		_returnFirstPartOfCommand(std::string command) const;
 		void			_handleNewRegistration(int socket);

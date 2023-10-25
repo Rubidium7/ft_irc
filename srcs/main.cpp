@@ -3,9 +3,10 @@
 
 int main(int ac, char **av)
 {
-	if (ac != 3)
+	bool	debug = (ac == 4 && !strcmp(av[3], "debug"));
+
+	if (ac != 3 && !debug)
 		return (print_error(WRONG_ARGS));
-	
 	std::string	password(av[2]);
 	if (password.size() > 100)
 		return (print_error(PASSWD_TOO_LONG));
@@ -15,11 +16,11 @@ int main(int ac, char **av)
 	if (port < 10)
 		return (port);
 
-	Server	server(port, password);
+	Server	server(port, password, debug);
 
 	if (server.checkFailure())
 		return (print_error(server.checkFailure()));
-	
+
 	while (42)
 	{
 		server.setReadySockets();
