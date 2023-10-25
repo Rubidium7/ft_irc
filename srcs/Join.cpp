@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Join.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/09/28 16:07:55 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/23 19:36:36 by tpoho            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "Join.hpp"
 #include "Part.hpp"
@@ -86,7 +75,7 @@ void Join::_channelDoesNotExistHelper(const int &socket, const std::string &full
 {
 	_serverSettings.channels.push_back(Channel(temp_channels.at(i), socket)); // Create Channel
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).giveOps(socket); //Give ops to only user
-	
+
 	std::stringstream ss;
 	ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients); // Join message
 	ss << "!" << "localhost" <<  " JOIN " << temp_channels.at(i);
@@ -100,7 +89,7 @@ void Join::_channelDoesNotExistHelper(const int &socket, const std::string &full
 	}
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).sendToAllChannelMembers(ss.str());
 	ss.str("");
-			
+
 	ss << ":localhost " << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients); // Print topic
 	ss << " " << temp_channels.at(i) << " :";
 	ss << _serverSettings.channels.at(_serverSettings.channels.size() - 1).getTopic() << std::endl;
@@ -168,7 +157,7 @@ void Join::_channelDoesNotHaveKeyHelper(const int &socket, const std::vector<Cha
 	}
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).sendToAllChannelMembers(ss.str());
 	ss.str("");
-						
+
 	ss << ":localhost " << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
 	ss << " " << _serverSettings.channels.at(k).getChannelName() << " :";
 	ss << _serverSettings.channels.at(k).getTopic() << std::endl;

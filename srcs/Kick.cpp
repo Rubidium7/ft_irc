@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Kick.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tpoho <tpoho@student.hive.fi>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/06 21:35:34 by tpoho             #+#    #+#             */
-/*   Updated: 2023/10/23 17:27:28 by tpoho            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "Kick.hpp"
 #include "ToolFunctions.hpp"
@@ -115,6 +104,6 @@ void Kick::_goThroughTempUsersLoopHelper(const t_kickcmd_data &data, std::vector
 			_printUserIsNotOnThatChannelError(data, j, _serverSettings);
 			continue ;
 		}
-		_kickUserFromChannel(data, i, temp_user_index, _serverSettings); 
+		_kickUserFromChannel(data, i, temp_user_index, _serverSettings);
 	}
 }
