@@ -57,7 +57,7 @@ Kick::_printDoesChannelExistError(	const t_kickcmd_data 				&data,
 {
 	std::stringstream ss;
 	ss << data.temp_channels.at(j);
-	ss << " :No such channel" << std::endl;
+	ss << " :No such channel";
 	Server::sendAnswer(data.socket, ToolFunctions::findNickName(data.socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ss.str(), _serverSettings.debug);
 	ss.str("");
 }
@@ -69,7 +69,7 @@ Kick::_printYoureNotChannelOperatorError(	t_kickcmd_data						&data,
 {
 	std::stringstream ss;
 	ss << data.temp_channels.at(j);
-	ss << " :You're not channel operator" << std::endl;
+	ss << " :You're not channel operator";
 	Server::sendAnswer(data.socket, ToolFunctions::findNickName(data.socket, _serverSettings.clients), ERR_CHANOPRIVSNEEDED, ss.str(), _serverSettings.debug);
 	ss.str("");
 }
@@ -81,7 +81,7 @@ Kick::_printUserIsNotOnThatChannelError(const t_kickcmd_data				&data,
 {
 	std::stringstream ss;
 	ss << data.temp_channels.at(j);
-	ss << " :User is not on that channel" << std::endl;
+	ss << " :User is not on that channel";
 	Server::sendAnswer(data.socket, ToolFunctions::findNickName(data.socket, _serverSettings.clients), ERR_USERNOTINCHANNEL, ss.str(), _serverSettings.debug);
 	ss.str("");
 }

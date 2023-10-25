@@ -36,7 +36,7 @@ Privmsg::_printNosuchChannelError(	int socket,
 {
 	std::stringstream ss;
 	ss << command_parts.at(1);
-	ss << " :No such channel" << std::endl;
+	ss << " :No such channel";
 	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_NOSUCHCHANNEL, ss.str(), _serverSettings.debug);
 	ss.str("");
 }
@@ -72,7 +72,7 @@ Privmsg::_senderNotOnChannelSenderHelper(	const int &socket,
 	std::stringstream ss;
 
 	ss << command_parts.at(1);
-	ss << " :Cannot send to channel" << std::endl;
+	ss << " :Cannot send to channel";
 	Server::sendAnswer(socket, ToolFunctions::findNickName(socket, _serverSettings.clients), ERR_CANNOTSENDTOCHAN, ss.str(), _serverSettings.debug);
 	ss.str("");
 }
