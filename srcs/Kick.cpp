@@ -127,6 +127,6 @@ Kick::_goThroughTempUsersLoopHelper(const t_kickcmd_data 				&data,
 			_printUserIsNotOnThatChannelError(data, j, _serverSettings);
 			continue ;
 		}
-		_kickUserFromChannel(data, i, temp_user_index, _serverSettings); 
+		_kickUserFromChannel(data, i, temp_user_index, _serverSettings);
 	}
 }

@@ -117,7 +117,7 @@ Join::_channelDoesNotExistHelper(	const int 									&socket,
 	}
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).sendToAllChannelMembers(ss.str());
 	ss.str("");
-			
+
 	ss << ":"; // Print topic
 	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
 	ss << " " << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
@@ -215,7 +215,7 @@ Join::_channelDoesNotHaveKeyHelper(	const int 								&socket,
 	}
 	_serverSettings.channels.at(_serverSettings.channels.size() - 1).sendToAllChannelMembers(ss.str());
 	ss.str("");
-						
+
 	ss << ":";
 	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
 	ss << " " << RPL_TOPIC << " " << ToolFunctions::findNickName(socket, _serverSettings.clients);
