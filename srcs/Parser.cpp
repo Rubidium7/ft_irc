@@ -85,12 +85,12 @@ bool	Parser::_isChannelFormatCorrect(size_t *amountOfChannels)
 	channels = _createVector(_args.at(1), ',');
 	for (size_t i = 0; i != channels.size(); i++)
 	{
-		if (channels.at(i).empty() || (channels.at(i).at(0) != '#' && amountOfChannels)) //remember to check
+		if (channels.at(i).empty() || channels.at(i).at(0) != '#')
 		{
 			_assignParserMessage(ERR_NOSUCHCHANNEL, channels.at(i) + " :Improper channel format");
 			return (false);
 		}
-		if (channels.at(i).size() < 2 && amountOfChannels)
+		if (channels.at(i).size() < 2)
 		{
 			_assignParserMessage(ERR_NOSUCHCHANNEL, channels.at(i) + " :Improper channel format");
 			return (false);
@@ -267,7 +267,7 @@ void	Parser::parseKick()
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
 	else if (_args.size() > 3 && _args.at(3).front() != ':')
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Improper kick message format");
-	else if (_args.at(1).front() != '#' || _args.at(1).size() < 2)
+	else if (!_isChannelFormatCorrect(NULL))
 		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
 }
 

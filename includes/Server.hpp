@@ -17,7 +17,6 @@ typedef struct s_server_mode
 	std::string					password;
 	t_error_code				failure;
 	bool						debug;
-	t_message					message;
 	int							serverSocket;
 	struct sockaddr_in			socketSettings;
 	Client						clients[MAX_AMOUNT_CLIENTS];
@@ -52,8 +51,6 @@ class Server
 		Server(const Server &src);
 		Server	&operator=(const Server &rhs);
 
-		void			_clearMessage();
-		void			_assignServerMessage(t_code code, std::string msg);
 		void			_sendMessageFromStruct(int socket, t_message message);
 		Client			&_matchClient(int socket);
 		int				_findSmallestFreeClientIndex() const;

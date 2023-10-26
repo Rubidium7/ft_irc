@@ -42,8 +42,6 @@ Server::Server(int port, std::string password, bool debug)
 	_serverSettings.clientBuffers.reserve(MAX_AMOUNT_CLIENTS + 4); //0,1,2 plus server is 3 clients start from 4
 	for (std::vector<std::string>::size_type i = 0; i < _serverSettings.clientBuffers.capacity(); i++)
 		_serverSettings.clientBuffers.push_back("");
-	_serverSettings.message.msg = "";
-	_serverSettings.message.code = EMPTY;
 	_serverSettings.isGollumAwake = 0;
 }
 
@@ -87,20 +85,6 @@ int
 Server::getServerSocket(void)
 {
 	return (_serverSettings.serverSocket);
-}
-
-void
-Server::_clearMessage()
-{
-	_serverSettings.message.msg = "";
-	_serverSettings.message.code = EMPTY;
-}
-
-void
-Server::_assignServerMessage(t_code code, std::string msg)
-{
-	_serverSettings.message.msg = msg;
-	_serverSettings.message.code = code;
 }
 
 void
@@ -298,8 +282,6 @@ Server::_handleCommands(int socket)
 
 	if (_serverSettings.debug)
 		std::cout << full_command << std::endl; //debug
-	_clearMessage();
-
 	beginning_status = _matchClient(socket).registrationStatus();
 	Parser	parser(full_command);
 	if (!parser.getArgs().size())
@@ -380,14 +362,12 @@ Server::_handleCommands(int socket)
 			if (!parser.getMessageCode())
 				WhoIs::whoIsCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
 			break ;
-		default: //check if you can just use sendanswer remember
-			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
+		default:
+			sendAnswer(socket, _matchClient(socket).getNick(), ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command", _serverSettings.debug);
+			return ;
 	}
-
-	if (_serverSettings.message.code)
-		_sendMessageFromStruct(socket, _serverSettings.message);
 	if (parser.getMessageCode())
-		_sendMessageFromStruct(socket, parser.getMessage());
+		_sendMessageFromStruct(socket, parser.getMessage()); //parser has assigned it's possible error msg to a struct and here it sends it
 	if (_matchClient(socket).registrationStatus() == REGISTERED && beginning_status)
 		_newUserMessage(socket, _matchClient(socket));
 }
