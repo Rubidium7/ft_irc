@@ -83,8 +83,8 @@ void	Topic::topicCommand(int socket, Client &client,
 		return (_displayTopic(client.getNick(), socket, serverSettings.channels.at(i), serverSettings.debug));
 	std::string input = _combineArgs(args);
 	input.erase(input.begin());
-	if (input.size() > 200)
-		input.erase(200, std::string::npos);
+	if (input.size() > TOPICLEN)
+		input.erase(TOPICLEN, std::string::npos);
 	serverSettings.channels.at(i).setTopic(input);
 	serverSettings.channels.at(i).sendToAllChannelMembers(":" + USER_ID(client.getNick(),
 	client.getUserName()) + " TOPIC " + serverSettings.channels.at(i).getChannelName() + " :" + input + "\r\n",

@@ -85,7 +85,7 @@ bool	Parser::_isChannelFormatCorrect(size_t *amountOfChannels)
 	channels = _createVector(_args.at(1), ',');
 	for (size_t i = 0; i != channels.size(); i++)
 	{
-		if (channels.at(i).empty() || (channels.at(i).at(0) != '#' && amountOfChannels))
+		if (channels.at(i).empty() || (channels.at(i).at(0) != '#' && amountOfChannels)) //remember to check
 		{
 			_assignParserMessage(ERR_NOSUCHCHANNEL, channels.at(i) + " :Improper channel format");
 			return (false);
@@ -216,8 +216,8 @@ void	Parser::parseNick()
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(2) + " :Too many targets");
 		return ;
 	}
-	if (_args.at(1).size() > 12)
-		_args.at(1).erase(12, std::string::npos);
+	if (_args.at(1).size() > NICKLEN)
+		_args.at(1).erase(NICKLEN, std::string::npos);
 
 	std::string	nick = _args.at(1);
 
@@ -288,15 +288,13 @@ void	Parser::parseMode(std::string nick)
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
 		return ;
 	}
-	if (_args.at(1) == nick)
+	if (_args.at(1) == nick) //if a request for a user mode is sent, it is simply ignored since it's out of this project's scope
 		return ;
 	if (_args.at(1).front() != '#' || _args.at(1).size() < 2)
 	{
 		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
 		return ;
 	}
-	// if (_args.size() == 2)
-	// 	return ;
 	t_mode	mode = identifyMode(_args.at(2));
 	switch (mode)
 	{

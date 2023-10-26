@@ -38,7 +38,7 @@ Kick::kickCommand(	int				socket,
 	}
 }
 
-int
+int // Remember to remove and use tool function for this
 Kick::_returnClientSocket(	std::string		nick,
 							t_server_mode	&_serverSettings)
 {
@@ -93,7 +93,7 @@ Kick::_kickUserFromChannel(	const t_kickcmd_data				&data,
 							t_server_mode						&_serverSettings)
 {
 	std::stringstream ss;
-	ss << ":";
+	ss << ":"; // Kick message
 	ss << USER_ID(ToolFunctions::findNickName(data.socket, _serverSettings.clients), ToolFunctions::findUserName(data.socket, _serverSettings.clients));
 	ss << " KICK " << _serverSettings.channels.at(i).getChannelName();
 	ss << " " << data.temp_users.at(k);
@@ -102,7 +102,8 @@ Kick::_kickUserFromChannel(	const t_kickcmd_data				&data,
 			ss << " " << data.full_command.substr(position, KICKLEN);
 	ss << std::endl;
 	_serverSettings.channels.at(i).sendToAllChannelMembers(ss.str(), _serverSettings.debug);
-	ss.str("");
+
+	ss.str(""); // Actual removal of user from channel
 	_serverSettings.channels.at(i).partFromChannel(_returnClientSocket(data.temp_users.at(k), _serverSettings));
 	_serverSettings.channels.at(i).setNewOpIfNoOp();
 	if (_serverSettings.channels.at(i).howManyMembersOnChannel() == 0)

@@ -39,12 +39,13 @@ Part::partFromAllChannels(	int 			socket,
 		if (_serverSettings.channels.at(i).isOnChannel(socket)) // Client on channel
 		{
 			std::stringstream ss;
-			ss << ":";
+			ss << ":"; // Part message
 			ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
 			ss << " PART " << _serverSettings.channels.at(i).getChannelName() << " :" << std::endl;
 			_serverSettings.channels.at(i).sendToAllChannelMembers(ss.str(), _serverSettings.debug);
 			ss.str("");
-			_serverSettings.channels.at(i).partFromChannel(socket);
+
+			_serverSettings.channels.at(i).partFromChannel(socket); // Actual removal from channel
 			_serverSettings.channels.at(i).setNewOpIfNoOp();
 			if (_serverSettings.channels.at(i).howManyMembersOnChannel() == 0) // If channel has no members the channel is removed
 				_serverSettings.channels.erase(_serverSettings.channels.begin() + i--); // i-- because all channels move one step back
@@ -59,7 +60,7 @@ Part::_partCommandClientOnChannelHelper(const int 						&socket,
 										t_server_mode 					&_serverSettings)
 {
 	std::stringstream ss;
-	ss << ":";
+	ss << ":"; // Part message
 	ss << USER_ID(ToolFunctions::findNickName(socket, _serverSettings.clients), ToolFunctions::findUserName(socket, _serverSettings.clients));
 	ss << " PART " << _serverSettings.channels.at(k).getChannelName();
 	std::string::size_type position = full_command.find(":");

@@ -30,7 +30,7 @@ Channel::operator=(const Channel &copy_assignment)
 	if (this == &copy_assignment)
 		return (*this);
 
-	_channelSettings.nameOfChannel	=  copy_assignment._channelSettings.nameOfChannel;
+	_channelSettings.nameOfChannel	= copy_assignment._channelSettings.nameOfChannel;
 	_channelSettings.channelMembers = copy_assignment._channelSettings.channelMembers;
 	_channelSettings.i				= copy_assignment._channelSettings.i;
 	_channelSettings.invitedClients	= copy_assignment._channelSettings.invitedClients;
@@ -314,7 +314,8 @@ Channel::getUserLimit() const
 	return (_channelSettings.l);
 }
 
-int Channel::getLastUsersSocket() const
+int
+Channel::getLastUsersSocket() const
 {
 	return (_channelSettings.channelMembers.back());
 }

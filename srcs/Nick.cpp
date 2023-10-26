@@ -18,7 +18,7 @@ bool	Nick::_nickInUse(std::string &nick, Client *clients)
 void	Nick::nickCommand(int socket, Client &client, std::string nick, t_server_mode &serverSettings)
 {
 	if (client.getNick() == nick)
-		return ; //idk if this should be an error or not
+		return ;
 	if (nick == "Gollum")
 	{
 		Server::sendAnswer(socket, client.getNick(), ERR_ERRONEUSNICKNAME, nick + " :Nickname reserved.", serverSettings.debug);

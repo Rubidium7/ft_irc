@@ -13,6 +13,7 @@
 # define CHANNELLEN 20
 # define PARTLEN 200
 # define PRIVMSGLEN 200
+# define JOINLEN 200
 # define MAX_AMOUNT_CLIENTS  5
 # define MAX_AMOUNT_CHANNELS 5
 # define MSG_SIZE 512

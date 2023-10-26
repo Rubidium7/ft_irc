@@ -10,12 +10,12 @@ void	Invite::inviteCommand(int socket, Client &client,
 	std::vector<std::string>::size_type	i;
 	int target_socket;
 
-	for (i = 0; i < serverSettings.channels.size(); i++)
+	for (i = 0; i < serverSettings.channels.size(); i++) //find the right channel
 	{
 		if (serverSettings.channels.at(i).getChannelName() == args.at(2))
 			break ;
 	}
-	if (i == serverSettings.channels.size())
+	if (i == serverSettings.channels.size()) //for some reason protocol doesn't define any errors when the channel doesn't exist
 		return ;
 	if (!serverSettings.channels.at(i).isOnChannel(socket))
 	{

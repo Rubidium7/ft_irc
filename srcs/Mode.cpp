@@ -60,7 +60,7 @@ void	Mode::modeCommand(int socket, Client &client,
 	std::vector<std::string>::size_type	i;
 	std::string	mode_arg;
 
-	if (args.at(1) == client.getNick())
+	if (args.at(1) == client.getNick()) //if a request for a user mode is sent, it is simply ignored since it's out of this project's scope
 		return ;
 	for (i = 0; i < serverSettings.channels.size(); i++)
 	{
@@ -112,7 +112,7 @@ void	Mode::modeCommand(int socket, Client &client,
 				serverSettings.channels.at(i).removeOps(target_socket);
 			return ;
 		case L:
-			serverSettings.channels.at(i).setUserLimit(atoi(args.at(3).c_str()));
+			serverSettings.channels.at(i).setUserLimit(atoi(args.at(3).c_str())); //parser already checks that the argument is a simple number, so you can trust atoi here
 			mode_arg = args.at(3);
 			break ;
 		case L_OFF:

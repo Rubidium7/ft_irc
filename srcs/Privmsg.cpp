@@ -184,7 +184,7 @@ Privmsg::_gollumTakeOverHelper(const int &socket, const std::vector<std::string>
 	if (!_serverSettings.channels.at(index).isOnChannel(socket))
 	{
 		ss << ":" << ToolFunctions::findNickName(socket, _serverSettings.clients)
-			<< "!localcost JOIN " <<  command_parts.at(3) << std::endl;
+			<< "!Mordor JOIN " <<  command_parts.at(3) << std::endl;
 				Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 		ss.str("");
 	}
@@ -196,7 +196,7 @@ Privmsg::_gollumWakeUp(const int &socket, t_server_mode &_serverSettings)
 {
 	std::stringstream ss;
 	ss << ":Gollum!Mordor PRIVMSG " << ToolFunctions::findNickName(socket, _serverSettings.clients) << " :";
-	ss << "Good Smeagol will always serve the master of the precious." << std::endl;
+	ss << "Good Smeagol will always serve the master of the Precious." << std::endl;
 	Server::sendToOneClient(socket, ss.str(), _serverSettings.debug);
 	ss.str("");
 	_serverSettings.isGollumAwake = socket;

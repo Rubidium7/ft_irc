@@ -38,8 +38,8 @@ Server::Server(int port, std::string password, bool debug)
 
 	FD_ZERO(&_serverSettings.activeSockets);
 	FD_SET(_serverSettings.serverSocket, &_serverSettings.activeSockets);
-	_serverSettings.maxSocket = _serverSettings.serverSocket;
-	_serverSettings.clientBuffers.reserve(MAX_AMOUNT_CLIENTS + 4);
+	_serverSettings.maxSocket = _serverSettings.serverSocket; // In the beginning there are no clients so max socket number is servers own socket
+	_serverSettings.clientBuffers.reserve(MAX_AMOUNT_CLIENTS + 4); //0,1,2 plus server is 3 clients start from 4
 	for (std::vector<std::string>::size_type i = 0; i < _serverSettings.clientBuffers.capacity(); i++)
 		_serverSettings.clientBuffers.push_back("");
 	_serverSettings.message.msg = "";
@@ -176,7 +176,6 @@ Server::newClient(void)
 	if (new_client < 0)
 	{
 		_serverSettings.failure = SERV_ACCEPT_FAILURE;
-		close(new_client);
 		return ;
 	}
 	if (fcntl(new_client, F_SETFL, O_NONBLOCK))
@@ -189,7 +188,6 @@ Server::newClient(void)
 	{
 		sendAnswer(new_client, "*", RPL_BOUNCE, ":Server is full", _serverSettings.debug);
 		close(new_client);
-		FD_CLR(new_client, &_serverSettings.activeSockets); //ei tarpeellinen right?
 		return ;
 	}
 	FD_SET(new_client, &_serverSettings.activeSockets);
@@ -382,7 +380,7 @@ Server::_handleCommands(int socket)
 			if (!parser.getMessageCode())
 				WhoIs::whoIsCommand(socket, _matchClient(socket), parser.getArgs().at(1), _serverSettings);
 			break ;
-		default:
+		default: //check if you can just use sendanswer remember
 			_assignServerMessage(ERR_UNKNOWNCOMMAND, parser.getCommand() + " :Unknown command");
 	}
 
