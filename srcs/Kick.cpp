@@ -38,18 +38,6 @@ Kick::kickCommand(	int				socket,
 	}
 }
 
-int // Remember to remove and use tool function for this
-Kick::_returnClientSocket(	std::string		nick,
-							t_server_mode	&_serverSettings)
-{
-	for (int i = 0; i < MAX_AMOUNT_CLIENTS; ++i)
-	{
-		if (_serverSettings.clients[i].getNick() == nick)
-			return (_serverSettings.clients[i].getSocket());
-	}
-	return (0);
-}
-
 void
 Kick::_printDoesChannelExistError(	const t_kickcmd_data 				&data,
 									std::vector<std::string>::size_type &j,
@@ -104,7 +92,7 @@ Kick::_kickUserFromChannel(	const t_kickcmd_data				&data,
 	_serverSettings.channels.at(i).sendToAllChannelMembers(ss.str(), _serverSettings.debug);
 
 	ss.str(""); // Actual removal of user from channel
-	_serverSettings.channels.at(i).partFromChannel(_returnClientSocket(data.temp_users.at(k), _serverSettings));
+	_serverSettings.channels.at(i).partFromChannel(ToolFunctions::findSocketForClientFromName(data.temp_users.at(k), _serverSettings.clients));
 	_serverSettings.channels.at(i).setNewOpIfNoOp();
 	if (_serverSettings.channels.at(i).howManyMembersOnChannel() == 0)
 		_serverSettings.channels.erase(_serverSettings.channels.begin() + i--);
@@ -123,7 +111,7 @@ Kick::_goThroughTempUsersLoopHelper(const t_kickcmd_data 				&data,
 			_printDoesChannelExistError(data, j, _serverSettings);
 			return ;
 		}
-		if (!_serverSettings.channels.at(i).isOnChannel(_returnClientSocket(data.temp_users.at(temp_user_index), _serverSettings))) // User not in channel
+		if (!_serverSettings.channels.at(i).isOnChannel(ToolFunctions::findSocketForClientFromName(data.temp_users.at(temp_user_index), _serverSettings.clients))) // User not in channel
 		{
 			_printUserIsNotOnThatChannelError(data, j, _serverSettings);
 			continue ;
