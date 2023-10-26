@@ -7,6 +7,10 @@
 # include <vector>
 # include <string>
 
+# define NICKLEN 12
+# define TOPICLEN 200
+# define KICKLEN 200
+# define CHANNELLEN 20
 # define MAX_AMOUNT_CLIENTS  5
 # define MAX_AMOUNT_CHANNELS 5
 # define MSG_SIZE 512

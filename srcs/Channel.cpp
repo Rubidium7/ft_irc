@@ -191,7 +191,7 @@ Channel::sendToAllChannelMembers(const std::string msg, bool debug)
 		if (_channelSettings.channelMembers.at(i) != 0)
 		{
 			if (debug)
-				std::cout << buffer; //debug
+				std::cout << message.str().c_str(); //debug
 			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
 		}
 	}
@@ -212,7 +212,7 @@ Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::strin
 		if (_channelSettings.channelMembers.at(i) != 0 && socket != _channelSettings.channelMembers.at(i))
 		{
 			if (debug)
-				std::cerr << buffer; //debug
+				std::cout << buffer; //debug
 			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
 		}
 	}

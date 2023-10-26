@@ -323,7 +323,7 @@ Server::_newUserMessage(int socket,
 	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
 	msg.clear();
 	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=12";
-	msg += " TOPICLEN=255 KICKLEN=255 CHANNELLEN=50 CHANMODES=k,l,i,t";
+	msg += " TOPICLEN=200 KICKLEN=200 CHANNELLEN=20 CHANMODES=k,l,i,t";
 	msg += " :are supported by this server";
 	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
 	msg.clear();
