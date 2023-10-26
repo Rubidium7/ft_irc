@@ -107,7 +107,7 @@ void
 Server::_sendMessageFromStruct(int socket, t_message message)
 {
 	if (_serverSettings.debug)
-		std::cerr << message.msg << std::endl; //debug
+		std::cout << message.msg << std::endl; //debug
 	sendAnswer(socket, _matchClient(socket).getNick(), message.code, message.msg, _serverSettings.debug);
 }
 
@@ -143,7 +143,7 @@ Server::sendAnswer(int socket, std::string nick, t_code code, std::string msg, b
 	buffer = tempMessage.c_str();
 	size = tempMessage.size();
 	if (debug)
-		std::cerr << buffer; //debug
+		std::cout << buffer; //debug
 	send(socket, buffer, size, 0);
 	buffer = NULL;
 }
@@ -162,7 +162,7 @@ Server::sendToOneClient(int socket, std::string msg, bool debug)
 	buffer = tempMessage.c_str();
 	size = tempMessage.size();
 	if (debug)
-		std::cerr << buffer; //debug
+		std::cout << buffer; //debug
 	send(socket, buffer, size, 0);
 }
 
@@ -176,19 +176,20 @@ Server::newClient(void)
 	if (new_client < 0)
 	{
 		_serverSettings.failure = SERV_ACCEPT_FAILURE;
+		close(new_client);
 		return ;
 	}
 	if (fcntl(new_client, F_SETFL, O_NONBLOCK))
 	{
 		_serverSettings.failure = SERV_FCNTL_FAILURE;
+		close(new_client);
 		return ;
 	}
 	if (_clientIndex >= MAX_AMOUNT_CLIENTS)
 	{
-		print_error(TOO_MANY_CLIENTS);
 		sendAnswer(new_client, "*", RPL_BOUNCE, ":Server is full", _serverSettings.debug);
 		close(new_client);
-		FD_CLR(new_client, &_serverSettings.activeSockets);
+		FD_CLR(new_client, &_serverSettings.activeSockets); //ei tarpeellinen right?
 		return ;
 	}
 	FD_SET(new_client, &_serverSettings.activeSockets);
@@ -258,96 +259,6 @@ Server::_findSmallestFreeClientIndex(void) const
 		}
 	}
 	return (MAX_AMOUNT_CLIENTS);
-}
-
-void
-Server::_messageOfTheDay(	int socket,
-							std::string &nick)
-{
-	std::string	msg;
-
-	msg = ":- " + _hostName;
-	msg += " Message of the Day -";
-	sendAnswer(socket, nick, RPL_MOTDSTART, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":Hello this is the server woo";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ": █     █░▓█████  ██▓     ▄████▄   ▒█████   ███▄ ▄███▓▓█████    ";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":▓█░ █ ░█░▓█   ▀ ▓██▒    ▒██▀ ▀█  ▒██▒  ██▒▓██▒▀█▀ ██▒▓█   ▀    ";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":▒█░ █ ░█ ▒███   ▒██░    ▒▓█    ▄ ▒██░  ██▒▓██    ▓██░▒███      ";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":░█░ █ ░█ ▒▓█  ▄ ▒██░    ▒▓▓▄ ▄██▒▒██   ██░▒██    ▒██ ▒▓█  ▄    ";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":░░██▒██▓ ░▒████▒░██████▒▒ ▓███▀ ░░ ████▓▒░▒██▒   ░██▒░▒████▒   ";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":░ ▓░▒ ▒  ░░ ▒░ ░░ ▒░▓  ░░ ░▒ ▒  ░░ ▒░▒░▒░ ░ ▒░   ░  ░░░ ▒░ ░   ";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":  ▒ ░ ░   ░ ░  ░░ ░ ▒  ░  ░  ▒     ░ ▒ ▒░ ░  ░      ░ ░ ░  ░   ";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":  ░   ░     ░     ░ ░   ░        ░ ░ ░ ▒  ░      ░      ░      ";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":    ░       ░  ░    ░  ░░ ░          ░ ░         ░      ░  ░";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":                        ░                                      ";
-	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
-	msg.clear();
-	sendAnswer(socket, nick, RPL_ENDOFMOTD, ":End of MOTD command.", _serverSettings.debug);
-}
-
-void
-Server::_newUserMessage(int socket,
-						Client &client)
-{
-	std::string	msg;
-	std::string	nick;
-	std::string len;
-	std::stringstream transform;
-
-	nick = client.getNick();
-	msg  = ":Welcome to the server ";
-	msg += USER_ID(nick, client.getUserName());
-	sendAnswer(socket, nick, RPL_WELCOME, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":Your host is " + _hostName;
-	msg += ", running version v0.1";
-	sendAnswer(socket, nick, RPL_YOURHOST, msg, _serverSettings.debug);
-	msg.clear();
-	msg = ":This server was created 17/08/2023 13:53:54"; //just made it up :p // ;)
-	sendAnswer(socket, nick, RPL_CREATED, msg, _serverSettings.debug);
-	msg.clear();
-	msg = _hostName + " v0.1 o iklot";
-	//<server_name> <version> <usermodes> <chanmodes> // Selittaako tama jotain vai voiko poistaa?
-	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
-	msg.clear();
-	transform << NICKLEN << " ";
-	transform << TOPICLEN << " ";
-	transform << KICKLEN << " ";
-	transform << CHANNELLEN;
-	transform >> len;
-	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=" + len;
-	transform >> len;
-	msg += " TOPICLEN=" + len;
-	transform >> len;
-	msg += " KICKLEN=" + len;
-	transform >> len;
-	msg += " CHANNELLEN=" + len + " CHANMODES=k,l,i,t";
-	msg += " :are supported by this server";
-	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
-	msg.clear();
-	//much more info can be added to 005 msg ^^^	// Viela tarpeellinen?
-	_messageOfTheDay(socket, nick);
 }
 
 bool
@@ -506,6 +417,8 @@ Server::_returnFirstPartOfCommand(std::string command) const
 	std::string first_part;
 
 	ss >> first_part;
+	for (size_t i = 0; i != first_part.size(); i++)
+		first_part.at(i) = toupper(first_part.at(i));
 	for (int i = 0; i < 14; i++)
 	{
 		if (commands[i].first_part == first_part)
@@ -539,4 +452,92 @@ void
 Server::_handlePing(int socket)
 {
 	sendToOneClient(socket, ":" + _hostName + " PONG " + _hostName + " :" + _hostName + "\r\n", _serverSettings.debug);
+}
+
+void
+Server::_messageOfTheDay(	int socket,
+							std::string &nick)
+{
+	std::string	msg;
+
+	msg = ":- " + _hostName;
+	msg += " Message of the Day -";
+	sendAnswer(socket, nick, RPL_MOTDSTART, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":Hello this is the server woo";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ": █     █░▓█████  ██▓     ▄████▄   ▒█████   ███▄ ▄███▓▓█████    ";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":▓█░ █ ░█░▓█   ▀ ▓██▒    ▒██▀ ▀█  ▒██▒  ██▒▓██▒▀█▀ ██▒▓█   ▀    ";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":▒█░ █ ░█ ▒███   ▒██░    ▒▓█    ▄ ▒██░  ██▒▓██    ▓██░▒███      ";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":░█░ █ ░█ ▒▓█  ▄ ▒██░    ▒▓▓▄ ▄██▒▒██   ██░▒██    ▒██ ▒▓█  ▄    ";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":░░██▒██▓ ░▒████▒░██████▒▒ ▓███▀ ░░ ████▓▒░▒██▒   ░██▒░▒████▒   ";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":░ ▓░▒ ▒  ░░ ▒░ ░░ ▒░▓  ░░ ░▒ ▒  ░░ ▒░▒░▒░ ░ ▒░   ░  ░░░ ▒░ ░   ";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":  ▒ ░ ░   ░ ░  ░░ ░ ▒  ░  ░  ▒     ░ ▒ ▒░ ░  ░      ░ ░ ░  ░   ";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":  ░   ░     ░     ░ ░   ░        ░ ░ ░ ▒  ░      ░      ░      ";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":    ░       ░  ░    ░  ░░ ░          ░ ░         ░      ░  ░";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":                        ░                                      ";
+	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
+	msg.clear();
+	sendAnswer(socket, nick, RPL_ENDOFMOTD, ":End of MOTD command.", _serverSettings.debug);
+}
+
+void
+Server::_newUserMessage(int socket,
+						Client &client)
+{
+	std::string	msg;
+	std::string	nick;
+	std::string len;
+	std::stringstream transform;
+
+	nick = client.getNick();
+	msg  = ":Welcome to the server ";
+	msg += nick + "!" + client.getUserName() + "@" + client.getHostName();
+	sendAnswer(socket, nick, RPL_WELCOME, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":Your host is " + _hostName;
+	msg += ", running version v0.1";
+	sendAnswer(socket, nick, RPL_YOURHOST, msg, _serverSettings.debug);
+	msg.clear();
+	msg = ":This server was created 17/08/2023 13:53:54";
+	sendAnswer(socket, nick, RPL_CREATED, msg, _serverSettings.debug);
+	msg.clear();
+	msg = _hostName + " v0.1 o iklot";
+	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
+	msg.clear();
+	transform << NICKLEN << " ";
+	transform << TOPICLEN << " ";
+	transform << KICKLEN << " ";
+	transform << CHANNELLEN;
+	transform >> len;
+	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=" + len;
+	transform >> len;
+	msg += " TOPICLEN=" + len;
+	transform >> len;
+	msg += " KICKLEN=" + len;
+	transform >> len;
+	msg += " CHANNELLEN=" + len + " CHANMODES=k,l,i,t";
+	msg += " :are supported by this server";
+	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
+	msg.clear();
+	_messageOfTheDay(socket, nick);
 }
