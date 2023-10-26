@@ -312,6 +312,8 @@ Server::_newUserMessage(int socket,
 {
 	std::string	msg;
 	std::string	nick;
+	std::string len;
+	std::stringstream transform;
 
 	nick = client.getNick();
 	msg  = ":Welcome to the server ";
@@ -329,8 +331,18 @@ Server::_newUserMessage(int socket,
 	//<server_name> <version> <usermodes> <chanmodes> // Selittaako tama jotain vai voiko poistaa?
 	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
 	msg.clear();
-	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=12";
-	msg += " TOPICLEN=200 KICKLEN=200 CHANNELLEN=20 CHANMODES=k,l,i,t";
+	transform << NICKLEN << " ";
+	transform << TOPICLEN << " ";
+	transform << KICKLEN << " ";
+	transform << CHANNELLEN;
+	transform >> len;
+	msg = "RFC2812 PREFIX=(o)@ CHANTYPES=#+ MODES=1 CHANLIMIT=#+:42 NICKLEN=" + len;
+	transform >> len;
+	msg += " TOPICLEN=" + len;
+	transform >> len;
+	msg += " KICKLEN=" + len;
+	transform >> len;
+	msg += " CHANNELLEN=" + len + " CHANMODES=k,l,i,t";
 	msg += " :are supported by this server";
 	sendAnswer(socket, nick, RPL_MYINFO, msg, _serverSettings.debug);
 	msg.clear();
