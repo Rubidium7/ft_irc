@@ -263,7 +263,7 @@ Server::_messageOfTheDay(	int socket,
 	msg += " Message of the Day -";
 	sendAnswer(socket, nick, RPL_MOTDSTART, msg, _serverSettings.debug);
 	msg.clear();
-	msg = "Hello this is the server woo";
+	msg = ":Hello this is the server woo";
 	sendAnswer(socket, nick, RPL_MOTD, msg, _serverSettings.debug);
 	msg.clear();
 	msg = ": █     █░▓█████  ██▓     ▄████▄   ▒█████   ███▄ ▄███▓▓█████    ";
