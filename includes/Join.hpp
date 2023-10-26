@@ -30,7 +30,7 @@ class Join
 			t_server_mode &_serverSettings);
 		static void _keyMatchesHelper(const int &socket, const std::string &full_command,
 			const std::vector<Channel>::size_type &k, t_server_mode	&_serverSettings);
-		static void _keyDoesNotMatchHelper(const int &socket, const std::vector<Channel>::size_type	&k,
+		static void _keyDoesNotMatchErrorHelper(const int &socket, const std::vector<Channel>::size_type	&k,
 		t_server_mode &_serverSettings);
 		static void _clientDoesNotProvideKeyErrorHelper(const int &socket, const std::vector<Channel>::size_type &k,
 			const t_server_mode &_serverSettings);

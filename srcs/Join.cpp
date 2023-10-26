@@ -173,7 +173,7 @@ Join::_keyMatchesHelper(const int 								&socket,
 }
 
 void
-Join::_keyDoesNotMatchHelper(	const int 								&socket,
+Join::_keyDoesNotMatchErrorHelper(	const int 								&socket,
 								const std::vector<Channel>::size_type	&k,
 								t_server_mode							&_serverSettings)
 {
