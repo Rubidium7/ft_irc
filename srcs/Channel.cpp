@@ -179,43 +179,41 @@ Channel::doesKeyMatch(const std::string &key) const
 void
 Channel::sendToAllChannelMembers(const std::string msg, bool debug)
 {
-	std::stringstream		message;
-	const char				*buffer;
-	std::string::size_type	size;
+	char	*buffer = new char[msg.size() + 1];
+	if (buffer == NULL)
+		return;
+	std::strcpy(buffer, msg.c_str());
 
-	message << msg;
-	buffer = message.str().c_str();
-	size = message.str().size();
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
 		if (_channelSettings.channelMembers.at(i) != 0)
 		{
 			if (debug)
-				std::cout << message.str().c_str(); //debug
-			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
+				std::cout << buffer << std::endl; //debug
+			send(_channelSettings.channelMembers.at(i), buffer, msg.size(), 0);
 		}
 	}
+	delete[] buffer;
 }
 
 void
 Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::string msg, bool debug)
 {
-	std::stringstream		message;
-	const char				*buffer;
-	std::string::size_type	size;
+	char	*buffer = new char[msg.size() + 1];
+	if (buffer == NULL)
+		return;
+	std::strcpy(buffer, msg.c_str());
 
-	message << msg;
-	buffer = message.str().c_str();
-	size = message.str().size();
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
 		if (_channelSettings.channelMembers.at(i) != 0 && socket != _channelSettings.channelMembers.at(i))
 		{
 			if (debug)
-				std::cout << buffer; //debug
-			send(_channelSettings.channelMembers.at(i), buffer, size, 0);
+				std::cout << buffer << std::endl; //debug
+			send(_channelSettings.channelMembers.at(i), buffer, msg.size(), 0);
 		}
 	}
+	delete[] buffer;
 }
 
 const std::vector<int>&
