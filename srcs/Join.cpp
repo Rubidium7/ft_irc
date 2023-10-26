@@ -82,10 +82,12 @@ void
 Join::_channelDoesNotExistHelper(	const int 									&socket,
 									const std::string							&full_command,
 									const std::vector<std::string>::size_type	&i,
-									const std::vector<std::string>				&temp_channels,
+									std::vector<std::string>					&temp_channels,
 									const std::vector<std::string>				&temp_keys,
 									t_server_mode 								&_serverSettings)
 {
+	if (temp_channels.at(i).size() > CHANNELLEN)
+		temp_channels.at(i) = temp_channels.at(i).substr(0, CHANNELLEN);
 	try
 	{
 		_serverSettings.channels.push_back(Channel(temp_channels.at(i), socket)); // Create Channel

@@ -99,7 +99,7 @@ Kick::_kickUserFromChannel(	const t_kickcmd_data				&data,
 	ss << " " << data.temp_users.at(k);
 	std::string::size_type position = data.full_command.find(":");
 	if (position != std::string::npos)
-			ss << " " << data.full_command.substr(position);
+			ss << " " << data.full_command.substr(position, KICKLEN);
 	ss << std::endl;
 	_serverSettings.channels.at(i).sendToAllChannelMembers(ss.str(), _serverSettings.debug);
 	ss.str("");

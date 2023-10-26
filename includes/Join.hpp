@@ -21,7 +21,7 @@ class Join
 		static int	_handleSpecialCases(const int &socket, const std::vector<std::string> &command_parts,
 			t_server_mode &_serverSettings);
 		static void _channelDoesNotExistHelper(const int &socket, const std::string &full_command,
-			const std::vector<std::string>::size_type &i, const std::vector<std::string> &temp_channels,
+			const std::vector<std::string>::size_type &i, std::vector<std::string> &temp_channels,
 				const std::vector<std::string> &temp_keys, t_server_mode &_serverSettings);
 		static void _channelDoesNotExistHelper(const int &socket, const std::string &full_command,
 			const std::vector<std::string>::size_type &i, const std::vector<std::string> &temp_channels,
