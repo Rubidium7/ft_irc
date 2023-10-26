@@ -26,7 +26,6 @@ class Kick
 		Kick(Kick &copy_constructor);
 		Kick &operator=(Kick &copy_assignment);
 
-		static int	_returnClientSocket(std::string nick, t_server_mode &_serverSettings);
 		static void _printDoesChannelExistError(const t_kickcmd_data &data,
 			std::vector<std::string>::size_type &j, t_server_mode &_serverSettings);
 		static void _printYoureNotChannelOperatorError(t_kickcmd_data &data,
