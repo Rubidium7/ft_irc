@@ -69,7 +69,7 @@ bool	Parser::_isChannelKeyFormatCorrect(size_t amountOfChannels)
 			_assignParserMessage(ERR_BADCHANNELKEY, keys.at(i) + " :Improper key format");
 			return (false);
 		}
-		if (i == amountOfChannels)
+		if (i == amountOfChannels && amountOfChannels)
 		{
 			_assignParserMessage(ERR_TOOMANYTARGETS, keys.at(i) + " :Too many targets");
 			return (false);
@@ -269,6 +269,8 @@ void	Parser::parseKick()
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Improper kick message format");
 	else if (!_isChannelFormatCorrect(NULL))
 		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
+	else if (!_isChannelKeyFormatCorrect(0))
+		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(2) + " :Improper nick format");
 }
 
 void	Parser::parseTopic()
