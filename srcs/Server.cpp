@@ -229,7 +229,14 @@ Server::receiveMessage(int socket)
 		// Add buffer to clientbuffer
 		for (int i = 0; _serverSettings.buffer[i]; i++)
 		{
-			_serverSettings.clientBuffers.at(socket).push_back(_serverSettings.buffer[i]);
+			try
+			{
+				_serverSettings.clientBuffers.at(socket).push_back(_serverSettings.buffer[i]);
+			}
+			catch(const std::exception& e)
+			{
+				// On purpose do nothing
+			}
 		}
 
 		while (_serverSettings.clientBuffers.at(socket).find(EOM) != std::string::npos)
