@@ -57,7 +57,7 @@ Privmsg::_senderIsOnChannelSenderHelper(const int &socket,
 	if (position != std::string::npos)
 	{
 		ss << " ";
-		ss << full_command.substr(position, MSG_SIZE) << std::endl;
+		ss << full_command.substr(position, PRIVMSGLEN) << std::endl;
 	}else
 		ss << " :" << std::endl;
 	_serverSettings.channels.at(channel_index).sendToAllChannelMembersExceptSocket(socket, ss.str(), _serverSettings.debug);
@@ -241,7 +241,7 @@ Privmsg::_messageTargetIsClientNotGollum(const int &socket, const std::string &f
 	if (position != std::string::npos)
 	{
 		ss << " ";
-		ss << full_command.substr(position, MSG_SIZE) << std::endl;
+		ss << full_command.substr(position, PRIVMSGLEN) << std::endl;
 	}else
 		ss << " :" << std::endl;
 	Server::sendToOneClient(targetSocket, ss.str(), _serverSettings.debug);

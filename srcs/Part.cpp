@@ -52,24 +52,6 @@ Part::partFromAllChannels(	int 			socket,
 	}
 }
 
-std::string
-Part::_returnLastPartOfString(	int			begin,
-								std::string full_command)
-{
-	std::string temp;
-	std::string last_part;
-	std::istringstream ss(full_command);
-
-	for (int i = 0; i < begin; ++i)
-	{
-		ss >> temp;
-	}
-
-	ss >> std::ws; // Skip leading whitespace
-	std::getline(ss, last_part);
-	return (last_part);
-}
-
 void
 Part::_partCommandClientOnChannelHelper(const int 						&socket,
 										const std::string 				full_command,
@@ -86,7 +68,7 @@ Part::_partCommandClientOnChannelHelper(const int 						&socket,
 	else
 	{
 		ss << " ";
-		ss << full_command.substr(position)  << std::endl;
+		ss << full_command.substr(position, PARTLEN)  << std::endl;
 	}
 	_serverSettings.channels.at(k).sendToAllChannelMembers(ss.str(), _serverSettings.debug);
 	_serverSettings.channels.at(k).partFromChannel(socket);
