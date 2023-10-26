@@ -57,7 +57,7 @@ Privmsg::_senderIsOnChannelSenderHelper(const int &socket,
 	if (position != std::string::npos)
 	{
 		ss << " ";
-		ss << full_command.substr(position) << std::endl;
+		ss << full_command.substr(position, MSG_SIZE) << std::endl;
 	}else
 		ss << " :" << std::endl;
 	_serverSettings.channels.at(channel_index).sendToAllChannelMembersExceptSocket(socket, ss.str(), _serverSettings.debug);
@@ -65,7 +65,7 @@ Privmsg::_senderIsOnChannelSenderHelper(const int &socket,
 }
 
 void
-Privmsg::_senderNotOnChannelSenderHelper(	const int &socket,
+Privmsg::_senderNotOnChannelSenderErrorHelper(	const int &socket,
 											const std::vector<std::string> &command_parts,
 											const t_server_mode &_serverSettings)
 {
@@ -212,7 +212,7 @@ Privmsg::_messageTargetIsChannel(const int &socket, const std::string &full_comm
 			if (_serverSettings.channels.at(channel_index).isOnChannel(socket)) // Sender on channel
 				_senderIsOnChannelSenderHelper(socket, command_parts, channel_index, full_command, _serverSettings);
 			else // Sender not on channel
-				_senderNotOnChannelSenderHelper(socket, command_parts, _serverSettings);
+				_senderNotOnChannelSenderErrorHelper(socket, command_parts, _serverSettings);
 			return ;
 		}
 	}
@@ -241,7 +241,7 @@ Privmsg::_messageTargetIsClientNotGollum(const int &socket, const std::string &f
 	if (position != std::string::npos)
 	{
 		ss << " ";
-		ss << full_command.substr(position) << std::endl;
+		ss << full_command.substr(position, MSG_SIZE) << std::endl;
 	}else
 		ss << " :" << std::endl;
 	Server::sendToOneClient(targetSocket, ss.str(), _serverSettings.debug);

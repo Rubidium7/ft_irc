@@ -21,7 +21,7 @@ class Privmsg
 			t_server_mode &_serverSettings);
 		static void _senderIsOnChannelSenderHelper(const int &socket, const std::vector<std::string> &command_parts,
 			const int channel_index, const std::string &full_command, t_server_mode &_serverSettings);
-		static void _senderNotOnChannelSenderHelper(const int &socket,
+		static void _senderNotOnChannelSenderErrorHelper(const int &socket,
 			const std::vector<std::string> &command_parts, const t_server_mode &_serverSettings);
 		static void _handleGollum(const int &socket, const std::vector<std::string> &command_parts,
 			t_server_mode &_serverSettings);
