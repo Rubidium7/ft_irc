@@ -24,7 +24,7 @@ typedef struct s_server_mode
 	fd_set						activeSockets;
 	fd_set						readySockets;
 	int							maxSocket;
-	char						buffer[MSG_SIZE]; //temporary solution // Is it stil a temporary solution? STILL NEEDED?
+	char						buffer[MSG_SIZE];
 	std::vector<std::string>	clientBuffers;
 	int							isGollumAwake;
 }	t_server_mode;
@@ -51,6 +51,7 @@ class Server
 		Server(const Server &src);
 		Server	&operator=(const Server &rhs);
 
+		void			_addToClientBuffer(int socket);
 		void			_sendMessageFromStruct(int socket, t_message message);
 		Client			&_matchClient(int socket);
 		int				_findSmallestFreeClientIndex() const;

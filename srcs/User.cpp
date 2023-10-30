@@ -52,6 +52,9 @@ void	User::userCommand(int socket, Client &client, std::vector<std::string> args
 {
 	if (!client.getUserName().empty())
 	{
+		std::cout << client.getUserName() << std::endl;
+		if (client.getUserName().empty())
+			std::cout << "is empty" << std::endl;
 		Server::sendAnswer(socket, client.getNick(), ERR_ALREADYREGISTERED, ":Unauthorized command (already registered)", debug);
 		return ;
 	}

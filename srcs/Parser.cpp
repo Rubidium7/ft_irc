@@ -127,7 +127,7 @@ bool	Parser::_onlyNumeric(std::string input)
 {
 	for (size_t i = 0; i != input.size(); i++)
 	{
-		if (!isdigit(input[i]))
+		if (!isdigit(input.at(i)))
 			return (false);
 	}
 	return (true);
@@ -153,7 +153,7 @@ void	Parser::parseCap()
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
 	else if (_args.size() > 3)
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(3) + " :Too many targets");
-	else if (_args.at(2) != "302") //we can choose something else to do here as well
+	else if (_args.at(2) != "302")
 		_assignParserMessage(ERR_INVALIDCAPCMD, _args.at(2) + " :Cap version unsupported");
 }
 
@@ -171,12 +171,10 @@ void	Parser::parseJoin()
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(3) + " :Too many targets");
 		return ;
 	}
-	if (_args.at(1).at(0) == ':' || _args.at(1).at(0) == '0')
+	if (_args.at(1) == ":" || _args.at(1) == "0")
 	{
 		if (_args.size() != 2)
 			_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(2) + " :Too many targets");
-		else if (_args.at(1).size() != 1)
-			_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :No such channel");
 		return ;
 	}
 	if (!_isChannelFormatCorrect(&amountOfChannels))
@@ -199,7 +197,7 @@ void	Parser::parseInvite()
 	}
 	if (_args.at(2).front() != '#' || _args.at(2).size() < 2)
 	{
-		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
+		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(2) + " :Improper channel format");
 		return ;
 	}
 }
@@ -225,7 +223,7 @@ void	Parser::parseNick()
 	{
 		if (!isalnum(nick.at(i)) && nick.at(i) != '-' && nick.at(i) != '_')
 		{
-			_assignParserMessage(ERR_ERRONEUSNICKNAME, _args.at(i) + " :Erroneous nickname");
+			_assignParserMessage(ERR_ERRONEUSNICKNAME, _args.at(1) + " :Erroneous nickname");
 			return ;
 		}
 	}

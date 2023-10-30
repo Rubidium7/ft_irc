@@ -199,6 +199,34 @@ Server::clientExit(int socket, t_server_mode &_serverSettings, const std::string
 }
 
 void
+Server::_addToClientBuffer(int socket)
+{
+	std::string	store;
+	std::string	new_content(_serverSettings.buffer);
+
+	store = _serverSettings.clientBuffers.at(socket);
+	size_t	size = store.size() + new_content.size();
+	if (size > MSG_SIZE)
+	{
+		if (new_content.size() >= MSG_SIZE)
+		{
+			new_content.erase(0, new_content.size() - MSG_SIZE);
+			_serverSettings.clientBuffers.at(socket).clear();
+			_serverSettings.clientBuffers.at(socket) = new_content;
+		}
+		else
+		{
+			_serverSettings.clientBuffers.at(socket).erase(0, store.size() + new_content.size() - MSG_SIZE);
+			_serverSettings.clientBuffers.at(socket).append(new_content);
+		}
+	}
+	else
+	{
+		_serverSettings.clientBuffers.at(socket).append(new_content);
+	}
+}
+
+void
 Server::receiveMessage(int socket)
 {
 	int	bytes_read = recv(socket, _serverSettings.buffer, MSG_SIZE, 0);
@@ -210,16 +238,13 @@ Server::receiveMessage(int socket)
 	{
 		_serverSettings.buffer[bytes_read] = '\0';
 		// Add buffer to clientbuffer
-		for (int i = 0; _serverSettings.buffer[i]; i++)
+		try
 		{
-			try
-			{
-				_serverSettings.clientBuffers.at(socket).push_back(_serverSettings.buffer[i]);
-			}
-			catch(const std::exception& e)
-			{
-				// On purpose do nothing
-			}
+			_addToClientBuffer(socket);
+		}
+		catch(const std::exception& e)
+		{
+			// On purpose do nothing
 		}
 
 		while (_serverSettings.clientBuffers.at(socket).find(EOM) != std::string::npos)
