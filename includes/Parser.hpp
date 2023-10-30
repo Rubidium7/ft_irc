@@ -38,6 +38,7 @@ class Parser
 		Parser &operator=(const Parser &rhs);
 
 		void						_assignParserMessage(t_code code, std::string msg);
+		bool						_hasWeirdChars(std::string str);
 		bool						_isChannelKeyFormatCorrect(size_t amountOfChannels);
 		bool						_isChannelFormatCorrect(size_t *amountOfChannels);
 		void						_saveArguments(std::string input);

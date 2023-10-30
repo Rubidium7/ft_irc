@@ -13,7 +13,7 @@ class User
 
 	private:
 		static bool			_weirdCharsInRealName(int socket, std::string nick, bool debug, std::vector<std::string> args);
-		static bool			_weirdChars(std::string &name);
+		static bool			_weirdChars(std::string &name, bool is_host);
 		static std::string	_parseRealName(std::vector<std::string> args);
 
 		User();

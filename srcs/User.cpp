@@ -22,14 +22,14 @@ bool	User::_weirdCharsInRealName(int socket, std::string nick, bool debug, std::
 	unsigned int	args_size;
 
 	args_size = args.size();
-	if (_weirdChars(args.at(4).erase(0, 1)))
+	if (_weirdChars(args.at(4).erase(0, 1), false))
 	{
 		Server::sendAnswer(socket, nick, ERR_ERRONEUSNICKNAME, args.at(4) + " :weird characters included", debug);
 		return (true);
 	}
 	for (unsigned int i = 5; i < args_size; i++)
 	{
-		if (_weirdChars(args.at(i)))
+		if (_weirdChars(args.at(i), false))
 		{
 			Server::sendAnswer(socket, nick, ERR_ERRONEUSNICKNAME, args.at(i) + " :weird characters included", debug);
 			return (true);
@@ -38,11 +38,11 @@ bool	User::_weirdCharsInRealName(int socket, std::string nick, bool debug, std::
 	return (false);
 }
 
-bool	User::_weirdChars(std::string &name)
+bool	User::_weirdChars(std::string &name, bool is_host)
 {
 	for (size_t i = 0; i < name.size(); i++)
 	{
-		if (!isalnum(name.at(i)) && name.at(i) != '-' && name.at(i) != '_')
+		if (!isalnum(name.at(i)) && name.at(i) != '-' && name.at(i) != '_' && !(is_host && name.at(i) == '.'))
 			return (true);
 	}
 	return (false);
@@ -59,7 +59,7 @@ void	User::userCommand(int socket, Client &client, std::vector<std::string> args
 	{
 		if (i == 2)
 			continue ;
-		if (_weirdChars(args.at(i)))
+		if (_weirdChars(args.at(i), i == 3))
 		{
 			Server::sendAnswer(socket, client.getNick(), ERR_ERRONEUSNICKNAME, args.at(i) + " :weird characters included", debug);
 			return ;

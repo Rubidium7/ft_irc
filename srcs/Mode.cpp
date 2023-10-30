@@ -119,7 +119,6 @@ void	Mode::modeCommand(int socket, Client &client,
 			serverSettings.channels.at(i).setUserLimit(MAX_AMOUNT_CLIENTS);
 			break ;
 		default:
-			std::cerr << "mode shouldn't get here" << std::endl;
 			return ;
 	}
 	_modeMessage(serverSettings.channels.at(i), USER_ID(client.getNick(), client.getUserName()),

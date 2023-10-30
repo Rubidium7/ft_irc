@@ -38,6 +38,18 @@ void	Parser::_assignParserMessage(t_code code, std::string msg)
 	_message.code = code;
 }
 
+bool	Parser::_hasWeirdChars(std::string str)
+{
+	for (size_t i = 0; i != str.size(); i++)
+	{
+		if (!isalnum(str.at(i)) && str.at(i) != '_' && str.at(i) != '-')
+		{
+			return (true);
+		}
+	}
+	return (false);
+}
+
 std::vector<std::string>	Parser::_createVector(std::string string, char separator)
 {
 	std::vector<std::string>	ans;
@@ -64,7 +76,7 @@ bool	Parser::_isChannelKeyFormatCorrect(size_t amountOfChannels)
 	keys = _createVector(_args.at(2), ',');
 	for (size_t i = 0; i != keys.size(); i++)
 	{
-		if (keys.at(i).empty())
+		if (keys.at(i).empty() || _hasWeirdChars(keys.at(i)))
 		{
 			_assignParserMessage(ERR_BADCHANNELKEY, keys.at(i) + " :Improper key format");
 			return (false);
@@ -90,7 +102,7 @@ bool	Parser::_isChannelFormatCorrect(size_t *amountOfChannels)
 			_assignParserMessage(ERR_NOSUCHCHANNEL, channels.at(i) + " :Improper channel format");
 			return (false);
 		}
-		if (channels.at(i).size() < 2)
+		if (channels.at(i).size() < 2 || _hasWeirdChars(channels.at(i).substr(1, std::string::npos)))
 		{
 			_assignParserMessage(ERR_NOSUCHCHANNEL, channels.at(i) + " :Improper channel format");
 			return (false);
@@ -195,7 +207,7 @@ void	Parser::parseInvite()
 		_assignParserMessage(ERR_TOOMANYTARGETS, _args.at(3) + " :Too many targets");
 		return ;
 	}
-	if (_args.at(2).front() != '#' || _args.at(2).size() < 2)
+	if (_args.at(2).front() != '#' || _args.at(2).size() < 2 || _hasWeirdChars(_args.at(2).substr(1, std::string::npos)))
 	{
 		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(2) + " :Improper channel format");
 		return ;
@@ -231,9 +243,9 @@ void	Parser::parseNick()
 
 void	Parser::parseUser()
 {
-	if (_args.size() < 5 || _args.at(4).size() < 2)
+	if (_args.size() < 5)
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Not enough parameters");
-	else if (_args.at(4).front() != ':')
+	else if (_args.at(4).front() != ':'|| _args.at(4).size() < 2)
 		_assignParserMessage(ERR_NEEDMOREPARAMS, _args.at(0) + " :Incorrect format");
 }
 
@@ -290,7 +302,7 @@ void	Parser::parseMode(std::string nick)
 	}
 	if (_args.at(1) == nick) //if a request for a user mode is sent, it is simply ignored since it's out of this project's scope
 		return ;
-	if (_args.at(1).front() != '#' || _args.at(1).size() < 2)
+	if (_args.at(1).front() != '#' || _args.at(1).size() < 2 || _hasWeirdChars(_args.at(1).substr(1, std::string::npos)))
 	{
 		_assignParserMessage(ERR_NOSUCHCHANNEL, _args.at(1) + " :Improper channel format");
 		return ;
