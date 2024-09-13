@@ -4,6 +4,7 @@
 
 # include <iostream>
 # include <string>
+# include <cstring>
 # include <sstream>
 # include <unistd.h>
 # include <cctype>

@@ -1,4 +1,5 @@
 
+#include <ctime>
 #include "Privmsg.hpp"
 #include "ToolFunctions.hpp"
 

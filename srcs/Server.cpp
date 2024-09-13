@@ -300,7 +300,7 @@ Server::_handleCommands(int socket)
 
 	int newline_pos = _serverSettings.clientBuffers.at(socket).find(EOM);
 	std::string full_command = _serverSettings.clientBuffers.at(socket).substr(0, newline_pos);
-	if (EOM == "\n")
+	if (!strcmp(EOM, "\n"))
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 1);
 	else
 		_serverSettings.clientBuffers.at(socket) = _serverSettings.clientBuffers.at(socket).substr(newline_pos + 2);

@@ -13,7 +13,7 @@ NAME = ircserv
 C = c++
 
 #compilation flags
-FLAGS = -std=c++98 -Wall -Wextra -Werror -I includes -g
+FLAGS = -Wall -Wextra -Werror -I includes -g
 
 OBJS_DIR = obj/
 SRCS_DIR = srcs/

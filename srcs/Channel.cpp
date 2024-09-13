@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cstring>
 #include "defines.hpp"
 #include "Channel.hpp"
 
@@ -182,7 +183,7 @@ Channel::sendToAllChannelMembers(const std::string msg, bool debug)
 	char	*buffer = new char[msg.size() + 1];
 	if (buffer == NULL)
 		return;
-	std::strcpy(buffer, msg.c_str());
+	strcpy(buffer, msg.c_str());
 
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
@@ -208,7 +209,7 @@ Channel::sendToAllChannelMembersExceptSocket(const int &socket, const std::strin
 	char	*buffer = new char[msg.size() + 1];
 	if (buffer == NULL)
 		return;
-	std::strcpy(buffer, msg.c_str());
+	strcpy(buffer, msg.c_str());
 
 	for (std::vector<int>::size_type i = 0; i < _channelSettings.channelMembers.size(); ++i)
 	{
