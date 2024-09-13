@@ -40,7 +40,7 @@ Do note that it was originally made for a unix system, so your mileage may vary 
 
 ### Prerequisites
 
-As this program is coded in c++ you'll need a c++ compiler
+As this program is coded in c++ you'll need a c++ compiler.
 The server was made to work with irssi so that's the client I recommend to install
 
 ### How to run it
