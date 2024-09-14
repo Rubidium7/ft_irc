@@ -30,7 +30,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About the project
 
-![product-screenshot](./screenshots/connect.PNG)
+![connect.PNG](./screenshots/connect.PNG)
 
 This is an irc server implemented in C++. Supports at least the basic irc server functionalities such as authentication, joining channels, topics, sending files etc. 
 This server was designed to work with irssi, so for the best experience use that client.
@@ -69,19 +69,19 @@ if you run something like
 
 you can connect to it like so from irssi:
 
-![product-screenshot](./screenshots/irssi_connect.PNG)
+![irssi_connect.PNG](./screenshots/irssi_connect.PNG)
 
 to join a channel just:
 
-![product-screenshot](./screenshots/irssi_join.PNG)
+![irssi_join.PNG](./screenshots/irssi_join.PNG)
 
 then just message away:
 
-![product-screenshot](./screenshots/irssi_messaging.PNG)
+![irssi_messaging.PNG](./screenshots/irssi_messaging.PNG)
 
-![product-screenshot](./screenshots/messaging.PNG)
+![messaging.PNG](./screenshots/messaging.PNG)
 
-_for more info on irssi usage you can check out [the irssi documentation](https://irssi.org/documentation/help/)_
+for more info on irssi usage you can check out [irssi documentation](https://irssi.org/documentation/help/)
 
 ### Supported commands
 - Join
